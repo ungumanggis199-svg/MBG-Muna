@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Monitoring MBG – Kejaksaan Negeri Muna</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════ RESET & VARS ═══════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --bg:#0c2016;--bg2:#112a1c;--bg3:#163622;--bg4:#1b4029;
+  --border:#28543a;--border2:rgba(40,84,58,0.5);
+  --gold:#c8a84b;--gold2:#e0c472;--gold-d:rgba(200,168,75,0.15);
+  --green:#1e7a45;--green2:#249950;--green3:#2db55e;
+  --white:#fff;--txt:#b8cfc0;--dim:#6d9a80;
+  --red:#ef4444;--yellow:#f59e0b;
+  --r8:8px;--r12:12px;--r16:16px;--r20:20px;
+  --shadow:0 8px 32px rgba(0,0,0,.5);
+  --font:'Plus Jakarta Sans',sans-serif;
+  --body:'Inter',sans-serif;
+}
+body{font-family:var(--body);background:var(--bg);color:var(--white);min-height:100vh;overflow-x:hidden}
+
+/* ═══════════════ SCREENS ════════════════════════════ */
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex;flex-direction:column}
+
+/* ═══════════════ LANDING ════════════════════════════ */
+#screen-landing{
+  background:linear-gradient(150deg,#0a1d10 0%,#0e2818 40%,#112e1c 100%);
+}
+
+/* Navbar landing */
+.ln-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 40px;
+  background:rgba(10,28,16,0.9);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(200,168,75,0.2);
+  position:sticky;top:0;z-index:100;
+}
+.ln-brand{display:flex;align-items:center;gap:12px}
+.ln-logo svg{display:block}
+.ln-name{display:flex;flex-direction:column}
+.ln-n1{font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:.04em}
+.ln-n2{font-size:11px;color:var(--dim)}
+.btn-login-top{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--font);font-size:13px;font-weight:600;
+  color:var(--gold);border:1.5px solid var(--gold);
+  border-radius:var(--r8);padding:8px 20px;
+  background:var(--gold-d);cursor:pointer;
+  text-decoration:none;transition:background .2s;
+}
+.btn-login-top:hover{background:rgba(200,168,75,.25)}
+
+/* Main 2-col */
+.ln-main{
+  display:grid;grid-template-columns:1fr 340px;
+  gap:0;flex:1;
+  max-width:1360px;width:100%;margin:0 auto;
+  padding:40px 40px 40px 40px;
+}
+.ln-left{display:flex;flex-direction:column;padding-right:36px}
+.ln-right{display:flex;flex-direction:column;gap:18px}
+
+/* Hero text */
+.hero-main{font-family:var(--font);font-size:clamp(30px,3.5vw,52px);font-weight:800;line-height:1.1;margin-bottom:10px;text-shadow:0 2px 20px rgba(0,0,0,.4)}
+.hero-sub{font-family:var(--font);font-size:clamp(13px,1.5vw,18px);font-weight:600;color:var(--gold);margin-bottom:14px}
+.hero-desc{font-size:14px;color:var(--txt);line-height:1.7;max-width:480px;margin-bottom:20px}
+.hero-line{width:48px;height:3px;background:var(--gold);border-radius:2px;opacity:.7;margin-bottom:32px}
+
+/* Menu cards */
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
+.mc{
+  background:rgba(22,54,34,.85);border:1px solid var(--border);
+  border-radius:var(--r16);padding:22px 20px 18px;
+  display:flex;flex-direction:column;gap:12px;
+  backdrop-filter:blur(6px);
+  transition:border-color .2s,transform .15s,box-shadow .2s;
+  position:relative;overflow:hidden;
+}
+.mc:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.35)}
+.mc-ico{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#1e7a45,#2c9d5c);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mc-h{font-family:var(--font);font-size:15px;font-weight:700;margin-bottom:6px}
+.mc-p{font-size:12.5px;color:var(--txt);line-height:1.6}
+.mc-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--font);font-size:13px;font-weight:600;
+  color:var(--gold);border:1.5px solid var(--gold);
+  border-radius:var(--r8);padding:8px 16px;
+  text-decoration:none;width:fit-content;
+  transition:background .2s;cursor:pointer;background:transparent;
+}
+.mc-btn:hover{background:var(--gold-d)}
+
+/* Stats bar */
+.stats-bar{
+  background:rgba(22,54,34,.75);border:1px solid var(--border);
+  border-radius:var(--r16);padding:18px 20px;backdrop-filter:blur(8px);
+}
+.sb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(200,168,75,.2)}
+.sb-lbl{font-family:var(--font);font-size:13px;font-weight:700;color:var(--gold)}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.si{display:flex;align-items:flex-start;gap:9px}
+.si-ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ic-b{background:rgba(59,130,246,.2);color:#60a5fa}
+.ic-g{background:rgba(200,168,75,.2);color:var(--gold)}
+.ic-gr{background:rgba(34,197,94,.2);color:#4ade80}
+.ic-t{background:rgba(20,184,166,.2);color:#2dd4bf}
+.si-lbl{font-size:11px;color:var(--dim);font-weight:500;line-height:1.3;margin-bottom:2px}
+.si-val{font-family:var(--font);font-size:24px;font-weight:800;line-height:1;margin-bottom:1px}
+.si-unit{font-size:11px;color:var(--txt)}
+.si-upd{font-size:10px;color:var(--dim);margin-top:3px}
+
+/* Login card right */
+.login-card{
+  background:rgba(22,54,34,.92);border:1px solid rgba(200,168,75,.3);
+  border-radius:var(--r20);padding:28px 24px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;
+}
+.lc-avatar{width:66px;height:66px;border-radius:50%;background:rgba(200,168,75,.12);border:2px solid rgba(200,168,75,.4);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.lc-title{font-family:var(--font);font-size:20px;font-weight:800;margin-bottom:3px}
+.lc-sub{font-size:12px;color:var(--gold);font-weight:600;margin-bottom:20px}
+.lc-form{width:100%;display:flex;flex-direction:column;gap:4px}
+.lc-lbl{font-family:var(--font);font-size:12px;font-weight:600;color:var(--white);margin-top:8px;display:block}
+.field{display:flex;align-items:center;background:rgba(10,28,16,.8);border:1px solid var(--border);border-radius:var(--r8);padding:0 12px;transition:border-color .2s}
+.field:focus-within{border-color:var(--gold)}
+.field-ico{color:var(--dim);display:flex;flex-shrink:0;margin-right:8px}
+.field input{flex:1;background:transparent;border:none;outline:none;color:var(--white);font-size:13px;padding:11px 0;font-family:var(--body)}
+.field input::placeholder{color:var(--dim)}
+.pw-eye{background:none;border:none;color:var(--dim);cursor:pointer;display:flex;align-items:center;padding:0}
+.lc-err{font-size:12px;color:#f87171;text-align:center;min-height:18px;margin-top:4px}
+.btn-masuk{margin-top:14px;width:100%;background:var(--green);color:var(--white);border:none;border-radius:var(--r8);font-family:var(--font);font-size:15px;font-weight:700;padding:13px;cursor:pointer;transition:background .2s}
+.btn-masuk:hover{background:var(--green2)}
+.lc-note{font-size:11px;color:var(--dim);text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;margin-top:10px;line-height:1.5}
+.lc-hint{font-size:11px;color:var(--dim);text-align:center;margin-top:8px}
+.lc-hint b{color:rgba(200,168,75,.7)}
+
+/* Quote card */
+.quote-card{background:rgba(22,54,34,.85);border:1px solid var(--border);border-radius:var(--r12);padding:18px 20px;display:flex;align-items:flex-start;gap:8px}
+.qm{font-family:Georgia,serif;font-size:40px;color:var(--gold);line-height:1;flex-shrink:0;user-select:none}
+.qm-o{margin-top:-5px}.qm-c{align-self:flex-end;margin-bottom:-5px}
+.qt{font-family:var(--font);font-size:13px;font-weight:600;color:var(--white);line-height:1.65;flex:1;text-align:center;padding:4px 0}
+
+/* ═══════════════ DASHBOARD ══════════════════════════ */
+#screen-dashboard{flex-direction:row}
+
+/* Sidebar */
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:linear-gradient(180deg,#0d2318 0%,#0a1d10 100%);
+  border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;
+  min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sb-logo-area{padding:20px 16px 16px;border-bottom:1px solid var(--border2);text-align:center}
+.sb-logo-area svg{margin:0 auto 8px;display:block}
+.sb-org{font-family:var(--font);font-size:12px;font-weight:700;color:var(--white);letter-spacing:.04em;line-height:1.3}
+.sb-nav{flex:1;padding:12px 8px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--font);font-size:13px;font-weight:500;
+  color:var(--txt);padding:10px 12px;border-radius:var(--r8);
+  cursor:pointer;transition:all .15s;margin-bottom:2px;
+  border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover{color:var(--white);background:rgba(255,255,255,.06)}
+.nav-item.active{color:var(--white);background:var(--green);font-weight:600}
+.nav-item svg{flex-shrink:0}
+.sb-login-box{padding:12px;border-top:1px solid var(--border2)}
+.sb-login-title{font-family:var(--font);font-size:10px;font-weight:700;color:var(--gold);letter-spacing:.1em;margin-bottom:10px;text-align:center}
+.sb-field{display:flex;align-items:center;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:var(--r8);padding:0 10px;margin-bottom:8px}
+.sb-field svg{color:var(--dim);margin-right:7px;flex-shrink:0}
+.sb-field input{flex:1;background:transparent;border:none;outline:none;color:var(--white);font-size:12px;padding:9px 0;font-family:var(--body)}
+.sb-field input::placeholder{color:var(--dim)}
+.btn-sb-masuk{width:100%;background:var(--green);color:var(--white);border:none;border-radius:var(--r8);font-family:var(--font);font-size:13px;font-weight:700;padding:10px;cursor:pointer;transition:background .2s;margin-bottom:6px}
+.btn-sb-masuk:hover{background:var(--green2)}
+.sb-lupa{font-size:11px;color:var(--gold);text-align:center;cursor:pointer;display:block;text-decoration:none}
+.sb-lupa:hover{color:var(--gold2)}
+
+/* Dashboard main */
+.dash-main{flex:1;display:flex;flex-direction:column;overflow-x:hidden}
+
+/* Topbar */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px;background:rgba(12,32,22,.95);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--border2);
+  position:sticky;top:0;z-index:50;
+}
+.tb-left{display:flex;align-items:center;gap:12px}
+.tb-menu{background:none;border:none;color:var(--txt);cursor:pointer;display:flex;align-items:center;padding:4px}
+.tb-title{font-family:var(--font)}
+.tb-h{font-size:16px;font-weight:700}
+.tb-s{font-size:12px;color:var(--gold);font-weight:600}
+.tb-right{display:flex;align-items:center;gap:14px}
+.tb-bell{background:none;border:none;color:var(--txt);cursor:pointer;display:flex;align-items:center;position:relative}
+.tb-notif-dot{position:absolute;top:0;right:0;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid var(--bg2)}
+.tb-user{display:flex;align-items:center;gap:8px;background:rgba(22,54,34,.8);border:1px solid var(--border);border-radius:var(--r8);padding:7px 12px;cursor:pointer;transition:border-color .2s}
+.tb-user:hover{border-color:var(--gold)}
+.tb-avatar{width:28px;height:28px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:11px;font-weight:700}
+.tb-uname{font-family:var(--font);font-size:12px;font-weight:600}
+.tb-logout{font-size:11px;color:var(--dim);cursor:pointer;margin-left:4px;transition:color .2s}
+.tb-logout:hover{color:#f87171}
+
+/* Content area */
+.dash-content{flex:1;padding:28px;overflow-y:auto}
+
+/* Page management: only one page visible */
+.dash-page{display:none}
+.dash-page.active{display:block}
+
+/* ─── HOME PAGE ─────────────────────────────── */
+.hero-banner{
+  background:linear-gradient(120deg,#163622 0%,#1b4a2d 60%,#163622 100%);
+  border:1px solid var(--border);border-radius:var(--r16);
+  padding:32px 36px;margin-bottom:24px;position:relative;overflow:hidden;
+}
+.hero-banner::after{content:'';position:absolute;right:-20px;top:-20px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(200,168,75,.08) 0%,transparent 70%)}
+.hb-h{font-family:var(--font);font-size:clamp(20px,2.5vw,28px);font-weight:800;line-height:1.25;margin-bottom:10px}
+.hb-p{font-size:14px;color:var(--txt);line-height:1.7;max-width:560px}
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.ds-card{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);
+  padding:18px 16px;display:flex;align-items:flex-start;gap:12px;
+  transition:border-color .2s,transform .15s;
+}
+.ds-card:hover{border-color:rgba(200,168,75,.4);transform:translateY(-2px)}
+.ds-ico{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ds-txt{display:flex;flex-direction:column}
+.ds-lbl{font-size:11px;color:var(--dim);font-weight:500;margin-bottom:3px}
+.ds-val{font-family:var(--font);font-size:26px;font-weight:800;line-height:1;margin-bottom:2px}
+.ds-unit{font-size:11px;color:var(--txt)}
+.ds-trend{font-size:10px;margin-top:4px;display:flex;align-items:center;gap:3px}
+.trend-up{color:#4ade80}.trend-dn{color:#f87171}
+.dash-cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+.dc{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);
+  padding:24px;display:flex;flex-direction:column;gap:14px;
+  transition:border-color .2s,transform .15s;overflow:hidden;position:relative;
+}
+.dc:hover{border-color:var(--gold);transform:translateY(-3px)}
+.dc-top{display:flex;align-items:flex-start;gap:14px}
+.dc-ico{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1e7a45,#2c9d5c);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dc-h{font-family:var(--font);font-size:16px;font-weight:700;margin-bottom:6px}
+.dc-p{font-size:13px;color:var(--txt);line-height:1.6}
+.dc-btn{
+  display:inline-flex;align-items:center;gap:6px;align-self:flex-start;
+  font-family:var(--font);font-size:13px;font-weight:600;
+  background:var(--green);color:var(--white);
+  border:none;border-radius:var(--r8);padding:10px 20px;
+  cursor:pointer;transition:background .2s;
+}
+.dc-btn:hover{background:var(--green2)}
+.dc-illus{position:absolute;right:16px;bottom:16px;opacity:.12;pointer-events:none}
+/* footer tagline */
+.dash-tagline{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);
+  padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
+}
+.dt-q{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--txt)}
+.dt-tag{font-family:var(--font);font-size:12px;font-weight:600;color:var(--gold)}
+
+/* ─── LAPORAN PAGE ──────────────────────────── */
+.page-header{margin-bottom:24px}
+.page-h{font-family:var(--font);font-size:22px;font-weight:800;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--dim)}
+.table-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);overflow:hidden}
+.table-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border2)}
+.table-title{font-family:var(--font);font-size:14px;font-weight:700}
+.btn-add{display:inline-flex;align-items:center;gap:6px;font-family:var(--font);font-size:12px;font-weight:600;background:var(--green);color:var(--white);border:none;border-radius:var(--r8);padding:8px 14px;cursor:pointer;transition:background .2s}
+.btn-add:hover{background:var(--green2)}
+table{width:100%;border-collapse:collapse}
+th{font-family:var(--font);font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.06em;text-transform:uppercase;padding:10px 16px;text-align:left;background:rgba(0,0,0,.2);border-bottom:1px solid var(--border2)}
+td{font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;font-family:var(--font);padding:3px 10px;border-radius:20px}
+.badge-g{background:rgba(34,197,94,.15);color:#4ade80}
+.badge-y{background:rgba(245,158,11,.15);color:#fbbf24}
+.badge-r{background:rgba(239,68,68,.15);color:#f87171}
+
+/* ─── ADUAN PAGE ────────────────────────────── */
+.aduan-grid{display:grid;gap:14px}
+.aduan-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:18px;display:flex;align-items:flex-start;gap:14px;transition:border-color .2s}
+.aduan-card:hover{border-color:rgba(200,168,75,.4)}
+.aduan-num{width:36px;height:36px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:13px;font-weight:700;flex-shrink:0}
+.aduan-body{flex:1}
+.aduan-h{font-family:var(--font);font-size:14px;font-weight:700;margin-bottom:4px}
+.aduan-p{font-size:12px;color:var(--txt);line-height:1.55}
+.aduan-meta{font-size:11px;color:var(--dim);margin-top:6px;display:flex;gap:14px}
+
+/* ─── FORM PAGE ─────────────────────────────── */
+.form-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:28px;max-width:700px}
+.form-section-title{font-family:var(--font);font-size:13px;font-weight:700;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin:22px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border2)}
+.form-section-title:first-child{margin-top:0}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.form-lbl{font-family:var(--font);font-size:12px;font-weight:600;color:var(--white)}
+.form-lbl span{color:#f87171;margin-left:2px}
+.form-inp,.form-sel,.form-ta{
+  background:rgba(10,28,16,.8);border:1px solid var(--border);
+  border-radius:var(--r8);color:var(--white);
+  font-size:13px;font-family:var(--body);
+  padding:11px 14px;
+  transition:border-color .2s,box-shadow .2s;
+  width:100%;
+}
+.form-inp:focus,.form-sel:focus,.form-ta:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-d)}
+.form-inp::placeholder,.form-ta::placeholder{color:var(--dim)}
+.form-sel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236d9a80' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.form-ta{resize:vertical;min-height:100px;line-height:1.6}
+.form-sel option{background:#163622;color:var(--white)}
+
+/* File upload */
+.file-upload{
+  border:2px dashed var(--border);border-radius:var(--r8);
+  padding:24px;text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;position:relative;
+}
+.file-upload:hover{border-color:var(--gold);background:var(--gold-d)}
+.file-upload input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.fu-ico{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.fu-text{font-family:var(--font);font-size:13px;font-weight:600;color:var(--txt);margin-bottom:4px}
+.fu-sub{font-size:11px;color:var(--dim)}
+.fu-preview{margin-top:10px;display:none}
+.fu-preview img{max-height:120px;border-radius:var(--r8);border:1px solid var(--border)}
+
+/* Nutrisi grid */
+.nutrisi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.nutrisi-item{display:flex;flex-direction:column;gap:5px}
+.nutrisi-lbl{font-size:11px;color:var(--dim);font-weight:500}
+.nutrisi-inp{background:rgba(10,28,16,.8);border:1px solid var(--border);border-radius:var(--r8);color:var(--white);font-size:13px;font-family:var(--body);padding:9px 12px;width:100%;transition:border-color .2s}
+.nutrisi-inp:focus{outline:none;border-color:var(--gold)}
+
+/* Form actions */
+.form-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--border2)}
+.btn-cancel{font-family:var(--font);font-size:13px;font-weight:600;color:var(--txt);background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:var(--r8);padding:11px 24px;cursor:pointer;transition:all .2s}
+.btn-cancel:hover{color:var(--white);border-color:var(--txt)}
+.btn-simpan{font-family:var(--font);font-size:14px;font-weight:700;color:var(--white);background:var(--green);border:none;border-radius:var(--r8);padding:12px 32px;cursor:pointer;transition:background .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-simpan:hover{background:var(--green2)}
+
+/* ─── INFORMASI PAGE ────────────────────────── */
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.info-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:20px;transition:border-color .2s,transform .15s}
+.info-card:hover{border-color:rgba(200,168,75,.4);transform:translateY(-2px)}
+.ic-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.ic-ico{width:38px;height:38px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ic-h{font-family:var(--font);font-size:14px;font-weight:700}
+.ic-p{font-size:12.5px;color:var(--txt);line-height:1.6}
+
+/* ─── KONTAK PAGE ───────────────────────────── */
+.kontak-wrap{max-width:600px}
+.kontak-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:20px;margin-bottom:14px;display:flex;align-items:flex-start;gap:14px}
+.kc-ico{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kc-h{font-family:var(--font);font-size:14px;font-weight:700;margin-bottom:4px}
+.kc-p{font-size:13px;color:var(--txt)}
+
+/* ═══════════════ TOAST ══════════════════════════════ */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  background:#1a4d2e;border:1px solid #2db55e;border-radius:var(--r12);
+  padding:14px 20px;display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+  transform:translateY(80px);opacity:0;
+  transition:transform .3s,opacity .3s;pointer-events:none;
+  max-width:340px;
+}
+.toast.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.toast-ico{color:#4ade80;flex-shrink:0}
+.toast-txt{font-family:var(--font);font-size:13px;font-weight:600}
+
+/* ═══════════════ MODAL ══════════════════════════════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r20);padding:28px;max-width:460px;width:90%;box-shadow:var(--shadow)}
+.modal-h{font-family:var(--font);font-size:18px;font-weight:800;margin-bottom:6px}
+.modal-p{font-size:13px;color:var(--txt);margin-bottom:20px;line-height:1.6}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.btn-modal-ok{font-family:var(--font);font-size:13px;font-weight:700;color:var(--white);background:var(--green);border:none;border-radius:var(--r8);padding:10px 22px;cursor:pointer;transition:background .2s}
+.btn-modal-ok:hover{background:var(--green2)}
+.btn-modal-cancel{font-family:var(--font);font-size:13px;font-weight:600;color:var(--txt);background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:var(--r8);padding:10px 22px;cursor:pointer;transition:all .2s}
+.btn-modal-cancel:hover{color:var(--white)}
+
+/* ═══════════════ ANIMATIONS ═════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.hero-main,.hero-sub,.hero-desc,.hero-line{animation:fadeUp .5s ease both}
+.hero-sub{animation-delay:.05s}.hero-desc{animation-delay:.1s}.hero-line{animation-delay:.15s}
+.mc:nth-child(1){animation:fadeUp .5s .1s ease both}
+.mc:nth-child(2){animation:fadeUp .5s .2s ease both}
+.stats-bar{animation:fadeUp .5s .3s ease both}
+.login-card{animation:fadeUp .5s .15s ease both}
+
+/* ═══════════════ RESPONSIVE ═════════════════════════ */
+@media(max-width:900px){
+  .ln-main{grid-template-columns:1fr;padding:20px}
+  .ln-left{padding-right:0;padding-bottom:24px}
+  .menu-grid,.stats-row,.dash-stats{grid-template-columns:repeat(2,1fr)}
+  .dash-cards,.info-grid{grid-template-columns:1fr}
+  .form-row,.nutrisi-grid{grid-template-columns:1fr}
+  .sidebar{width:200px}
+}
+@media(max-width:640px){
+  .ln-nav{padding:12px 16px}
+  .menu-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .sidebar{display:none}
+  .dash-stats{grid-template-columns:1fr 1fr}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ SCREEN: LANDING ══════════════════ -->
+<div id="screen-landing" class="screen active">
+
+  <!-- Navbar -->
+  <nav class="ln-nav">
+    <div class="ln-brand">
+      <div class="ln-logo">
+        <svg viewBox="0 0 52 52" width="48" height="48">
+          <circle cx="26" cy="26" r="25" fill="#0f2d1a" stroke="#c8a84b" stroke-width="1.5"/>
+          <line x1="26" y1="13" x2="26" y2="40" stroke="#c8a84b" stroke-width="1.8"/>
+          <line x1="14" y1="21" x2="38" y2="21" stroke="#c8a84b" stroke-width="1.5"/>
+          <path d="M14 21 Q11 26 14 29 Q17 32 20 29 Q23 26 20 21Z" fill="none" stroke="#c8a84b" stroke-width="1.2"/>
+          <path d="M32 21 Q29 26 32 29 Q35 32 38 29 Q41 26 38 21Z" fill="none" stroke="#c8a84b" stroke-width="1.2"/>
+          <text x="20" y="16" fill="#c8a84b" font-size="5" text-anchor="middle">★</text>
+          <text x="26" y="13" fill="#c8a84b" font-size="5" text-anchor="middle">★</text>
+          <text x="32" y="16" fill="#c8a84b" font-size="5" text-anchor="middle">★</text>
+          <rect x="21" y="40" width="10" height="1.8" rx="1" fill="#c8a84b"/>
+          <rect x="18" y="42" width="16" height="1.8" rx="1" fill="#c8a84b"/>
+        </svg>
+      </div>
+      <div class="ln-name">
+        <span class="ln-n1">KEJAKSAAN NEGERI MUNA</span>
+        <span class="ln-n2">KEJAKSAAN REPUBLIK INDONESIA</span>
+      </div>
+    </div>
+    <button class="btn-login-top" onclick="showLoginModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Login SPPG
+    </button>
+  </nav>
+
+  <!-- Main 2-col -->
+  <div class="ln-main">
+    <!-- LEFT -->
+    <div class="ln-left">
+      <div class="hero-section">
+        <h1 class="hero-main">KEJAKSAAN NEGERI MUNA</h1>
+        <h2 class="hero-sub">Monitoring Program Makanan Bergizi Gratis (MBG)</h2>
+        <p class="hero-desc">Transparansi, Pengawasan, dan Pelayanan Aduan Masyarakat<br>dalam Mendukung Program Makanan Bergizi Gratis.</p>
+        <div class="hero-line"></div>
+      </div>
+
+      <div class="menu-grid">
+        <div class="mc">
+          <div class="mc-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 17V13"/><path d="M12 17V9"/><path d="M16 17V12"/></svg></div>
+          <div><div class="mc-h">1. Laporan Distribusi MBG</div><p class="mc-p">Melihat data penyaluran makanan bergizi gratis berdasarkan wilayah, sekolah, dan periode distribusi.</p></div>
+          <button class="mc-btn" onclick="showLoginModal()">Buka Laporan <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+        <div class="mc">
+          <div class="mc-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="12" cy="15" r="2"/><path d="M12 13v-2"/></svg></div>
+          <div><div class="mc-h">2. Layanan Aduan MBG</div><p class="mc-p">Sampaikan laporan, keluhan, atau informasi terkait pelaksanaan Program MBG secara cepat dan transparan.</p></div>
+          <button class="mc-btn" onclick="showLoginModal()">Buka Layanan <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="sb-head">
+          <span class="sb-lbl">Informasi Terkini</span>
+          <svg viewBox="0 0 28 28" width="24" height="24"><circle cx="14" cy="14" r="13" fill="none" stroke="#c8a84b" stroke-width="1"/><line x1="14" y1="7" x2="14" y2="21" stroke="#c8a84b" stroke-width="1.2"/><line x1="8" y1="12" x2="20" y2="12" stroke="#c8a84b" stroke-width="1.2"/><path d="M8 12 Q6.5 15 8 17 Q9.5 19 11.5 17 Q13.5 15 11.5 12Z" fill="none" stroke="#c8a84b" stroke-width=".8"/><path d="M16.5 12 Q15 15 16.5 17 Q18 19 20 17 Q22 15 20 12Z" fill="none" stroke="#c8a84b" stroke-width=".8"/></svg>
+        </div>
+        <div class="stats-row">
+          <div class="si"><div class="si-ico ic-b"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div><div class="si-lbl">Total SPPG Aktif</div><div class="si-val" data-target="23">0</div><div class="si-unit">Unit</div><div class="si-upd">Update 08:30 WIB</div></div></div>
+          <div class="si"><div class="si-ico ic-g"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div><div><div class="si-lbl">Total Sekolah Penerima</div><div class="si-val" data-target="128">0</div><div class="si-unit">Sekolah</div><div class="si-upd">Update 08:30 WIB</div></div></div>
+          <div class="si"><div class="si-ico ic-gr"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h12L16 13"/><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg></div><div><div class="si-lbl">Total Distribusi Hari Ini</div><div class="si-val" data-target="12450">0</div><div class="si-unit">Porsi</div><div class="si-upd">Update 08:30 WIB</div></div></div>
+          <div class="si"><div class="si-ico ic-t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><div><div class="si-lbl">Total Aduan Ditindaklanjuti</div><div class="si-val" data-target="47">0</div><div class="si-unit">Aduan</div><div class="si-upd">Update 08:30 WIB</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="ln-right">
+      <div class="login-card">
+        <div class="lc-avatar"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+        <h2 class="lc-title">Login SPPG</h2>
+        <p class="lc-sub">Portal Operator SPPG</p>
+        <div class="lc-form">
+          <label class="lc-lbl">Username</label>
+          <div class="field"><span class="field-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span><input type="text" id="ln-user" placeholder="Masukkan username" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+          <label class="lc-lbl">Password</label>
+          <div class="field"><span class="field-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input type="password" id="ln-pass" placeholder="Masukkan password" onkeydown="if(event.key==='Enter')doLogin()"/><button class="pw-eye" onclick="toggleEye('ln-pass','eye1')" type="button"><svg id="eye1" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+          <div class="lc-err" id="ln-err"></div>
+          <button class="btn-masuk" onclick="doLogin()">Masuk</button>
+          <p class="lc-note"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Akses khusus Operator SPPG Kejari Muna</p>
+          <p class="lc-hint">Demo: user <b>admin</b> / pass <b>admin123</b></p>
+        </div>
+      </div>
+      <div class="quote-card">
+        <span class="qm qm-o">&ldquo;</span>
+        <p class="qt">Bersama Mengawal Program MBG<br>Untuk Generasi Sehat Indonesia</p>
+        <span class="qm qm-c">&rdquo;</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: DASHBOARD ════════════════ -->
+<div id="screen-dashboard" class="screen">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-logo-area">
+      <svg viewBox="0 0 52 52" width="44" height="44">
+        <circle cx="26" cy="26" r="25" fill="#0f2d1a" stroke="#c8a84b" stroke-width="1.5"/>
+        <line x1="26" y1="13" x2="26" y2="40" stroke="#c8a84b" stroke-width="1.8"/>
+        <line x1="14" y1="21" x2="38" y2="21" stroke="#c8a84b" stroke-width="1.5"/>
+        <path d="M14 21 Q11 26 14 29 Q17 32 20 29 Q23 26 20 21Z" fill="none" stroke="#c8a84b" stroke-width="1.2"/>
+        <path d="M32 21 Q29 26 32 29 Q35 32 38 29 Q41 26 38 21Z" fill="none" stroke="#c8a84b" stroke-width="1.2"/>
+        <text x="20" y="16" fill="#c8a84b" font-size="5" text-anchor="middle">★</text>
+        <text x="26" y="13" fill="#c8a84b" font-size="5" text-anchor="middle">★</text>
+        <text x="32" y="16" fill="#c8a84b" font-size="5" text-anchor="middle">★</text>
+        <rect x="21" y="40" width="10" height="1.8" rx="1" fill="#c8a84b"/>
+        <rect x="18" y="42" width="16" height="1.8" rx="1" fill="#c8a84b"/>
+      </svg>
+      <div class="sb-org">KEJAKSAAN NEGERI<br>MUNA</div>
+    </div>
+
+    <nav class="sb-nav">
+      <button class="nav-item active" onclick="navTo('home',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Beranda
+      </button>
+      <button class="nav-item" onclick="navTo('laporan',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Laporan MBG
+      </button>
+      <button class="nav-item" onclick="navTo('aduan',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+        Layanan Aduan
+      </button>
+      <button class="nav-item" onclick="navTo('informasi',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Informasi
+      </button>
+      <button class="nav-item" onclick="navTo('kontak',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.59 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l.81-.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 16z"/></svg>
+        Kontak
+      </button>
+    </nav>
+
+    <!-- Mini login for sidebar -->
+    <div class="sb-login-box" id="sb-login-box" style="display:none">
+      <div class="sb-login-title">LOGIN SPPG</div>
+      <div class="sb-field"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><input type="text" id="sb-user" placeholder="Username"/></div>
+      <div class="sb-field"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input type="password" id="sb-pass" placeholder="Password"/></div>
+      <button class="btn-sb-masuk" onclick="doLogin('sb')">Masuk</button>
+      <a href="#" class="sb-lupa">Lupa Password?</a>
+    </div>
+  </aside>
+
+  <!-- Main area -->
+  <div class="dash-main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="tb-left">
+        <button class="tb-menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <div class="tb-title"><div class="tb-h">Pemantauan Makanan Bergizi Gratis</div><div class="tb-s">Kejaksaan Negeri Muna</div></div>
+      </div>
+      <div class="tb-right">
+        <button class="tb-bell"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="tb-notif-dot"></span></button>
+        <div class="tb-user" onclick="doLogout()">
+          <div class="tb-avatar" id="tb-initial">A</div>
+          <span class="tb-uname" id="tb-uname">Admin</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <span class="tb-logout" onclick="doLogout()" title="Keluar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </span>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="dash-content">
+
+      <!-- HOME PAGE -->
+      <div class="dash-page active" id="page-home">
+        <div class="hero-banner">
+          <div class="hb-h">Bersama Mengawasi,<br>Bersama Mewujudkan Generasi Sehat dan Cerdas</div>
+          <p class="hb-p">Transparansi, Akuntabilitas, dan Integritas untuk Program Makanan Bergizi Gratis</p>
+        </div>
+        <div class="dash-stats">
+          <div class="ds-card"><div class="ds-ico ic-b"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="ds-txt"><span class="ds-lbl">Total SPPG</span><span class="ds-val" data-target="18">0</span><span class="ds-unit">Unit</span><div class="ds-trend trend-up">↑ 2 dari bulan lalu</div></div></div>
+          <div class="ds-card"><div class="ds-ico ic-g"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="ds-txt"><span class="ds-lbl">Penyaluran Hari Ini</span><span class="ds-val" data-target="2560">0</span><span class="ds-unit">Porsi</span><div class="ds-trend trend-up">↑ 8% dari kemarin</div></div></div>
+          <div class="ds-card"><div class="ds-ico ic-gr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="ds-txt"><span class="ds-lbl">Selesai</span><span class="ds-val" data-target-pct="92">0</span><span class="ds-unit">Distribusi</span><div class="ds-trend trend-up">↑ 5% dari kemarin</div></div></div>
+          <div class="ds-card"><div class="ds-ico" style="background:rgba(245,158,11,.2);color:#fbbf24"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="ds-txt"><span class="ds-lbl">Aduan Masuk</span><span class="ds-val" data-target="7">0</span><span class="ds-unit">Aduan</span><div class="ds-trend trend-dn">↓ 2 dari kemarin</div></div></div>
+        </div>
+        <div class="dash-cards">
+          <div class="dc">
+            <div class="dc-top">
+              <div class="dc-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 17V13"/><path d="M12 17V9"/><path d="M16 17V12"/></svg></div>
+              <div><div class="dc-h">Laporan MBG</div><p class="dc-p">Lihat rekapitulasi dan detail laporan penyaluran Makanan Bergizi Gratis di seluruh SPPG.</p></div>
+            </div>
+            <button class="dc-btn" onclick="navTo('laporan',null)">Lihat Laporan <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
+            <div class="dc-illus"><svg width="100" height="80" viewBox="0 0 100 80"><rect x="10" y="60" width="12" height="18" rx="2" fill="#4ade80" opacity=".5"/><rect x="28" y="40" width="12" height="38" rx="2" fill="#4ade80" opacity=".6"/><rect x="46" y="50" width="12" height="28" rx="2" fill="#4ade80" opacity=".5"/><rect x="64" y="30" width="12" height="48" rx="2" fill="#4ade80" opacity=".7"/><rect x="82" y="45" width="12" height="33" rx="2" fill="#4ade80" opacity=".6"/><path d="M16 60 Q34 38 52 48 Q70 28 88 43" fill="none" stroke="#4ade80" stroke-width="2" opacity=".7"/></svg></div>
+          </div>
+          <div class="dc">
+            <div class="dc-top">
+              <div class="dc-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg></div>
+              <div><div class="dc-h">Layanan Aduan</div><p class="dc-p">Sampaikan aduan, kritik, atau saran terkait program Makanan Bergizi Gratis secara mudah dan cepat.</p></div>
+            </div>
+            <button class="dc-btn" onclick="navTo('aduan',null)">Ajukan Aduan <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
+            <div class="dc-illus"><svg width="80" height="80" viewBox="0 0 80 80"><rect x="5" y="20" width="50" height="36" rx="4" fill="none" stroke="#60a5fa" stroke-width="2" opacity=".5"/><path d="M10 30h40M10 40h30" stroke="#60a5fa" stroke-width="1.5" opacity=".4"/><rect x="32" y="36" width="36" height="26" rx="4" fill="#163622" stroke="#4ade80" stroke-width="1.5" opacity=".8"/><path d="M37 44h26M37 50h18" stroke="#4ade80" stroke-width="1.5" opacity=".6"/></svg></div>
+          </div>
+        </div>
+        <div class="dash-tagline">
+          <div class="dt-q"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg><span>"Integritas adalah komitmen kita, pengawasan adalah tanggung jawab kita."</span></div>
+          <span class="dt-tag">#KejariMunaPeduli</span>
+        </div>
+      </div>
+
+      <!-- LAPORAN PAGE -->
+      <div class="dash-page" id="page-laporan">
+        <div class="page-header">
+          <h2 class="page-h">Laporan Distribusi MBG</h2>
+          <p class="page-sub">Rekapitulasi penyaluran makanan bergizi gratis seluruh SPPG Kabupaten Muna</p>
+        </div>
+        <div class="table-wrap">
+          <div class="table-head">
+            <span class="table-title">Data Laporan Terbaru</span>
+            <button class="btn-add" onclick="navTo('form-laporan',null)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Tambah Laporan</button>
+          </div>
+          <table>
+            <thead><tr><th>SPPG</th><th>Tanggal</th><th>Menu MBG</th><th>Porsi</th><th>Status</th></tr></thead>
+            <tbody id="laporan-tbody">
+              <tr><td>SPPG Raha Utara</td><td>10 Jun 2026</td><td>Nasi, Ayam Goreng, Sayur Asem, Buah</td><td>320</td><td><span class="badge badge-g">✓ Selesai</span></td></tr>
+              <tr><td>SPPG Katobu</td><td>10 Jun 2026</td><td>Nasi, Ikan Bakar, Kangkung, Pisang</td><td>280</td><td><span class="badge badge-g">✓ Selesai</span></td></tr>
+              <tr><td>SPPG Parigi</td><td>10 Jun 2026</td><td>Nasi, Tempe, Bayam, Jeruk</td><td>195</td><td><span class="badge badge-y">⏳ Proses</span></td></tr>
+              <tr><td>SPPG Tongkuno</td><td>09 Jun 2026</td><td>Nasi, Telur, Wortel, Apel</td><td>240</td><td><span class="badge badge-g">✓ Selesai</span></td></tr>
+              <tr><td>SPPG Duruka</td><td>09 Jun 2026</td><td>Nasi, Ayam Rebus, Buncis, Pepaya</td><td>175</td><td><span class="badge badge-r">✗ Belum</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADUAN PAGE -->
+      <div class="dash-page" id="page-aduan">
+        <div class="page-header">
+          <h2 class="page-h">Layanan Aduan MBG</h2>
+          <p class="page-sub">Aduan, kritik dan saran terkait pelaksanaan Program MBG</p>
+        </div>
+        <div class="aduan-grid">
+          <div class="aduan-card"><div class="aduan-num" style="background:rgba(239,68,68,.2);color:#f87171">!</div><div class="aduan-body"><div class="aduan-h">Kualitas makanan kurang baik</div><p class="aduan-p">Makanan yang diterima di SDN 1 Raha sudah dingin dan tidak segar. Perlu diperhatikan waktu distribusi.</p><div class="aduan-meta"><span>📍 SDN 1 Raha</span><span>📅 10 Jun 2026</span><span class="badge badge-y" style="font-size:10px">Diproses</span></div></div></div>
+          <div class="aduan-card"><div class="aduan-num" style="background:rgba(245,158,11,.2);color:#fbbf24">!</div><div class="aduan-body"><div class="aduan-h">Jumlah porsi tidak sesuai</div><p class="aduan-p">SPPG Katobu mengirim 40 porsi, padahal jumlah siswa 65 orang. Ada kekurangan 25 porsi.</p><div class="aduan-meta"><span>📍 SDN 3 Katobu</span><span>📅 09 Jun 2026</span><span class="badge badge-g" style="font-size:10px">Selesai</span></div></div></div>
+          <div class="aduan-card"><div class="aduan-num" style="background:rgba(34,197,94,.2);color:#4ade80">i</div><div class="aduan-body"><div class="aduan-h">Saran penambahan variasi menu</div><p class="aduan-p">Menu MBG sudah baik, namun disarankan menambah variasi agar siswa tidak bosan. Susu UHT bisa menjadi pilihan tambahan.</p><div class="aduan-meta"><span>📍 SMAN 1 Muna</span><span>📅 08 Jun 2026</span><span class="badge badge-g" style="font-size:10px">Dicatat</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- FORM LAPORAN PAGE (dari PDF) -->
+      <div class="dash-page" id="page-form-laporan">
+        <div class="page-header">
+          <h2 class="page-h">Input Laporan MBG</h2>
+          <p class="page-sub">Isi formulir laporan harian distribusi Makanan Bergizi Gratis</p>
+        </div>
+        <div class="form-card">
+          <div class="form-section-title">Identitas SPPG</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-lbl">Nama SPPG <span>*</span></label>
+              <select class="form-sel" id="f-sppg">
+                <option value="">Pilih Nama SPPG Anda</option>
+                <option>SPPG Raha Utara</option>
+                <option>SPPG Katobu</option>
+                <option>SPPG Parigi</option>
+                <option>SPPG Tongkuno</option>
+                <option>SPPG Duruka</option>
+                <option>SPPG Napabalano</option>
+                <option>SPPG Lohia</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Tanggal <span>*</span></label>
+              <input type="date" class="form-inp" id="f-tanggal"/>
+            </div>
+          </div>
+
+          <div class="form-section-title">Informasi Menu MBG</div>
+          <div class="form-group">
+            <label class="form-lbl">Menu MBG <span>*</span></label>
+            <textarea class="form-ta" id="f-menu" placeholder="Contoh: Nasi putih, ayam goreng, sayur bayam, buah pisang..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-lbl">Jumlah Porsi <span>*</span></label>
+            <input type="number" class="form-inp" id="f-porsi" placeholder="Contoh: 320" min="1"/>
+          </div>
+          <div class="form-group">
+            <label class="form-lbl">Jumlah Sekolah Penerima <span>*</span></label>
+            <input type="number" class="form-inp" id="f-sekolah" placeholder="Contoh: 5" min="1"/>
+          </div>
+
+          <div class="form-section-title">Informasi Kandungan Gizi</div>
+          <div class="nutrisi-grid">
+            <div class="nutrisi-item"><span class="nutrisi-lbl">Kalori (kkal)</span><input type="number" class="nutrisi-inp" id="f-kalori" placeholder="misal: 650"/></div>
+            <div class="nutrisi-item"><span class="nutrisi-lbl">Protein (g)</span><input type="number" class="nutrisi-inp" id="f-protein" placeholder="misal: 25"/></div>
+            <div class="nutrisi-item"><span class="nutrisi-lbl">Karbohidrat (g)</span><input type="number" class="nutrisi-inp" id="f-karbo" placeholder="misal: 85"/></div>
+            <div class="nutrisi-item"><span class="nutrisi-lbl">Lemak (g)</span><input type="number" class="nutrisi-inp" id="f-lemak" placeholder="misal: 18"/></div>
+            <div class="nutrisi-item"><span class="nutrisi-lbl">Serat (g)</span><input type="number" class="nutrisi-inp" id="f-serat" placeholder="misal: 6"/></div>
+            <div class="nutrisi-item"><span class="nutrisi-lbl">Vitamin C (mg)</span><input type="number" class="nutrisi-inp" id="f-vitc" placeholder="misal: 30"/></div>
+          </div>
+          <div class="form-group">
+            <label class="form-lbl">Keterangan Gizi Tambahan</label>
+            <textarea class="form-ta" id="f-keterangan-gizi" placeholder="Informasi kandungan gizi tambahan atau catatan khusus menu..." style="min-height:80px"></textarea>
+          </div>
+
+          <div class="form-section-title">Dokumentasi</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-lbl">Foto Menu Hari Ini</label>
+              <div class="file-upload" id="fu-menu">
+                <input type="file" accept="image/*" onchange="previewFile(this,'prev-menu')"/>
+                <div class="fu-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6d9a80" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                <div class="fu-text">Pilih Gambar / Import File</div>
+                <div class="fu-sub">JPG, PNG maks. 5MB</div>
+                <div class="fu-preview" id="prev-menu"><img/></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Dokumentasi Distribusi</label>
+              <div class="file-upload" id="fu-dist">
+                <input type="file" accept="image/*" onchange="previewFile(this,'prev-dist')"/>
+                <div class="fu-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6d9a80" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+                <div class="fu-text">Pilih Gambar / Import File</div>
+                <div class="fu-sub">JPG, PNG maks. 5MB</div>
+                <div class="fu-preview" id="prev-dist"><img/></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-cancel" onclick="navTo('laporan',null)">Batal</button>
+            <button class="btn-simpan" onclick="simpanLaporan()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              SIMPAN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- INFORMASI PAGE -->
+      <div class="dash-page" id="page-informasi">
+        <div class="page-header"><h2 class="page-h">Informasi Program MBG</h2><p class="page-sub">Panduan dan regulasi Program Makanan Bergizi Gratis</p></div>
+        <div class="info-grid">
+          <div class="info-card"><div class="ic-head"><div class="ic-ico" style="background:rgba(59,130,246,.2);color:#60a5fa"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="ic-h">Dasar Hukum</div></div><p class="ic-p">Perpres No. 83 Tahun 2024 tentang Program MBG sebagai dasar pelaksanaan program nasional penyediaan makanan bergizi bagi pelajar Indonesia.</p></div>
+          <div class="info-card"><div class="ic-head"><div class="ic-ico" style="background:rgba(34,197,94,.2);color:#4ade80"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="ic-h">Standar Menu</div></div><p class="ic-p">Menu MBG harus memenuhi standar gizi: 30% kebutuhan kalori harian, mengandung karbohidrat, protein hewani/nabati, sayuran, dan buah.</p></div>
+          <div class="info-card"><div class="ic-head"><div class="ic-ico" style="background:rgba(200,168,75,.2);color:var(--gold)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="ic-h">Peran Kejaksaan</div></div><p class="ic-p">Kejaksaan Negeri Muna berperan sebagai pengawas pelaksanaan MBG, memastikan transparansi distribusi dan menindaklanjuti aduan masyarakat.</p></div>
+          <div class="info-card"><div class="ic-head"><div class="ic-ico" style="background:rgba(20,184,166,.2);color:#2dd4bf"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="ic-h">Prosedur Pelaporan</div></div><p class="ic-p">Operator SPPG wajib mengisi laporan harian melalui sistem ini, meliputi menu, jumlah porsi, kandungan gizi, dan dokumentasi foto distribusi.</p></div>
+          <div class="info-card"><div class="ic-head"><div class="ic-ico" style="background:rgba(239,68,68,.2);color:#f87171"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="ic-h">Mekanisme Aduan</div></div><p class="ic-p">Masyarakat dan pihak sekolah dapat menyampaikan aduan melalui portal ini. Setiap aduan akan ditindaklanjuti dalam 1×24 jam oleh tim Kejari Muna.</p></div>
+          <div class="info-card"><div class="ic-head"><div class="ic-ico" style="background:rgba(168,85,247,.2);color:#c084fc"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="ic-h">Sanksi Pelanggaran</div></div><p class="ic-p">Penyelewengan dalam program MBG dapat dikenai sanksi hukum sesuai UU Tindak Pidana Korupsi. Kejaksaan berwenang melakukan penyelidikan.</p></div>
+        </div>
+      </div>
+
+      <!-- KONTAK PAGE -->
+      <div class="dash-page" id="page-kontak">
+        <div class="page-header"><h2 class="page-h">Kontak & Lokasi</h2><p class="page-sub">Hubungi Kejaksaan Negeri Muna untuk informasi lebih lanjut</p></div>
+        <div class="kontak-wrap">
+          <div class="kontak-card"><div class="kc-ico" style="background:rgba(34,197,94,.2);color:#4ade80"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.59 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l.81-.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 16z"/></svg></div><div><div class="kc-h">Telepon</div><p class="kc-p">(0403) 21234 / 21235</p></div></div>
+          <div class="kontak-card"><div class="kc-ico" style="background:rgba(59,130,246,.2);color:#60a5fa"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div><div class="kc-h">Email</div><p class="kc-p">kejari.muna@kejaksaan.go.id</p></div></div>
+          <div class="kontak-card"><div class="kc-ico" style="background:rgba(200,168,75,.2);color:var(--gold)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><div class="kc-h">Alamat</div><p class="kc-p">Jl. Jend. Ahmad Yani No. 1, Raha, Kabupaten Muna, Sulawesi Tenggara 93611</p></div></div>
+          <div class="kontak-card"><div class="kc-ico" style="background:rgba(245,158,11,.2);color:#fbbf24"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="kc-h">Jam Operasional</div><p class="kc-p">Senin – Jumat: 08.00 – 16.00 WITA<br>Sabtu – Minggu: Tutup</p></div></div>
+        </div>
+      </div>
+
+    </div><!-- /dash-content -->
+  </div><!-- /dash-main -->
+</div><!-- /screen-dashboard -->
+
+<!-- Modal logout -->
+<div class="modal-overlay" id="modal-logout">
+  <div class="modal">
+    <div class="modal-h">Keluar dari Sistem?</div>
+    <p class="modal-p">Anda akan keluar dari portal SPPG Kejaksaan Negeri Muna. Data yang belum disimpan akan hilang.</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('modal-logout')">Batal</button>
+      <button class="btn-modal-ok" onclick="confirmLogout()">Ya, Keluar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+  <span class="toast-txt" id="toast-txt">Berhasil disimpan!</span>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════
+   AUTH
+════════════════════════════════════════════════════ */
+const USERS = {
+  'admin':    { pass:'admin123', name:'Admin', role:'admin' },
+  'sppg1':   { pass:'sppg1234', name:'Operator SPPG 1', role:'sppg' },
+};
+let currentUser = null;
+
+function doLogin(src) {
+  const u = src==='sb'
+    ? document.getElementById('sb-user').value.trim()
+    : document.getElementById('ln-user').value.trim();
+  const p = src==='sb'
+    ? document.getElementById('sb-pass').value
+    : document.getElementById('ln-pass').value;
+  const errEl = document.getElementById('ln-err');
+
+  if (!u || !p) {
+    if(errEl) errEl.textContent='Username dan password wajib diisi.';
+    return;
+  }
+  const user = USERS[u.toLowerCase()];
+  if (!user || user.pass !== p) {
+    if(errEl) errEl.textContent='Username atau password salah.';
+    shakeEl(src==='sb'?'.sb-login-box':'.login-card');
+    return;
+  }
+  currentUser = { username: u, ...user };
+  if(errEl) errEl.textContent='';
+  goDashboard();
+}
+
+function goDashboard() {
+  document.getElementById('screen-landing').classList.remove('active');
+  document.getElementById('screen-dashboard').classList.add('active');
+  document.getElementById('tb-uname').textContent = currentUser.name;
+  document.getElementById('tb-initial').textContent = currentUser.name.charAt(0).toUpperCase();
+  // Set today's date as default on form
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('f-tanggal').value = today;
+  // Animate counters
+  document.querySelectorAll('.ds-val[data-target]').forEach(animateCounter);
+  document.querySelectorAll('.ds-val[data-target-pct]').forEach(el => {
+    const t = parseInt(el.dataset.targetPct);
+    animateCounterPct(el, t);
+  });
+}
+
+function doLogout() {
+  document.getElementById('modal-logout').classList.add('open');
+}
+function confirmLogout() {
+  closeModal('modal-logout');
+  currentUser = null;
+  document.getElementById('screen-dashboard').classList.remove('active');
+  document.getElementById('screen-landing').classList.add('active');
+  document.getElementById('ln-user').value='';
+  document.getElementById('ln-pass').value='';
+  navTo('home', null);
+}
+function showLoginModal() {
+  document.getElementById('ln-user').focus();
+  document.querySelector('.login-card').scrollIntoView({behavior:'smooth'});
+}
+
+/* ════════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════════ */
+function navTo(page, btn) {
+  // Deactivate all pages
+  document.querySelectorAll('.dash-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  // Activate target page
+  const pageEl = document.getElementById('page-' + page);
+  if (pageEl) pageEl.classList.add('active');
+
+  // Activate nav item
+  if (btn) {
+    btn.classList.add('active');
+  } else {
+    // match by page name
+    const map = {home:'Beranda',laporan:'Laporan MBG','form-laporan':'Laporan MBG',aduan:'Layanan Aduan',informasi:'Informasi',kontak:'Kontak'};
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if(n.textContent.trim() === map[page]) n.classList.add('active');
+    });
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   FORM
+════════════════════════════════════════════════════ */
+function simpanLaporan() {
+  const sppg   = document.getElementById('f-sppg').value;
+  const tgl    = document.getElementById('f-tanggal').value;
+  const menu   = document.getElementById('f-menu').value.trim();
+  const porsi  = document.getElementById('f-porsi').value;
+  if (!sppg || !tgl || !menu || !porsi) {
+    showToast('⚠ Lengkapi field wajib terlebih dahulu.','#f59e0b');
+    return;
+  }
+  // Add to table
+  const tbody = document.getElementById('laporan-tbody');
+  const d = new Date(tgl);
+  const tglStr = d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+  const row = document.createElement('tr');
+  row.innerHTML = `<td>${sppg}</td><td>${tglStr}</td><td>${menu.substring(0,40)}${menu.length>40?'...':''}</td><td>${parseInt(porsi).toLocaleString('id-ID')}</td><td><span class="badge badge-g">✓ Selesai</span></td>`;
+  tbody.insertBefore(row, tbody.firstChild);
+  showToast('Laporan berhasil disimpan!');
+  // Reset form
+  document.getElementById('f-sppg').value='';
+  document.getElementById('f-menu').value='';
+  document.getElementById('f-porsi').value='';
+  document.getElementById('f-sekolah').value='';
+  document.getElementById('f-keterangan-gizi').value='';
+  ['kalori','protein','karbo','lemak','serat','vitc'].forEach(k=>document.getElementById('f-'+k).value='');
+  ['prev-menu','prev-dist'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.style.display='none';
+    el.querySelector('img').src='';
+  });
+  setTimeout(()=>navTo('laporan',null), 1200);
+}
+
+function previewFile(input, previewId) {
+  const file = input.files[0];
+  if (!file) return;
+  const prev = document.getElementById(previewId);
+  const reader = new FileReader();
+  reader.onload = e => {
+    prev.querySelector('img').src = e.target.result;
+    prev.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ════════════════════════════════════════════════════
+   UI HELPERS
+════════════════════════════════════════════════════ */
+function toggleEye(inputId, iconId) {
+  const inp = document.getElementById(inputId);
+  const ico = document.getElementById(iconId);
+  if (inp.type==='password') {
+    inp.type='text';
+    ico.innerHTML=`<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+  } else {
+    inp.type='password';
+    ico.innerHTML=`<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  }
+}
+
+function animateCounter(el) {
+  const t = parseInt(el.dataset.target);
+  const dur=1200, step=16, inc=t/(dur/step);
+  let cur=0;
+  const tm=setInterval(()=>{
+    cur+=inc; if(cur>=t){el.textContent=t.toLocaleString('id-ID');clearInterval(tm);}
+    else el.textContent=Math.floor(cur).toLocaleString('id-ID');
+  },step);
+}
+function animateCounterPct(el, target) {
+  const dur=1200,step=16,inc=target/(dur/step);
+  let cur=0;
+  const tm=setInterval(()=>{
+    cur+=inc; if(cur>=target){el.textContent=target+'%';clearInterval(tm);}
+    else el.textContent=Math.floor(cur)+'%';
+  },step);
+}
+
+// Run counters on landing
+document.querySelectorAll('.si-val[data-target]').forEach(animateCounter);
+
+function showToast(msg, color) {
+  const t=document.getElementById('toast');
+  const txt=document.getElementById('toast-txt');
+  if(color) t.style.borderColor=color;
+  else t.style.borderColor='#2db55e';
+  txt.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function shakeEl(sel){
+  const el=document.querySelector(sel);
+  if(!el)return;
+  el.style.animation='none';
+  el.style.transform='translateX(6px)';
+  setTimeout(()=>{el.style.transform='translateX(-6px)';},80);
+  setTimeout(()=>{el.style.transform='';},160);
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
