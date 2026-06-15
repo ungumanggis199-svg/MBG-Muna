@@ -116,28 +116,139 @@ body{font-family:var(--body);background:var(--bg);color:var(--white);min-height:
 .si-upd{font-size:10px;color:var(--dim);margin-top:3px}
 
 /* Login card right */
-.login-card{
-  background:rgba(22,54,34,.92);border:1px solid rgba(200,168,75,.3);
-  border-radius:var(--r20);padding:28px 24px;box-shadow:var(--shadow);
-  display:flex;flex-direction:column;align-items:center;
+.login-card {
+  background: rgba(22,54,34,.92);
+  border: 1px solid rgba(200,168,75,.3);
+  border-radius: var(--r20);
+  padding: 28px 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
-.lc-avatar{width:66px;height:66px;border-radius:50%;background:rgba(200,168,75,.12);border:2px solid rgba(200,168,75,.4);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
-.lc-title{font-family:var(--font);font-size:20px;font-weight:800;margin-bottom:3px}
-.lc-sub{font-size:12px;color:var(--gold);font-weight:600;margin-bottom:20px}
-.lc-form{width:100%;display:flex;flex-direction:column;gap:4px}
-.lc-lbl{font-family:var(--font);font-size:12px;font-weight:600;color:var(--white);margin-top:8px;display:block}
-.field{display:flex;align-items:center;background:rgba(10,28,16,.8);border:1px solid var(--border);border-radius:var(--r8);padding:0 12px;transition:border-color .2s}
-.field:focus-within{border-color:var(--gold)}
-.field-ico{color:var(--dim);display:flex;flex-shrink:0;margin-right:8px}
-.field input{flex:1;background:transparent;border:none;outline:none;color:var(--white);font-size:13px;padding:11px 0;font-family:var(--body)}
-.field input::placeholder{color:var(--dim)}
-.pw-eye{background:none;border:none;color:var(--dim);cursor:pointer;display:flex;align-items:center;padding:0}
-.lc-err{font-size:12px;color:#f87171;text-align:center;min-height:18px;margin-top:4px}
-.btn-masuk{margin-top:14px;width:100%;background:var(--green);color:var(--white);border:none;border-radius:var(--r8);font-family:var(--font);font-size:15px;font-weight:700;padding:13px;cursor:pointer;transition:background .2s}
-.btn-masuk:hover{background:var(--green2)}
-.lc-note{font-size:11px;color:var(--dim);text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;margin-top:10px;line-height:1.5}
-.lc-hint{font-size:11px;color:var(--dim);text-align:center;margin-top:8px}
-.lc-hint b{color:rgba(200,168,75,.7)}
+
+.lc-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.lc-lbl {
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--white);
+  margin-top: 12px;
+  margin-bottom: 7px;
+  display: block;
+  width: 100%;
+}
+
+.field {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: rgba(10,28,16,.8);
+  border: 1px solid var(--border);
+  border-radius: var(--r8);
+  padding: 0 12px;
+  transition: border-color .2s;
+}
+
+.field:focus-within {
+  border-color: var(--gold);
+}
+
+.field-ico {
+  color: var(--dim);
+  display: flex;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.field input {
+  width: 100%;
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--white);
+  font-size: 13px;
+  padding: 12px 0;
+  font-family: var(--body);
+  min-width: 0;
+}
+
+.field input::placeholder {
+  color: var(--dim);
+}
+
+.pw-eye {
+  background: none;
+  border: none;
+  color: var(--dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.btn-masuk {
+  margin-top: 16px;
+  width: 100%;
+  background: var(--green);
+  color: var(--white);
+  border: none;
+  border-radius: var(--r8);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 700;
+  padding: 13px;
+  cursor: pointer;
+  transition: background .2s;
+  display: block;
+}
+
+.btn-masuk:hover {
+  background: var(--green2);
+}
+
+.lc-err {
+  font-size: 12px;
+  color: #f87171;
+  text-align: center;
+  min-height: 18px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.lc-note {
+  font-size: 11px;
+  color: var(--dim);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 12px;
+  line-height: 1.5;
+  width: 100%;
+}
+
+.lc-hint {
+  font-size: 11px;
+  color: var(--dim);
+  text-align: center;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.lc-hint b {
+  color: rgba(200,168,75,.7);
+}
 
 /* Quote card */
 .quote-card{background:rgba(22,54,34,.85);border:1px solid var(--border);border-radius:var(--r12);padding:18px 20px;display:flex;align-items:flex-start;gap:8px}
