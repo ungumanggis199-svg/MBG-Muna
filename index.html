@@ -801,24 +801,11 @@ tr:hover td{background:rgba(255,255,255,.03)}
 /* ════════════════════════════════════════════════════
    AUTH
 ════════════════════════════════════════════════════ */
-
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxl7u7NeBrpaXxylVCRmKqhIapX2nRRZN0l5vRu2mDwP3CkJBmRDUopBmbiRoAix_YB/exec";
 const FORM_MONITORING_URL = "/form-monitoring.html";
 
-const USERS = {
-  "admin": {
-    pass: "admin123",
-    name: "Admin",
-    role: "admin"
-  },
-  "sppg1": {
-    pass: "sppg1234",
-    name: "Operator SPPG 1",
-    role: "sppg"
-  }
-};
-
-function doLogin(src) {
-  const usernameInput = src === "sb"
+async function doLogin(src) {
+  const emailInput = src === "sb"
     ? document.getElementById("sb-user")
     : document.getElementById("ln-user");
 
@@ -828,35 +815,47 @@ function doLogin(src) {
 
   const errEl = document.getElementById("ln-err");
 
-  const username = usernameInput.value.trim().toLowerCase();
-  const password = passwordInput.value;
+  const email = emailInput.value.trim().toLowerCase();
+  const password = passwordInput.value.trim();
 
-  if (!username || !password) {
-    if (errEl) errEl.textContent = "Username dan password wajib diisi.";
+  if (!email || !password) {
+    if (errEl) errEl.textContent = "Email dan password wajib diisi.";
     return;
   }
 
-  const user = USERS[username];
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "login",
+        email: email,
+        password: password
+      })
+    });
 
-  if (!user || user.pass !== password) {
-    if (errEl) errEl.textContent = "Username atau password salah.";
-    shakeEl(src === "sb" ? ".sb-login-box" : ".login-card");
-    return;
+    const result = await res.json();
+
+    if (!result.success) {
+      if (errEl) errEl.textContent = result.message || "Email atau password salah.";
+      shakeEl(src === "sb" ? ".sb-login-box" : ".login-card");
+      return;
+    }
+
+    localStorage.setItem("mbg_email", email);
+    localStorage.setItem("mbg_password", password);
+    localStorage.setItem("mbg_sppg", result.sppg || "");
+
+    window.location.href = FORM_MONITORING_URL;
+
+  } catch (error) {
+    if (errEl) errEl.textContent = "Gagal terhubung ke server Apps Script.";
   }
-
-  if (errEl) errEl.textContent = "";
-
-  localStorage.setItem("mbg_login", "true");
-  localStorage.setItem("mbg_user", username);
-  localStorage.setItem("mbg_name", user.name);
-
-  window.location.href = FORM_MONITORING_URL;
 }
 
 function doLogout() {
-  localStorage.removeItem("mbg_login");
-  localStorage.removeItem("mbg_user");
-  localStorage.removeItem("mbg_name");
+  localStorage.removeItem("mbg_email");
+  localStorage.removeItem("mbg_password");
+  localStorage.removeItem("mbg_sppg");
   window.location.href = "/";
 }
 
