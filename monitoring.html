@@ -6,17 +6,21 @@
 
   <title>Monitoring Distribusi MBG - Kejaksaan Negeri Muna</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     :root {
-      --green-dark: #062615;
+      --green-dark: #043927;
       --green-main: #0f5132;
       --green-soft: #15803d;
+      --green-light: #dcfce7;
       --gold: #d7b45a;
       --white: #ffffff;
-      --text: #102015;
+      --text: #0f172a;
       --muted: #64748b;
-      --border: #d8e3dc;
+      --border: #d9e5dd;
       --danger: #dc2626;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.10);
     }
 
     * {
@@ -29,30 +33,46 @@
       font-family: Arial, Helvetica, sans-serif;
       color: var(--text);
       background:
-        linear-gradient(rgba(255,255,255,0.82), rgba(255,255,255,0.9)),
+        linear-gradient(
+          120deg,
+          rgba(255,255,255,0.88),
+          rgba(255,255,255,0.82)
+        ),
         url("https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Background%20Form.png");
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
     }
 
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(215,180,90,0.18), transparent 28%),
+        radial-gradient(circle at 80% 12%, rgba(21,128,61,0.13), transparent 30%),
+        radial-gradient(circle at 60% 90%, rgba(4,57,39,0.12), transparent 32%);
+      z-index: -1;
+    }
+
     .page {
-      max-width: 1180px;
+      max-width: 1220px;
       margin: 0 auto;
-      padding: 26px 18px 40px;
+      padding: 24px 18px 42px;
     }
 
     .topbar {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      background: rgba(255,255,255,0.88);
-      border: 1px solid rgba(6, 38, 21, 0.12);
-      border-radius: 18px;
+      align-items: center;
+      gap: 18px;
       padding: 18px 22px;
-      box-shadow: 0 16px 36px rgba(0,0,0,0.08);
-      backdrop-filter: blur(10px);
+      border: 1px solid rgba(4,57,39,0.12);
+      border-radius: 24px;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
       margin-bottom: 24px;
     }
 
@@ -63,116 +83,308 @@
     }
 
     .brand img {
-      width: 68px;
-      height: 68px;
+      width: 70px;
+      height: 70px;
       object-fit: contain;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
     }
 
     .brand-small {
       font-size: 13px;
       font-weight: 800;
-      letter-spacing: 0.04em;
       color: var(--green-main);
       text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .brand-main {
+      margin-top: 4px;
       font-size: 28px;
       font-weight: 900;
+      line-height: 1.05;
       color: var(--green-dark);
       text-transform: uppercase;
-      line-height: 1.1;
-      margin-top: 4px;
     }
 
     .brand-sub {
+      margin-top: 6px;
       font-size: 13px;
       color: var(--muted);
-      margin-top: 6px;
     }
 
     .btn-back {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 112px;
       text-decoration: none;
       color: var(--green-dark);
-      border: 1px solid rgba(15,81,50,0.25);
+      border: 1px solid rgba(4,57,39,0.18);
       border-radius: 999px;
-      padding: 10px 18px;
-      font-weight: 700;
-      background: rgba(255,255,255,0.75);
+      padding: 11px 18px;
+      font-size: 13px;
+      font-weight: 800;
+      background: rgba(255,255,255,0.78);
+      transition: 0.2s ease;
+    }
+
+    .btn-back:hover {
+      transform: translateY(-1px);
+      border-color: var(--gold);
     }
 
     .hero {
-      text-align: center;
-      margin: 26px 0;
+      display: grid;
+      grid-template-columns: 1.5fr 0.9fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .hero-card {
+      border-radius: 24px;
+      padding: 28px;
+      color: #ffffff;
+      background:
+        linear-gradient(135deg, rgba(4,57,39,0.96), rgba(15,81,50,0.88)),
+        radial-gradient(circle at 80% 20%, rgba(215,180,90,0.30), transparent 34%);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      right: -80px;
+      top: -90px;
+      background: rgba(215,180,90,0.16);
+    }
+
+    .hero-kicker {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      color: #fde68a;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 14px;
     }
 
     .hero h1 {
+      position: relative;
+      z-index: 1;
       margin: 0;
       font-size: 34px;
-      color: var(--green-dark);
+      line-height: 1.1;
       text-transform: uppercase;
-      letter-spacing: 0.02em;
     }
 
     .hero p {
-      margin: 8px 0 0;
-      color: var(--muted);
+      position: relative;
+      z-index: 1;
+      margin: 12px 0 0;
+      max-width: 620px;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.65;
       font-size: 14px;
+    }
+
+    .update-card {
+      border-radius: 24px;
+      padding: 24px;
+      background: rgba(255,255,255,0.90);
+      border: 1px solid rgba(4,57,39,0.12);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .update-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .update-value {
+      color: var(--green-dark);
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.3;
+    }
+
+    .update-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     .summary {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 14px;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
 
     .summary-card {
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(15,81,50,0.12);
-      border-radius: 16px;
+      background: rgba(255,255,255,0.90);
+      border: 1px solid rgba(4,57,39,0.12);
+      border-radius: 20px;
       padding: 18px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+      box-shadow: 0 12px 28px rgba(15,23,42,0.07);
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .summary-icon {
+      width: 46px;
+      height: 46px;
+      flex-shrink: 0;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      color: var(--green-main);
+      font-size: 21px;
     }
 
     .summary-label {
-      color: var(--muted);
       font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 8px;
+      font-weight: 800;
+      color: var(--muted);
+      margin-bottom: 5px;
     }
 
     .summary-value {
-      font-size: 28px;
+      font-size: 27px;
       font-weight: 900;
       color: var(--green-dark);
       line-height: 1;
     }
 
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(4,57,39,0.12);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .panel-title {
+      color: var(--green-dark);
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .panel-sub {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .chart-wrap {
+      height: 280px;
+      position: relative;
+    }
+
+    .latest-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .latest-item {
+      border: 1px solid #e4eee8;
+      border-radius: 16px;
+      padding: 12px;
+      background: #fbfdfc;
+    }
+
+    .latest-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .latest-name {
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--green-dark);
+    }
+
+    .latest-date {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .latest-menu {
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.45;
+    }
+
     .toolbar {
       display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr;
+      grid-template-columns: 1.5fr 1fr 1fr;
       gap: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .toolbar input,
     .toolbar select {
       width: 100%;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
+      border-radius: 14px;
+      padding: 13px 14px;
       font-size: 14px;
-      background: rgba(255,255,255,0.92);
+      background: rgba(255,255,255,0.94);
       outline: none;
     }
 
+    .toolbar input:focus,
+    .toolbar select:focus {
+      border-color: var(--green-soft);
+      box-shadow: 0 0 0 3px rgba(21,128,61,0.10);
+    }
+
     .table-card {
-      background: rgba(255,255,255,0.93);
-      border: 1px solid rgba(15,81,50,0.12);
-      border-radius: 18px;
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(4,57,39,0.12);
+      border-radius: 22px;
       overflow: hidden;
-      box-shadow: 0 18px 42px rgba(0,0,0,0.08);
+      box-shadow: var(--shadow);
     }
 
     .table-head {
@@ -190,8 +402,9 @@
     }
 
     .table-note {
-      font-size: 12px;
       color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
     }
 
     .table-wrap {
@@ -200,8 +413,8 @@
 
     table {
       width: 100%;
-      border-collapse: collapse;
       min-width: 980px;
+      border-collapse: collapse;
     }
 
     th {
@@ -231,9 +444,9 @@
       display: inline-flex;
       padding: 5px 10px;
       border-radius: 999px;
-      background: #dcfce7;
+      background: var(--green-light);
       color: #166534;
-      font-weight: 800;
+      font-weight: 900;
       font-size: 12px;
     }
 
@@ -243,38 +456,36 @@
       color: #ffffff;
       background: var(--green-soft);
       padding: 7px 10px;
-      border-radius: 8px;
-      font-weight: 700;
+      border-radius: 9px;
+      font-weight: 800;
       font-size: 12px;
       margin-right: 4px;
       margin-bottom: 4px;
     }
 
-    .empty,
-    .error {
+    .empty {
       text-align: center;
       padding: 24px;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .error {
-      color: var(--danger);
+      display: none;
+      margin-bottom: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      color: #991b1b;
       background: #fee2e2;
       border: 1px solid #fca5a5;
-      border-radius: 12px;
-      margin-bottom: 16px;
-      display: none;
+      text-align: center;
+      font-weight: 800;
     }
 
-    @media (max-width: 800px) {
-      .topbar {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .brand-main {
-        font-size: 21px;
+    @media (max-width: 920px) {
+      .hero,
+      .dashboard-grid {
+        grid-template-columns: 1fr;
       }
 
       .summary {
@@ -285,8 +496,32 @@
         grid-template-columns: 1fr;
       }
 
+      .brand-main {
+        font-size: 22px;
+      }
+
       .hero h1 {
-        font-size: 24px;
+        font-size: 26px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .brand img {
+        width: 58px;
+        height: 58px;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-card {
+        padding: 16px;
       }
     }
   </style>
@@ -311,33 +546,97 @@
     </header>
 
     <section class="hero">
-      <h1>Monitoring Distribusi MBG</h1>
-      <p>Data publik laporan distribusi Program Makanan Bergizi Gratis</p>
+      <div class="hero-card">
+        <div class="hero-kicker">Dashboard Publik MBG</div>
+        <h1>Monitoring Distribusi MBG</h1>
+        <p>
+          Menampilkan rekapitulasi laporan distribusi Program Makanan Bergizi Gratis secara informatif,
+          transparan, dan mudah dipantau oleh publik.
+        </p>
+      </div>
+
+      <div class="update-card">
+        <div class="update-label">Update Terakhir</div>
+        <div class="update-value" id="updateTerakhir">-</div>
+        <div class="update-note">
+          Data diperbarui otomatis berdasarkan laporan yang dikirim oleh operator SPPG.
+        </div>
+      </div>
     </section>
 
     <section class="summary">
       <div class="summary-card">
-        <div class="summary-label">Total Laporan</div>
-        <div class="summary-value" id="totalLaporan">0</div>
+        <div class="summary-icon">📄</div>
+        <div>
+          <div class="summary-label">Total Laporan</div>
+          <div class="summary-value" id="totalLaporan">0</div>
+        </div>
       </div>
 
       <div class="summary-card">
-        <div class="summary-label">Total SPPG Melapor</div>
-        <div class="summary-value" id="totalSppg">0</div>
+        <div class="summary-icon">🏫</div>
+        <div>
+          <div class="summary-label">SPPG Melapor</div>
+          <div class="summary-value" id="totalSppg">0</div>
+        </div>
       </div>
 
       <div class="summary-card">
-        <div class="summary-label">Laporan Hari Ini</div>
-        <div class="summary-value" id="laporanHariIni">0</div>
+        <div class="summary-icon">📅</div>
+        <div>
+          <div class="summary-label">Laporan Hari Ini</div>
+          <div class="summary-value" id="laporanHariIni">0</div>
+        </div>
       </div>
 
       <div class="summary-card">
-        <div class="summary-label">Update Terakhir</div>
-        <div class="summary-value" id="updateTerakhir" style="font-size:16px;">-</div>
+        <div class="summary-icon">✅</div>
+        <div>
+          <div class="summary-label">Status Data</div>
+          <div class="summary-value" style="font-size:20px;">Aktif</div>
+        </div>
       </div>
     </section>
 
     <div id="errorBox" class="error"></div>
+
+    <section class="dashboard-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Grafik Laporan per SPPG</div>
+            <div class="panel-sub">Jumlah laporan yang masuk berdasarkan nama SPPG.</div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chartSppg"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Laporan Terbaru</div>
+            <div class="panel-sub">5 laporan terakhir yang tersimpan.</div>
+          </div>
+        </div>
+        <div class="latest-list" id="latestList">
+          <div class="empty">Memuat laporan terbaru...</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-bottom:18px;">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Tren Laporan Harian</div>
+          <div class="panel-sub">Pergerakan jumlah laporan distribusi berdasarkan tanggal.</div>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartTrend"></canvas>
+      </div>
+    </section>
 
     <section class="toolbar">
       <input type="text" id="searchInput" placeholder="Cari SPPG, menu, atau nilai gizi..." />
@@ -349,7 +648,7 @@
 
     <section class="table-card">
       <div class="table-head">
-        <div class="table-title">Data Laporan Distribusi MBG</div>
+        <div class="table-title">Data Detail Distribusi MBG</div>
         <div class="table-note" id="tableNote">Memuat data...</div>
       </div>
 
@@ -378,6 +677,8 @@
 
   <script>
     let monitoringData = [];
+    let chartSppg = null;
+    let chartTrend = null;
 
     document.addEventListener("DOMContentLoaded", async function() {
       await loadMonitoringData();
@@ -406,6 +707,8 @@
 
         updateSummary(result.summary || {});
         buildSppgFilter();
+        renderLatestList();
+        renderCharts();
         renderTable();
 
       } catch (error) {
@@ -437,6 +740,191 @@
       });
     }
 
+    function renderLatestList() {
+      const list = document.getElementById("latestList");
+      const latest = monitoringData.slice(0, 5);
+
+      if (latest.length === 0) {
+        list.innerHTML = '<div class="empty">Belum ada laporan tersimpan.</div>';
+        return;
+      }
+
+      list.innerHTML = latest.map(function(item) {
+        return `
+          <div class="latest-item">
+            <div class="latest-top">
+              <div class="latest-name">${escapeHtml(item.namaSppg)}</div>
+              <div class="latest-date">${escapeHtml(formatTanggal(item.tanggal))}</div>
+            </div>
+            <div class="latest-menu">${escapeHtml(limitText(item.menuMbg, 90))}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderCharts() {
+      renderSppgChart();
+      renderTrendChart();
+    }
+
+    function renderSppgChart() {
+      const ctx = document.getElementById("chartSppg");
+
+      const grouped = {};
+
+      monitoringData.forEach(function(item) {
+        const key = item.namaSppg || "Tidak diketahui";
+        grouped[key] = (grouped[key] || 0) + 1;
+      });
+
+      const sorted = Object.entries(grouped)
+        .sort(function(a, b) {
+          return b[1] - a[1];
+        })
+        .slice(0, 8);
+
+      const labels = sorted.map(item => item[0]);
+      const values = sorted.map(item => item[1]);
+
+      if (chartSppg) chartSppg.destroy();
+
+      chartSppg = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Jumlah Laporan",
+            data: values,
+            borderWidth: 0,
+            borderRadius: 10,
+            backgroundColor: "rgba(21, 128, 61, 0.82)"
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.raw + " laporan";
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: "#64748b",
+                font: {
+                  size: 11,
+                  weight: "bold"
+                }
+              },
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0,
+                color: "#64748b"
+              },
+              grid: {
+                color: "rgba(100,116,139,0.14)"
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderTrendChart() {
+      const ctx = document.getElementById("chartTrend");
+
+      const grouped = {};
+
+      monitoringData.forEach(function(item) {
+        const key = normalizeDate(item.tanggal);
+        if (!key) return;
+        grouped[key] = (grouped[key] || 0) + 1;
+      });
+
+      const sorted = Object.entries(grouped)
+        .sort(function(a, b) {
+          return new Date(a[0]) - new Date(b[0]);
+        })
+        .slice(-10);
+
+      const labels = sorted.map(item => formatTanggalShort(item[0]));
+      const values = sorted.map(item => item[1]);
+
+      if (chartTrend) chartTrend.destroy();
+
+      chartTrend = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Laporan Harian",
+            data: values,
+            fill: true,
+            tension: 0.38,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            borderWidth: 3,
+            borderColor: "rgba(15, 81, 50, 0.95)",
+            backgroundColor: "rgba(21, 128, 61, 0.13)",
+            pointBackgroundColor: "#d7b45a"
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.raw + " laporan";
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: "#64748b",
+                font: {
+                  size: 11,
+                  weight: "bold"
+                }
+              },
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0,
+                color: "#64748b"
+              },
+              grid: {
+                color: "rgba(100,116,139,0.14)"
+              }
+            }
+          }
+        }
+      });
+    }
+
     function renderTable() {
       const tbody = document.getElementById("monitoringTbody");
       const note = document.getElementById("tableNote");
@@ -445,7 +933,7 @@
       const sppg = document.getElementById("filterSppg").value;
       const tanggal = document.getElementById("filterTanggal").value;
 
-      let filtered = monitoringData.filter(function(item) {
+      const filtered = monitoringData.filter(function(item) {
         const text = [
           item.namaSppg,
           item.tanggal,
@@ -456,7 +944,7 @@
 
         const matchKeyword = !keyword || text.includes(keyword);
         const matchSppg = !sppg || item.namaSppg === sppg;
-        const matchTanggal = !tanggal || item.tanggal === tanggal;
+        const matchTanggal = !tanggal || normalizeDate(item.tanggal) === tanggal;
 
         return matchKeyword && matchSppg && matchTanggal;
       });
@@ -486,10 +974,29 @@
       }).join("");
     }
 
+    function normalizeDate(value) {
+      if (!value) return "";
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        return value;
+      }
+
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return value;
+
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+
+      return `${y}-${m}-${d}`;
+    }
+
     function formatTanggal(value) {
       if (!value) return "-";
 
-      const date = new Date(value);
+      const normalized = normalizeDate(value);
+      const date = new Date(normalized + "T00:00:00");
+
       if (isNaN(date.getTime())) return value;
 
       return date.toLocaleDateString("id-ID", {
@@ -497,6 +1004,23 @@
         month: "long",
         year: "numeric"
       });
+    }
+
+    function formatTanggalShort(value) {
+      if (!value) return "-";
+
+      const date = new Date(value + "T00:00:00");
+      if (isNaN(date.getTime())) return value;
+
+      return date.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short"
+      });
+    }
+
+    function limitText(text, max) {
+      const value = String(text || "");
+      return value.length > max ? value.substring(0, max) + "..." : value;
     }
 
     function escapeHtml(value) {
