@@ -389,6 +389,11 @@
   const messageBox = document.getElementById("messageBox");
   const btnSimpan = document.getElementById("btnSimpan");
 
+  const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5 MB
+  const COMPRESS_MAX_WIDTH = 1600;
+  const COMPRESS_MAX_HEIGHT = 1600;
+  const JPEG_QUALITY = 0.72;
+
   document.addEventListener("DOMContentLoaded", function () {
     const email = localStorage.getItem("mbg_email");
     const password = localStorage.getItem("mbg_password");
@@ -442,19 +447,24 @@
       return;
     }
 
-    const maxSize = 4 * 1024 * 1024;
+    if (fotoMenu.size > MAX_UPLOAD_SIZE) {
+      showMessage("Foto Menu MBG maksimal 5 MB.", "error");
+      return;
+    }
 
-    if (fotoMenu.size > maxSize || fotoDistribusi.size > maxSize) {
-      showMessage("Ukuran foto maksimal 4 MB per file.", "error");
+    if (fotoDistribusi.size > MAX_UPLOAD_SIZE) {
+      showMessage("Foto Distribusi maksimal 5 MB.", "error");
       return;
     }
 
     btnSimpan.disabled = true;
-    btnSimpan.textContent = "Menyimpan...";
+    btnSimpan.textContent = "Mengompresi foto...";
 
     try {
-      const fotoMenuBase64 = await fileToBase64(fotoMenu);
-      const fotoDistribusiBase64 = await fileToBase64(fotoDistribusi);
+      const fotoMenuCompressed = await compressImageToBase64(fotoMenu, "foto-menu-mbg.jpg");
+      const fotoDistribusiCompressed = await compressImageToBase64(fotoDistribusi, "foto-distribusi-mbg.jpg");
+
+      btnSimpan.textContent = "Menyimpan...";
 
       const payload = {
         email: email,
@@ -463,16 +473,8 @@
         tanggal: tanggal,
         menuMbg: menuMbg,
         nilaiGizi: nilaiGizi,
-        fotoMenu: {
-          fileName: fotoMenu.name,
-          mimeType: fotoMenu.type,
-          data: fotoMenuBase64
-        },
-        fotoDistribusi: {
-          fileName: fotoDistribusi.name,
-          mimeType: fotoDistribusi.type,
-          data: fotoDistribusiBase64
-        }
+        fotoMenu: fotoMenuCompressed,
+        fotoDistribusi: fotoDistribusiCompressed
       };
 
       const res = await fetch("/api/save-monitoring", {
@@ -486,7 +488,7 @@
       const result = await res.json();
 
       if (result.success) {
-        showMessage("Data berhasil disimpan ke Google Spreadsheet dan foto berhasil masuk ke Google Drive.", "success");
+        showMessage("Data berhasil disimpan. Foto sudah dikompresi dan tersimpan ke Google Drive.", "success");
 
         form.reset();
 
@@ -501,7 +503,7 @@
 
     } catch (error) {
       console.error(error);
-      showMessage("Gagal mengirim data ke server.", "error");
+      showMessage("Gagal memproses foto atau mengirim data.", "error");
 
     } finally {
       btnSimpan.disabled = false;
@@ -509,17 +511,63 @@
     }
   });
 
-  function fileToBase64(file) {
+  function compressImageToBase64(file, newFileName) {
     return new Promise(function(resolve, reject) {
+      if (!file.type.startsWith("image/")) {
+        reject(new Error("File harus berupa gambar."));
+        return;
+      }
+
       const reader = new FileReader();
 
-      reader.onload = function() {
-        const base64 = reader.result.split(",")[1];
-        resolve(base64);
+      reader.onload = function(event) {
+        const img = new Image();
+
+        img.onload = function() {
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > COMPRESS_MAX_WIDTH) {
+              height = Math.round(height * COMPRESS_MAX_WIDTH / width);
+              width = COMPRESS_MAX_WIDTH;
+            }
+          } else {
+            if (height > COMPRESS_MAX_HEIGHT) {
+              width = Math.round(width * COMPRESS_MAX_HEIGHT / height);
+              height = COMPRESS_MAX_HEIGHT;
+            }
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+          const base64 = compressedDataUrl.split(",")[1];
+
+          resolve({
+            fileName: newFileName,
+            mimeType: "image/jpeg",
+            data: base64,
+            originalName: file.name,
+            originalSize: file.size,
+            compressedInfo: "compressed-browser"
+          });
+        };
+
+        img.onerror = function() {
+          reject(new Error("Gagal membaca gambar. Gunakan format JPG, JPEG, atau PNG."));
+        };
+
+        img.src = event.target.result;
       };
 
       reader.onerror = function() {
-        reject(new Error("Gagal membaca file."));
+        reject(new Error("Gagal membaca file gambar."));
       };
 
       reader.readAsDataURL(file);
