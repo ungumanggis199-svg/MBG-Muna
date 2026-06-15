@@ -420,6 +420,42 @@
   }
 });
 
+    async function loadListSPPG() {
+  const select = document.getElementById("namaSppg");
+
+  select.innerHTML = '<option value="">Memuat List SPPG...</option>';
+
+  try {
+    const res = await fetch("/api/list-sppg");
+    const result = await res.json();
+
+    if (!result.success) {
+      select.innerHTML = '<option value="">Gagal memuat List SPPG</option>';
+      showMessage(result.message || "Gagal mengambil List SPPG.", "error");
+      return;
+    }
+
+    select.innerHTML = '<option value="">Pilih Nama SPPG</option>';
+
+    if (!result.data || result.data.length === 0) {
+      select.innerHTML = '<option value="">List SPPG masih kosong</option>';
+      return;
+    }
+
+    result.data.forEach(function(namaSppg) {
+      const option = document.createElement("option");
+      option.value = namaSppg;
+      option.textContent = namaSppg;
+      select.appendChild(option);
+    });
+
+  } catch (error) {
+    console.error(error);
+    select.innerHTML = '<option value="">Gagal memuat List SPPG</option>';
+    showMessage("Gagal terhubung ke server List SPPG.", "error");
+  }
+}
+
   form.addEventListener("submit", async function(event) {
     event.preventDefault();
 
