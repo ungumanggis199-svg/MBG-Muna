@@ -7,6 +7,7 @@
   <title>Monitoring Distribusi MBG - Kejaksaan Negeri Muna</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     :root {
@@ -524,6 +525,204 @@
         padding: 16px;
       }
     }
+  .report-panel {
+  margin-bottom: 18px;
+}
+
+.report-action {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-export {
+  border: none;
+  border-radius: 999px;
+  padding: 11px 18px;
+  background: linear-gradient(135deg, #0f5132, #15803d);
+  color: #ffffff;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(21, 128, 61, 0.18);
+}
+
+.btn-export:hover {
+  transform: translateY(-1px);
+}
+
+.report-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.report-tab {
+  border: 1px solid rgba(15, 81, 50, 0.18);
+  background: #ffffff;
+  color: #0f5132;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.report-tab.active {
+  background: #0f5132;
+  color: #ffffff;
+  border-color: #0f5132;
+}
+
+.report-controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.report-control label {
+  display: block;
+  margin-bottom: 7px;
+  color: #043927;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.report-control input,
+.report-control select {
+  width: 100%;
+  border: 1px solid #d9e5dd;
+  border-radius: 13px;
+  padding: 12px 13px;
+  background: #ffffff;
+  font-size: 14px;
+}
+
+.report-export-area {
+  background: #ffffff;
+  border: 1px solid rgba(4, 57, 39, 0.12);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.report-print-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e5eee9;
+  margin-bottom: 14px;
+}
+
+.report-print-head img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.report-print-org {
+  font-size: 12px;
+  font-weight: 900;
+  color: #0f5132;
+  text-transform: uppercase;
+}
+
+.report-print-title {
+  margin-top: 3px;
+  font-size: 20px;
+  font-weight: 900;
+  color: #043927;
+  text-transform: uppercase;
+}
+
+.report-print-sub {
+  margin-top: 3px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.report-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.report-mini-card {
+  border: 1px solid #e5eee9;
+  border-radius: 14px;
+  padding: 13px;
+  background: #f8fbf9;
+}
+
+.report-mini-label {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+.report-mini-value {
+  font-size: 22px;
+  font-weight: 900;
+  color: #043927;
+}
+
+.report-chart-box {
+  height: 260px;
+  border: 1px solid #e5eee9;
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.report-table-wrap {
+  overflow-x: auto;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 860px;
+}
+
+.report-table th {
+  background: #f3f8f5;
+  color: #043927;
+  text-align: left;
+  padding: 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #d9e5dd;
+}
+
+.report-table td {
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  border-bottom: 1px solid #edf2ef;
+}
+
+.report-footer {
+  margin-top: 12px;
+  color: #64748b;
+  font-size: 11px;
+  text-align: right;
+}
+
+.pdf-mode .btn-export,
+.pdf-mode .report-tabs,
+.pdf-mode .report-controls {
+  display: none !important;
+}
+
+@media (max-width: 800px) {
+  .report-controls,
+  .report-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+    
   </style>
 </head>
 
@@ -599,6 +798,86 @@
     </section>
 
     <div id="errorBox" class="error"></div>
+    <section class="panel report-panel">
+  <div class="panel-head">
+    <div>
+      <div class="panel-title">Generator Laporan Monitoring MBG</div>
+      <div class="panel-sub">Pilih jenis laporan, lihat grafik, lalu ekspor ke PDF.</div>
+    </div>
+
+    <div class="report-action">
+      <button class="btn-export" type="button" onclick="exportReportPDF()">
+        Export PDF
+      </button>
+    </div>
+  </div>
+
+  <div class="report-tabs">
+    <button class="report-tab active" type="button" data-report-tab="daily">
+      Laporan Harian
+    </button>
+
+    <button class="report-tab" type="button" data-report-tab="monthly">
+      Laporan Bulanan
+    </button>
+
+    <button class="report-tab" type="button" data-report-tab="sppgMonthly">
+      Bulanan per SPPG
+    </button>
+  </div>
+
+  <div class="report-controls">
+    <div class="report-control" id="controlReportDate">
+      <label>Tanggal Laporan</label>
+      <input type="date" id="reportDate">
+    </div>
+
+    <div class="report-control" id="controlReportMonth">
+      <label>Bulan Laporan</label>
+      <input type="month" id="reportMonth">
+    </div>
+
+    <div class="report-control" id="controlReportSppg">
+      <label>Nama SPPG</label>
+      <select id="reportSppg">
+        <option value="">Pilih SPPG</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="report-export-area" id="reportExportArea">
+    <div class="report-print-head">
+      <img
+        src="https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Logo-Kejaksaan%20%281%29%281%29.png"
+        alt="Logo Kejaksaan"
+      >
+
+      <div>
+        <div class="report-print-org">Kejaksaan Republik Indonesia</div>
+        <div class="report-print-title" id="reportTitle">Laporan Harian MBG</div>
+        <div class="report-print-sub" id="reportSubtitle">Periode laporan</div>
+      </div>
+    </div>
+
+    <div class="report-summary-grid" id="reportSummaryCards"></div>
+
+    <div class="report-chart-box">
+      <canvas id="reportChart"></canvas>
+    </div>
+
+    <div class="report-table-wrap">
+      <table class="report-table">
+        <thead id="reportThead"></thead>
+        <tbody id="reportTbody"></tbody>
+      </table>
+    </div>
+
+    <div class="report-footer" id="reportFooter">
+      Kejaksaan Negeri Muna · Monitoring Distribusi MBG
+    </div>
+  </div>
+</section>
+    
 
     <section class="dashboard-grid">
       <div class="panel">
@@ -676,9 +955,11 @@
   </main>
 
   <script>
-    let monitoringData = [];
-    let chartSppg = null;
-    let chartTrend = null;
+let monitoringData = [];
+let chartSppg = null;
+let chartTrend = null;
+let reportChart = null;
+let activeReportTab = "daily";
 
     document.addEventListener("DOMContentLoaded", async function() {
       await loadMonitoringData();
@@ -705,11 +986,12 @@
 
         monitoringData = result.data || [];
 
-        updateSummary(result.summary || {});
-        buildSppgFilter();
-        renderLatestList();
-        renderCharts();
-        renderTable();
+updateSummary(result.summary || {});
+buildSppgFilter();
+renderLatestList();
+renderCharts();
+initReportGenerator();
+renderTable();
 
       } catch (error) {
         console.error(error);
@@ -975,21 +1257,32 @@
     }
 
     function normalizeDate(value) {
-      if (!value) return "";
+  if (!value) return "";
 
-      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-        return value;
-      }
+  const raw = String(value).trim();
 
-      const date = new Date(value);
-      if (isNaN(date.getTime())) return value;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return raw;
+  }
 
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, "0");
-      const d = String(date.getDate()).padStart(2, "0");
+  const ddmmyyyy = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (ddmmyyyy) {
+    const d = String(ddmmyyyy[1]).padStart(2, "0");
+    const m = String(ddmmyyyy[2]).padStart(2, "0");
+    const y = ddmmyyyy[3];
 
-      return `${y}-${m}-${d}`;
-    }
+    return `${y}-${m}-${d}`;
+  }
+
+  const date = new Date(raw);
+  if (isNaN(date.getTime())) return raw;
+
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+
+  return `${y}-${m}-${d}`;
+}
 
     function formatTanggal(value) {
       if (!value) return "-";
@@ -1023,6 +1316,505 @@
       return value.length > max ? value.substring(0, max) + "..." : value;
     }
 
+    function initReportGenerator() {
+  populateReportSppg();
+
+  const latestDate = getLatestDateFromData() || getTodayInputValue();
+  const latestMonth = latestDate ? latestDate.slice(0, 7) : getTodayInputValue().slice(0, 7);
+
+  document.getElementById("reportDate").value = latestDate;
+  document.getElementById("reportMonth").value = latestMonth;
+
+  document.querySelectorAll(".report-tab").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      document.querySelectorAll(".report-tab").forEach(function(item) {
+        item.classList.remove("active");
+      });
+
+      btn.classList.add("active");
+      activeReportTab = btn.dataset.reportTab;
+      toggleReportControls();
+      renderReportGenerator();
+    });
+  });
+
+  document.getElementById("reportDate").addEventListener("change", renderReportGenerator);
+  document.getElementById("reportMonth").addEventListener("change", renderReportGenerator);
+  document.getElementById("reportSppg").addEventListener("change", renderReportGenerator);
+
+  toggleReportControls();
+  renderReportGenerator();
+}
+
+function toggleReportControls() {
+  document.getElementById("controlReportDate").style.display =
+    activeReportTab === "daily" ? "block" : "none";
+
+  document.getElementById("controlReportMonth").style.display =
+    activeReportTab === "daily" ? "none" : "block";
+
+  document.getElementById("controlReportSppg").style.display =
+    activeReportTab === "sppgMonthly" ? "block" : "none";
+}
+
+function populateReportSppg() {
+  const select = document.getElementById("reportSppg");
+  const sppgList = [...new Set(monitoringData.map(item => item.namaSppg))].filter(Boolean);
+
+  select.innerHTML = '<option value="">Pilih SPPG</option>';
+
+  sppgList.forEach(function(sppg) {
+    const option = document.createElement("option");
+    option.value = sppg;
+    option.textContent = sppg;
+    select.appendChild(option);
+  });
+
+  if (sppgList.length > 0) {
+    select.value = sppgList[0];
+  }
+}
+
+function renderReportGenerator() {
+  const rows = getRowsForActiveReport();
+  const title = getReportTitle();
+  const subtitle = getReportSubtitle();
+
+  document.getElementById("reportTitle").textContent = title;
+  document.getElementById("reportSubtitle").textContent = subtitle;
+
+  renderReportSummary(rows);
+  renderReportChart(rows);
+  renderReportTable(rows);
+
+  const now = new Date();
+  document.getElementById("reportFooter").textContent =
+    "Kejaksaan Negeri Muna · Monitoring Distribusi MBG · Dicetak " +
+    now.toLocaleString("id-ID");
+}
+
+function getRowsForActiveReport() {
+  const reportDate = document.getElementById("reportDate").value;
+  const reportMonth = document.getElementById("reportMonth").value;
+  const reportSppg = document.getElementById("reportSppg").value;
+
+  return monitoringData.filter(function(item) {
+    const itemDate = normalizeDate(item.tanggal);
+    const itemMonth = itemDate ? itemDate.slice(0, 7) : "";
+
+    if (activeReportTab === "daily") {
+      return itemDate === reportDate;
+    }
+
+    if (activeReportTab === "monthly") {
+      return itemMonth === reportMonth;
+    }
+
+    if (activeReportTab === "sppgMonthly") {
+      return itemMonth === reportMonth && item.namaSppg === reportSppg;
+    }
+
+    return false;
+  });
+}
+
+function getReportTitle() {
+  if (activeReportTab === "daily") {
+    return "Laporan Harian Distribusi MBG";
+  }
+
+  if (activeReportTab === "monthly") {
+    return "Laporan Bulanan Distribusi MBG";
+  }
+
+  return "Laporan Bulanan per SPPG";
+}
+
+function getReportSubtitle() {
+  const reportDate = document.getElementById("reportDate").value;
+  const reportMonth = document.getElementById("reportMonth").value;
+  const reportSppg = document.getElementById("reportSppg").value;
+
+  if (activeReportTab === "daily") {
+    return "Tanggal: " + formatTanggal(reportDate);
+  }
+
+  if (activeReportTab === "monthly") {
+    return "Bulan: " + formatMonthLabel(reportMonth);
+  }
+
+  return "SPPG: " + (reportSppg || "-") + " · Bulan: " + formatMonthLabel(reportMonth);
+}
+
+function renderReportSummary(rows) {
+  const sppgSet = new Set(rows.map(item => item.namaSppg).filter(Boolean));
+  const tanggalSet = new Set(rows.map(item => normalizeDate(item.tanggal)).filter(Boolean));
+  const menuCount = rows.filter(item => item.menuMbg).length;
+
+  const cards = [
+    {
+      label: "Total Laporan",
+      value: rows.length
+    },
+    {
+      label: "SPPG Melapor",
+      value: sppgSet.size
+    },
+    {
+      label: "Hari Tercatat",
+      value: tanggalSet.size
+    },
+    {
+      label: "Menu Tercatat",
+      value: menuCount
+    }
+  ];
+
+  document.getElementById("reportSummaryCards").innerHTML = cards.map(function(card) {
+    return `
+      <div class="report-mini-card">
+        <div class="report-mini-label">${escapeHtml(card.label)}</div>
+        <div class="report-mini-value">${escapeHtml(card.value)}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderReportChart(rows) {
+  const canvas = document.getElementById("reportChart");
+
+  if (reportChart) {
+    reportChart.destroy();
+  }
+
+  let labels = [];
+  let values = [];
+  let chartType = "bar";
+  let labelName = "Jumlah Laporan";
+
+  if (activeReportTab === "daily") {
+    const grouped = groupBy(rows, "namaSppg");
+
+    labels = Object.keys(grouped);
+    values = labels.map(key => grouped[key].length);
+    chartType = "bar";
+  }
+
+  if (activeReportTab === "monthly") {
+    const grouped = {};
+
+    rows.forEach(function(item) {
+      const key = normalizeDate(item.tanggal);
+      if (!key) return;
+      grouped[key] = (grouped[key] || 0) + 1;
+    });
+
+    const sorted = Object.entries(grouped).sort(function(a, b) {
+      return new Date(a[0]) - new Date(b[0]);
+    });
+
+    labels = sorted.map(item => formatTanggalShort(item[0]));
+    values = sorted.map(item => item[1]);
+    chartType = "line";
+  }
+
+  if (activeReportTab === "sppgMonthly") {
+    const grouped = {};
+
+    rows.forEach(function(item) {
+      const key = normalizeDate(item.tanggal);
+      if (!key) return;
+      grouped[key] = (grouped[key] || 0) + 1;
+    });
+
+    const sorted = Object.entries(grouped).sort(function(a, b) {
+      return new Date(a[0]) - new Date(b[0]);
+    });
+
+    labels = sorted.map(item => formatTanggalShort(item[0]));
+    values = sorted.map(item => item[1]);
+    chartType = "bar";
+  }
+
+  if (labels.length === 0) {
+    labels = ["Tidak ada data"];
+    values = [0];
+  }
+
+  reportChart = new Chart(canvas, {
+    type: chartType,
+    data: {
+      labels: labels,
+      datasets: [{
+        label: labelName,
+        data: values,
+        borderRadius: chartType === "bar" ? 8 : 0,
+        borderWidth: chartType === "line" ? 3 : 0,
+        tension: 0.36,
+        fill: chartType === "line",
+        backgroundColor: chartType === "line"
+          ? "rgba(21, 128, 61, 0.14)"
+          : "rgba(21, 128, 61, 0.82)",
+        borderColor: "rgba(15, 81, 50, 0.95)",
+        pointBackgroundColor: "#d7b45a"
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.raw + " laporan";
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: "#64748b",
+            font: {
+              size: 11,
+              weight: "bold"
+            }
+          }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0,
+            color: "#64748b"
+          },
+          grid: {
+            color: "rgba(100,116,139,0.14)"
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderReportTable(rows) {
+  if (activeReportTab === "daily") {
+    renderDailyReportTable(rows);
+    return;
+  }
+
+  if (activeReportTab === "monthly") {
+    renderMonthlyReportTable(rows);
+    return;
+  }
+
+  renderSppgMonthlyReportTable(rows);
+}
+
+function renderDailyReportTable(rows) {
+  document.getElementById("reportThead").innerHTML = `
+    <tr>
+      <th>Nama SPPG</th>
+      <th>Tanggal</th>
+      <th>Menu MBG</th>
+      <th>Nilai Gizi</th>
+      <th>Dokumentasi</th>
+      <th>Waktu Simpan</th>
+    </tr>
+  `;
+
+  if (rows.length === 0) {
+    document.getElementById("reportTbody").innerHTML =
+      '<tr><td colspan="6" class="empty">Belum ada laporan pada periode ini.</td></tr>';
+    return;
+  }
+
+  document.getElementById("reportTbody").innerHTML = rows.map(function(item) {
+    return `
+      <tr>
+        <td><strong>${escapeHtml(item.namaSppg)}</strong></td>
+        <td>${escapeHtml(formatTanggal(item.tanggal))}</td>
+        <td>${escapeHtml(item.menuMbg)}</td>
+        <td>${escapeHtml(item.nilaiGizi)}</td>
+        <td>
+          ${item.linkFotoMenu ? `<a href="${item.linkFotoMenu}" target="_blank">Foto Menu</a>` : "-"}
+          ${item.linkFotoDistribusi ? ` · <a href="${item.linkFotoDistribusi}" target="_blank">Foto Distribusi</a>` : ""}
+        </td>
+        <td>${escapeHtml(item.waktuSimpan || "-")}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderMonthlyReportTable(rows) {
+  document.getElementById("reportThead").innerHTML = `
+    <tr>
+      <th>Tanggal</th>
+      <th>Jumlah Laporan</th>
+      <th>SPPG Melapor</th>
+      <th>Daftar SPPG</th>
+    </tr>
+  `;
+
+  if (rows.length === 0) {
+    document.getElementById("reportTbody").innerHTML =
+      '<tr><td colspan="4" class="empty">Belum ada laporan pada bulan ini.</td></tr>';
+    return;
+  }
+
+  const grouped = {};
+
+  rows.forEach(function(item) {
+    const date = normalizeDate(item.tanggal);
+    if (!grouped[date]) grouped[date] = [];
+    grouped[date].push(item);
+  });
+
+  const sorted = Object.entries(grouped).sort(function(a, b) {
+    return new Date(a[0]) - new Date(b[0]);
+  });
+
+  document.getElementById("reportTbody").innerHTML = sorted.map(function(entry) {
+    const date = entry[0];
+    const items = entry[1];
+    const sppgList = [...new Set(items.map(item => item.namaSppg))].filter(Boolean);
+
+    return `
+      <tr>
+        <td>${escapeHtml(formatTanggal(date))}</td>
+        <td><strong>${items.length}</strong> laporan</td>
+        <td>${sppgList.length} SPPG</td>
+        <td>${escapeHtml(sppgList.join(", "))}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderSppgMonthlyReportTable(rows) {
+  document.getElementById("reportThead").innerHTML = `
+    <tr>
+      <th>Tanggal</th>
+      <th>Menu MBG</th>
+      <th>Nilai Gizi</th>
+      <th>Dokumentasi</th>
+      <th>Waktu Simpan</th>
+    </tr>
+  `;
+
+  if (rows.length === 0) {
+    document.getElementById("reportTbody").innerHTML =
+      '<tr><td colspan="5" class="empty">Belum ada laporan SPPG pada bulan ini.</td></tr>';
+    return;
+  }
+
+  document.getElementById("reportTbody").innerHTML = rows.map(function(item) {
+    return `
+      <tr>
+        <td>${escapeHtml(formatTanggal(item.tanggal))}</td>
+        <td>${escapeHtml(item.menuMbg)}</td>
+        <td>${escapeHtml(item.nilaiGizi)}</td>
+        <td>
+          ${item.linkFotoMenu ? `<a href="${item.linkFotoMenu}" target="_blank">Foto Menu</a>` : "-"}
+          ${item.linkFotoDistribusi ? ` · <a href="${item.linkFotoDistribusi}" target="_blank">Foto Distribusi</a>` : ""}
+        </td>
+        <td>${escapeHtml(item.waktuSimpan || "-")}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function exportReportPDF() {
+  const element = document.getElementById("reportExportArea");
+  const title = getReportTitle().replaceAll(" ", "-").toLowerCase();
+  const date = new Date().toISOString().slice(0, 10);
+  const filename = title + "-" + date + ".pdf";
+
+  document.body.classList.add("pdf-mode");
+
+  const options = {
+    margin: 8,
+    filename: filename,
+    image: {
+      type: "jpeg",
+      quality: 0.98
+    },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      scrollY: 0
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait"
+    }
+  };
+
+  html2pdf()
+    .set(options)
+    .from(element)
+    .save()
+    .then(function() {
+      document.body.classList.remove("pdf-mode");
+    })
+    .catch(function(error) {
+      console.error(error);
+      document.body.classList.remove("pdf-mode");
+      alert("Gagal membuat PDF. Silakan coba lagi.");
+    });
+}
+
+function groupBy(rows, key) {
+  return rows.reduce(function(result, item) {
+    const groupKey = item[key] || "Tidak diketahui";
+
+    if (!result[groupKey]) {
+      result[groupKey] = [];
+    }
+
+    result[groupKey].push(item);
+    return result;
+  }, {});
+}
+
+function getLatestDateFromData() {
+  const dates = monitoringData
+    .map(item => normalizeDate(item.tanggal))
+    .filter(Boolean)
+    .sort(function(a, b) {
+      return new Date(b) - new Date(a);
+    });
+
+  return dates[0] || "";
+}
+
+function getTodayInputValue() {
+  const date = new Date();
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+
+  return `${y}-${m}-${d}`;
+}
+
+function formatMonthLabel(value) {
+  if (!value) return "-";
+
+  const date = new Date(value + "-01T00:00:00");
+  if (isNaN(date.getTime())) return value;
+
+  return date.toLocaleDateString("id-ID", {
+    month: "long",
+    year: "numeric"
+  });
+}
+    
     function escapeHtml(value) {
       return String(value || "")
         .replaceAll("&", "&amp;")
