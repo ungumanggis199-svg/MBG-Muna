@@ -385,43 +385,141 @@
   </main>
 
   <script>
-    const form = document.getElementById("formMonitoring");
-    const messageBox = document.getElementById("messageBox");
-    const btnSimpan = document.getElementById("btnSimpan");
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxl7u7NeBrpaXxylVCRmKqhIapX2nRRZN0l5vRu2mDwP3CkJBmRDUopBmbiRoAix_YB/exec";
 
-    form.addEventListener("submit", function(event) {
-      event.preventDefault();
+  const form = document.getElementById("formMonitoring");
+  const messageBox = document.getElementById("messageBox");
+  const btnSimpan = document.getElementById("btnSimpan");
 
-      const namaSppg = document.getElementById("namaSppg").value.trim();
-      const tanggal = document.getElementById("tanggal").value;
-      const menuMbg = document.getElementById("menuMbg").value.trim();
-      const nilaiGizi = document.getElementById("nilaiGizi").value.trim();
-      const fotoMenu = document.getElementById("fotoMenu").files[0];
-      const fotoDistribusi = document.getElementById("fotoDistribusi").files[0];
+  document.addEventListener("DOMContentLoaded", function () {
+    const email = localStorage.getItem("mbg_email");
+    const password = localStorage.getItem("mbg_password");
+    const sppg = localStorage.getItem("mbg_sppg");
 
-      if (!namaSppg || !tanggal || !menuMbg || !nilaiGizi || !fotoMenu || !fotoDistribusi) {
-        showMessage("Mohon lengkapi seluruh data terlebih dahulu.", "error");
-        return;
+    if (!email || !password) {
+      alert("Silakan login terlebih dahulu.");
+      window.location.href = "/";
+      return;
+    }
+
+    if (sppg) {
+      const select = document.getElementById("namaSppg");
+      const optionExists = Array.from(select.options).some(function(option) {
+        return option.value === sppg;
+      });
+
+      if (!optionExists) {
+        const option = document.createElement("option");
+        option.value = sppg;
+        option.textContent = sppg;
+        select.appendChild(option);
       }
 
-      btnSimpan.disabled = true;
-      btnSimpan.textContent = "Memeriksa...";
-
-      setTimeout(function() {
-        showMessage(
-          "Form tahap 1 sudah berjalan. Tahap berikutnya tombol Simpan akan disambungkan ke Google Apps Script.",
-          "success"
-        );
-
-        btnSimpan.disabled = false;
-        btnSimpan.textContent = "Simpan";
-      }, 700);
-    });
-
-    function showMessage(message, type) {
-      messageBox.textContent = message;
-      messageBox.className = "message " + type;
+      select.value = sppg;
     }
-  </script>
+  });
+
+  form.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const email = localStorage.getItem("mbg_email");
+    const password = localStorage.getItem("mbg_password");
+
+    if (!email || !password) {
+      alert("Sesi login habis. Silakan login ulang.");
+      window.location.href = "/";
+      return;
+    }
+
+    const namaSppg = document.getElementById("namaSppg").value.trim();
+    const tanggal = document.getElementById("tanggal").value;
+    const menuMbg = document.getElementById("menuMbg").value.trim();
+    const nilaiGizi = document.getElementById("nilaiGizi").value.trim();
+    const fotoMenu = document.getElementById("fotoMenu").files[0];
+    const fotoDistribusi = document.getElementById("fotoDistribusi").files[0];
+
+    if (!namaSppg || !tanggal || !menuMbg || !nilaiGizi || !fotoMenu || !fotoDistribusi) {
+      showMessage("Mohon lengkapi seluruh data terlebih dahulu.", "error");
+      return;
+    }
+
+    btnSimpan.disabled = true;
+    btnSimpan.textContent = "Menyimpan...";
+
+    try {
+      const fotoMenuBase64 = await fileToBase64(fotoMenu);
+      const fotoDistribusiBase64 = await fileToBase64(fotoDistribusi);
+
+      const payload = {
+        action: "saveMonitoring",
+        email: email,
+        password: password,
+        namaSppg: namaSppg,
+        tanggal: tanggal,
+        menuMbg: menuMbg,
+        nilaiGizi: nilaiGizi,
+        fotoMenu: {
+          fileName: fotoMenu.name,
+          mimeType: fotoMenu.type,
+          data: fotoMenuBase64
+        },
+        fotoDistribusi: {
+          fileName: fotoDistribusi.name,
+          mimeType: fotoDistribusi.type,
+          data: fotoDistribusiBase64
+        }
+      };
+
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        showMessage("Data berhasil disimpan ke Google Spreadsheet.", "success");
+        form.reset();
+
+        const sppg = localStorage.getItem("mbg_sppg");
+        if (sppg) {
+          document.getElementById("namaSppg").value = sppg;
+        }
+
+      } else {
+        showMessage(result.message || "Data gagal disimpan.", "error");
+      }
+
+    } catch (error) {
+      showMessage("Gagal mengirim data ke Apps Script.", "error");
+
+    } finally {
+      btnSimpan.disabled = false;
+      btnSimpan.textContent = "Simpan";
+    }
+  });
+
+  function fileToBase64(file) {
+    return new Promise(function(resolve, reject) {
+      const reader = new FileReader();
+
+      reader.onload = function() {
+        const base64 = reader.result.split(",")[1];
+        resolve(base64);
+      };
+
+      reader.onerror = function() {
+        reject(new Error("Gagal membaca file."));
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function showMessage(message, type) {
+    messageBox.textContent = message;
+    messageBox.className = "message " + type;
+  }
+</script>
 </body>
 </html>
