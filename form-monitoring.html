@@ -308,13 +308,8 @@
           <div class="form-group">
             <label for="namaSppg">Nama SPPG</label>
             <select id="namaSppg" name="namaSppg" required>
-              <option value="">Pilih Nama SPPG</option>
-              <option value="SPPG 1">SPPG 1</option>
-              <option value="SPPG 2">SPPG 2</option>
-              <option value="SPPG 3">SPPG 3</option>
-              <option value="SPPG 4">SPPG 4</option>
-              <option value="SPPG 5">SPPG 5</option>
-            </select>
+        <option value="">Memuat List SPPG...</option>
+        </select>
           </div>
 
           <div class="form-group">
@@ -394,34 +389,36 @@
   const COMPRESS_MAX_HEIGHT = 1600;
   const JPEG_QUALITY = 0.82;
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const email = localStorage.getItem("mbg_email");
-    const password = localStorage.getItem("mbg_password");
-    const sppg = localStorage.getItem("mbg_sppg");
+  document.addEventListener("DOMContentLoaded", async function () {
+  const email = localStorage.getItem("mbg_email");
+  const password = localStorage.getItem("mbg_password");
+  const sppg = localStorage.getItem("mbg_sppg");
 
-    if (!email || !password) {
-      alert("Silakan login terlebih dahulu.");
-      window.location.href = "/";
-      return;
+  if (!email || !password) {
+    alert("Silakan login terlebih dahulu.");
+    window.location.href = "/";
+    return;
+  }
+
+  await loadListSPPG();
+
+  if (sppg && sppg.toLowerCase() !== "admin") {
+    const select = document.getElementById("namaSppg");
+
+    const optionExists = Array.from(select.options).some(function(option) {
+      return option.value.toLowerCase() === sppg.toLowerCase();
+    });
+
+    if (!optionExists) {
+      const option = document.createElement("option");
+      option.value = sppg;
+      option.textContent = sppg;
+      select.appendChild(option);
     }
 
-    if (sppg && sppg.toLowerCase() !== "admin") {
-      const select = document.getElementById("namaSppg");
-
-      const optionExists = Array.from(select.options).some(function(option) {
-        return option.value.toLowerCase() === sppg.toLowerCase();
-      });
-
-      if (!optionExists) {
-        const option = document.createElement("option");
-        option.value = sppg;
-        option.textContent = sppg;
-        select.appendChild(option);
-      }
-
-      select.value = sppg;
-    }
-  });
+    select.value = sppg;
+  }
+});
 
   form.addEventListener("submit", async function(event) {
     event.preventDefault();
