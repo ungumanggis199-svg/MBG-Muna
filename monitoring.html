@@ -866,7 +866,209 @@
     flex-direction: column;
   }
 }  
-    
+  /* INFOGRAFIS LAPORAN PDF */
+.report-infographic-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.report-info-card {
+  border: 1px solid #e5eee9;
+  border-radius: 16px;
+  padding: 14px;
+  background: linear-gradient(135deg, #f8fbf9, #ffffff);
+  position: relative;
+  overflow: hidden;
+}
+
+.report-info-card::after {
+  content: "";
+  position: absolute;
+  right: -24px;
+  top: -24px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(21, 128, 61, 0.08);
+}
+
+.report-info-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  background: #dcfce7;
+  color: #0f5132;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.report-info-label {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 900;
+  margin-bottom: 5px;
+}
+
+.report-info-value {
+  font-size: 22px;
+  font-weight: 900;
+  color: #043927;
+  line-height: 1;
+}
+
+.report-info-desc {
+  margin-top: 7px;
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.report-progress {
+  width: 100%;
+  height: 8px;
+  background: #e5eee9;
+  border-radius: 999px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.report-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0f5132, #16a34a);
+  border-radius: 999px;
+}
+
+.report-section-title {
+  margin: 18px 0 10px;
+  padding: 10px 12px;
+  border-left: 5px solid #0f5132;
+  background: #f3f8f5;
+  border-radius: 10px;
+  color: #043927;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.report-evidence-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.evidence-card {
+  border: 1px solid #e5eee9;
+  border-radius: 16px;
+  padding: 12px;
+  background: #ffffff;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.evidence-head {
+  margin-bottom: 10px;
+}
+
+.evidence-title {
+  font-size: 13px;
+  font-weight: 900;
+  color: #043927;
+}
+
+.evidence-meta {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.evidence-images {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.evidence-photo-box {
+  border: 1px solid #e5eee9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.evidence-photo-label {
+  padding: 7px 9px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #043927;
+  background: #f3f8f5;
+  border-bottom: 1px solid #e5eee9;
+}
+
+.evidence-photo-box img {
+  width: 100%;
+  height: 145px;
+  object-fit: cover;
+  display: block;
+  background: #f8fafc;
+}
+
+.photo-fallback {
+  display: none;
+  min-height: 145px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px;
+  font-size: 12px;
+  color: #0f5132;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.no-photo-box {
+  min-height: 145px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  padding: 12px;
+}
+
+@media print {
+  .report-infographic-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .report-evidence-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .evidence-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+@media (max-width: 800px) {
+  .report-infographic-grid,
+  .report-evidence-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .evidence-images {
+    grid-template-columns: 1fr;
+  }
+}  
   </style>
 </head>
 
@@ -1005,9 +1207,12 @@
 
     <div class="report-summary-grid" id="reportSummaryCards"></div>
 
-    <div class="report-chart-box">
-      <canvas id="reportChart"></canvas>
-    </div>
+    <div class="report-infographic-grid" id="reportInfographicGrid"></div>
+<div class="report-section-title">
+  Dokumentasi Foto Menu dan Distribusi
+</div>
+
+<div class="report-evidence-grid" id="reportEvidenceGrid"></div>
 
     <div class="report-table-wrap">
       <table class="report-table">
@@ -1707,7 +1912,8 @@ function renderReportGenerator() {
   document.getElementById("reportSubtitle").textContent = subtitle;
 
   renderReportSummary(rows);
-  renderReportChart(rows);
+  renderReportInfographic(rows);
+  renderReportEvidence(rows);
   renderReportTable(rows);
 
   const now = new Date();
@@ -2051,14 +2257,179 @@ function renderSppgMonthlyReportTable(rows) {
     `;
   }).join("");
 }
+function renderReportInfographic(rows) {
+  const container = document.getElementById("reportInfographicGrid");
+  if (!container) return;
 
-function exportReportPDF() {
+  const sppgSet = new Set(rows.map(item => item.namaSppg).filter(Boolean));
+  const tanggalSet = new Set(rows.map(item => normalizeDate(item.tanggal)).filter(Boolean));
+
+  const withFotoMenu = rows.filter(item => item.linkFotoMenu).length;
+  const withFotoDistribusi = rows.filter(item => item.linkFotoDistribusi).length;
+  const documented = rows.filter(item => item.linkFotoMenu || item.linkFotoDistribusi).length;
+
+  let coverage = 0;
+
+  if (activeReportTab === "daily" && allSppgList && allSppgList.length > 0) {
+    coverage = Math.round((sppgSet.size / allSppgList.length) * 100);
+  } else if (rows.length > 0) {
+    coverage = Math.round((documented / rows.length) * 100);
+  }
+
+  const cards = [
+    {
+      icon: "📊",
+      label: "Total Laporan",
+      value: rows.length,
+      desc: "Jumlah laporan yang masuk pada periode ini.",
+      progress: rows.length > 0 ? 100 : 0
+    },
+    {
+      icon: "🏫",
+      label: "SPPG Melapor",
+      value: sppgSet.size,
+      desc: "Jumlah SPPG yang mengirimkan laporan.",
+      progress: coverage
+    },
+    {
+      icon: "🍱",
+      label: "Foto Menu",
+      value: withFotoMenu,
+      desc: "Dokumentasi menu MBG yang tersedia.",
+      progress: rows.length > 0 ? Math.round((withFotoMenu / rows.length) * 100) : 0
+    },
+    {
+      icon: "🚚",
+      label: "Foto Distribusi",
+      value: withFotoDistribusi,
+      desc: "Bukti distribusi MBG yang tersedia.",
+      progress: rows.length > 0 ? Math.round((withFotoDistribusi / rows.length) * 100) : 0
+    }
+  ];
+
+  container.innerHTML = cards.map(function(card) {
+    return `
+      <div class="report-info-card">
+        <div class="report-info-icon">${card.icon}</div>
+        <div class="report-info-label">${escapeHtml(card.label)}</div>
+        <div class="report-info-value">${escapeHtml(card.value)}</div>
+        <div class="report-info-desc">${escapeHtml(card.desc)}</div>
+        <div class="report-progress">
+          <div class="report-progress-fill" style="width:${Math.max(0, Math.min(card.progress, 100))}%"></div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderReportEvidence(rows) {
+  const container = document.getElementById("reportEvidenceGrid");
+  if (!container) return;
+
+  const rowsWithPhoto = rows
+    .filter(item => item.linkFotoMenu || item.linkFotoDistribusi)
+    .slice(0, 12);
+
+  if (rowsWithPhoto.length === 0) {
+    container.innerHTML = `
+      <div class="empty" style="grid-column:1 / -1;">
+        Belum ada dokumentasi foto pada periode laporan ini.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = rowsWithPhoto.map(function(item, index) {
+    return `
+      <div class="evidence-card">
+        <div class="evidence-head">
+          <div class="evidence-title">${escapeHtml(item.namaSppg || "-")}</div>
+          <div class="evidence-meta">
+            ${escapeHtml(formatTanggal(item.tanggal))} · ${escapeHtml(item.waktuSimpan || "-")}
+          </div>
+        </div>
+
+        <div class="evidence-images">
+          ${renderEvidencePhoto("Foto Menu MBG", item.linkFotoMenu)}
+          ${renderEvidencePhoto("Foto Distribusi", item.linkFotoDistribusi)}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderEvidencePhoto(label, url) {
+  if (!url) {
+    return `
+      <div class="evidence-photo-box">
+        <div class="evidence-photo-label">${escapeHtml(label)}</div>
+        <div class="no-photo-box">Foto belum tersedia</div>
+      </div>
+    `;
+  }
+
+  const imageUrl = driveImageUrl(url);
+
+  return `
+    <div class="evidence-photo-box">
+      <div class="evidence-photo-label">${escapeHtml(label)}</div>
+
+      <img
+        src="${escapeAttr(imageUrl)}"
+        crossorigin="anonymous"
+        alt="${escapeAttr(label)}"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+      >
+
+      <a
+        class="photo-fallback"
+        href="${escapeAttr(url)}"
+        target="_blank"
+      >
+        Buka ${escapeHtml(label)}
+      </a>
+    </div>
+  `;
+}
+
+function driveImageUrl(url) {
+  const id = extractDriveFileId(url);
+
+  if (!id) {
+    return url;
+  }
+
+  return "https://drive.google.com/thumbnail?id=" + id + "&sz=w1000";
+}
+
+function extractDriveFileId(url) {
+  const value = String(url || "");
+
+  let match = value.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (match && match[1]) return match[1];
+
+  match = value.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (match && match[1]) return match[1];
+
+  return "";
+}
+
+function escapeAttr(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+async function exportReportPDF() {
   const element = document.getElementById("reportExportArea");
   const title = getReportTitle().replaceAll(" ", "-").toLowerCase();
   const date = new Date().toISOString().slice(0, 10);
   const filename = title + "-" + date + ".pdf";
 
   document.body.classList.add("pdf-mode");
+
+  await waitForImages(element);
 
   const options = {
     margin: 8,
@@ -2070,12 +2441,17 @@ function exportReportPDF() {
     html2canvas: {
       scale: 2,
       useCORS: true,
-      scrollY: 0
+      allowTaint: false,
+      scrollY: 0,
+      imageTimeout: 15000
     },
     jsPDF: {
       unit: "mm",
       format: "a4",
       orientation: "portrait"
+    },
+    pagebreak: {
+      mode: ["avoid-all", "css", "legacy"]
     }
   };
 
@@ -2091,6 +2467,29 @@ function exportReportPDF() {
       document.body.classList.remove("pdf-mode");
       alert("Gagal membuat PDF. Silakan coba lagi.");
     });
+}
+
+function waitForImages(container) {
+  const images = Array.from(container.querySelectorAll("img"));
+
+  const promises = images.map(function(img) {
+    return new Promise(function(resolve) {
+      if (img.complete) {
+        resolve();
+        return;
+      }
+
+      img.onload = function() {
+        resolve();
+      };
+
+      img.onerror = function() {
+        resolve();
+      };
+    });
+  });
+
+  return Promise.all(promises);
 }
 
 function groupBy(rows, key) {
