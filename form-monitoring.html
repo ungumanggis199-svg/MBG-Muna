@@ -385,8 +385,6 @@
   </main>
 
   <script>
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxl7u7NeBrpaXxylVCRmKqhIapX2nRRZN0l5vRu2mDwP3CkJBmRDUopBmbiRoAix_YB/exec";
-
   const form = document.getElementById("formMonitoring");
   const messageBox = document.getElementById("messageBox");
   const btnSimpan = document.getElementById("btnSimpan");
@@ -402,10 +400,11 @@
       return;
     }
 
-    if (sppg) {
+    if (sppg && sppg.toLowerCase() !== "admin") {
       const select = document.getElementById("namaSppg");
+
       const optionExists = Array.from(select.options).some(function(option) {
-        return option.value === sppg;
+        return option.value.toLowerCase() === sppg.toLowerCase();
       });
 
       if (!optionExists) {
@@ -443,6 +442,13 @@
       return;
     }
 
+    const maxSize = 4 * 1024 * 1024;
+
+    if (fotoMenu.size > maxSize || fotoDistribusi.size > maxSize) {
+      showMessage("Ukuran foto maksimal 4 MB per file.", "error");
+      return;
+    }
+
     btnSimpan.disabled = true;
     btnSimpan.textContent = "Menyimpan...";
 
@@ -451,7 +457,6 @@
       const fotoDistribusiBase64 = await fileToBase64(fotoDistribusi);
 
       const payload = {
-        action: "saveMonitoring",
         email: email,
         password: password,
         namaSppg: namaSppg,
@@ -470,19 +475,23 @@
         }
       };
 
-      const res = await fetch(APPS_SCRIPT_URL, {
+      const res = await fetch("/api/save-monitoring", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(payload)
       });
 
       const result = await res.json();
 
       if (result.success) {
-        showMessage("Data berhasil disimpan ke Google Spreadsheet.", "success");
+        showMessage("Data berhasil disimpan ke Google Spreadsheet dan foto berhasil masuk ke Google Drive.", "success");
+
         form.reset();
 
         const sppg = localStorage.getItem("mbg_sppg");
-        if (sppg) {
+        if (sppg && sppg.toLowerCase() !== "admin") {
           document.getElementById("namaSppg").value = sppg;
         }
 
@@ -491,7 +500,8 @@
       }
 
     } catch (error) {
-      showMessage("Gagal mengirim data ke Apps Script.", "error");
+      console.error(error);
+      showMessage("Gagal mengirim data ke server.", "error");
 
     } finally {
       btnSimpan.disabled = false;
