@@ -522,6 +522,214 @@ tr:hover td{background:rgba(255,255,255,.03)}
   .dash-stats{grid-template-columns:1fr 1fr}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+  /* PATCH TAMPILAN INDEX - KEJARI MUNA */
+
+/* Background landing lebih realistik dan dinamis */
+#screen-landing {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 31, 18, 0.96) 0%,
+      rgba(6, 45, 27, 0.92) 34%,
+      rgba(7, 53, 33, 0.82) 60%,
+      rgba(5, 31, 18, 0.95) 100%
+    ),
+    url("https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Background%20Form.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* efek cahaya lembut */
+#screen-landing::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 18% 24%, rgba(200, 168, 75, 0.16), transparent 28%),
+    radial-gradient(circle at 74% 20%, rgba(45, 181, 94, 0.12), transparent 30%),
+    radial-gradient(circle at 52% 78%, rgba(255, 255, 255, 0.07), transparent 35%);
+  animation: bgGlowMove 10s ease-in-out infinite alternate;
+}
+
+/* efek garis/pola dinamis */
+#screen-landing::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.25;
+  background-image:
+    linear-gradient(115deg, transparent 0%, transparent 42%, rgba(200,168,75,0.18) 43%, transparent 44%),
+    linear-gradient(120deg, transparent 0%, transparent 55%, rgba(255,255,255,0.08) 56%, transparent 57%);
+  background-size: 260px 260px, 420px 420px;
+  animation: bgLineMove 18s linear infinite;
+}
+
+@keyframes bgGlowMove {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate3d(18px, -16px, 0) scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes bgLineMove {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 260px 260px, -420px 420px;
+  }
+}
+
+/* supaya isi tetap di atas background */
+.ln-nav,
+.ln-main {
+  position: relative;
+  z-index: 2;
+}
+
+/* navbar lebih rapi */
+.ln-nav {
+  justify-content: flex-start !important;
+  padding: 14px 42px !important;
+  background: rgba(5, 26, 15, 0.78) !important;
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(200, 168, 75, 0.22);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.22);
+}
+
+/* logo kiri atas pakai logo kejaksaan */
+.ln-logo {
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ln-logo img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+}
+
+.ln-brand {
+  gap: 12px;
+}
+
+.ln-n1 {
+  font-size: 14px !important;
+  color: #ffffff;
+}
+
+.ln-n2 {
+  font-size: 11px !important;
+  color: rgba(184, 207, 192, 0.88) !important;
+}
+
+/* hapus tombol login kanan atas jika masih tersisa */
+.btn-login-top {
+  display: none !important;
+}
+
+/* layout utama lebih lega dan modern */
+.ln-main {
+  max-width: 1380px;
+  min-height: calc(100vh - 72px);
+  align-items: start;
+  padding-top: 64px !important;
+}
+
+/* hero lebih hidup */
+.hero-main {
+  letter-spacing: -0.035em;
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.42);
+}
+
+.hero-sub {
+  color: #e0c472 !important;
+}
+
+.hero-desc {
+  color: rgba(232, 241, 235, 0.86) !important;
+}
+
+/* kartu dibuat lebih glassmorphism */
+.mc,
+.stats-bar,
+.login-card,
+.quote-card {
+  background: linear-gradient(
+    145deg,
+    rgba(22, 66, 40, 0.78),
+    rgba(10, 45, 27, 0.82)
+  ) !important;
+  border: 1px solid rgba(200, 168, 75, 0.26) !important;
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+}
+
+.mc:hover,
+.login-card:hover,
+.quote-card:hover,
+.stats-bar:hover {
+  border-color: rgba(224, 196, 114, 0.55) !important;
+}
+
+/* input login lebih menyatu */
+.field {
+  background: rgba(2, 23, 13, 0.72) !important;
+  border-color: rgba(200, 168, 75, 0.18) !important;
+}
+
+.field:focus-within {
+  border-color: rgba(224, 196, 114, 0.7) !important;
+  box-shadow: 0 0 0 3px rgba(200, 168, 75, 0.12);
+}
+
+/* tombol masuk lebih tegas */
+.btn-masuk {
+  background: linear-gradient(135deg, #20884d, #16a34a) !important;
+  box-shadow: 0 12px 26px rgba(22, 163, 74, 0.22);
+}
+
+.btn-masuk:hover {
+  background: linear-gradient(135deg, #22a75c, #22c55e) !important;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .ln-nav {
+    padding: 12px 18px !important;
+  }
+
+  .ln-main {
+    padding-top: 28px !important;
+  }
+
+  .ln-logo,
+  .ln-logo img {
+    width: 48px;
+    height: 48px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -531,31 +739,20 @@ tr:hover td{background:rgba(255,255,255,.03)}
 
   <!-- Navbar -->
   <nav class="ln-nav">
-    <div class="ln-brand">
-      <div class="ln-logo">
-        <svg viewBox="0 0 52 52" width="48" height="48">
-          <circle cx="26" cy="26" r="25" fill="#0f2d1a" stroke="#c8a84b" stroke-width="1.5"/>
-          <line x1="26" y1="13" x2="26" y2="40" stroke="#c8a84b" stroke-width="1.8"/>
-          <line x1="14" y1="21" x2="38" y2="21" stroke="#c8a84b" stroke-width="1.5"/>
-          <path d="M14 21 Q11 26 14 29 Q17 32 20 29 Q23 26 20 21Z" fill="none" stroke="#c8a84b" stroke-width="1.2"/>
-          <path d="M32 21 Q29 26 32 29 Q35 32 38 29 Q41 26 38 21Z" fill="none" stroke="#c8a84b" stroke-width="1.2"/>
-          <text x="20" y="16" fill="#c8a84b" font-size="5" text-anchor="middle">★</text>
-          <text x="26" y="13" fill="#c8a84b" font-size="5" text-anchor="middle">★</text>
-          <text x="32" y="16" fill="#c8a84b" font-size="5" text-anchor="middle">★</text>
-          <rect x="21" y="40" width="10" height="1.8" rx="1" fill="#c8a84b"/>
-          <rect x="18" y="42" width="16" height="1.8" rx="1" fill="#c8a84b"/>
-        </svg>
-      </div>
-      <div class="ln-name">
-        <span class="ln-n1">KEJAKSAAN NEGERI MUNA</span>
-        <span class="ln-n2">KEJAKSAAN REPUBLIK INDONESIA</span>
-      </div>
+  <div class="ln-brand">
+    <div class="ln-logo">
+      <img 
+        src="https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Logo-Kejaksaan%20%281%29%281%29.png" 
+        alt="Logo Kejaksaan"
+      />
     </div>
-    <button class="btn-login-top" onclick="showLoginModal()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-      Login SPPG
-    </button>
-  </nav>
+
+    <div class="ln-name">
+      <span class="ln-n1">KEJAKSAAN NEGERI MUNA</span>
+      <span class="ln-n2">KEJAKSAAN REPUBLIK INDONESIA</span>
+    </div>
+  </div>
+</nav>
 
   <!-- Main 2-col -->
   <div class="ln-main">
