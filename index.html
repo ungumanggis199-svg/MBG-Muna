@@ -801,69 +801,70 @@ tr:hover td{background:rgba(255,255,255,.03)}
 /* ════════════════════════════════════════════════════
    AUTH
 ════════════════════════════════════════════════════ */
+
+const FORM_MONITORING_URL = "/form-monitoring.html";
+
 const USERS = {
-  'admin':    { pass:'admin123', name:'Admin', role:'admin' },
-  'sppg1':   { pass:'sppg1234', name:'Operator SPPG 1', role:'sppg' },
+  "admin": {
+    pass: "admin123",
+    name: "Admin",
+    role: "admin"
+  },
+  "sppg1": {
+    pass: "sppg1234",
+    name: "Operator SPPG 1",
+    role: "sppg"
+  }
 };
-let currentUser = null;
 
 function doLogin(src) {
-  const u = src==='sb'
-    ? document.getElementById('sb-user').value.trim()
-    : document.getElementById('ln-user').value.trim();
-  const p = src==='sb'
-    ? document.getElementById('sb-pass').value
-    : document.getElementById('ln-pass').value;
-  const errEl = document.getElementById('ln-err');
+  const usernameInput = src === "sb"
+    ? document.getElementById("sb-user")
+    : document.getElementById("ln-user");
 
-  if (!u || !p) {
-    if(errEl) errEl.textContent='Username dan password wajib diisi.';
+  const passwordInput = src === "sb"
+    ? document.getElementById("sb-pass")
+    : document.getElementById("ln-pass");
+
+  const errEl = document.getElementById("ln-err");
+
+  const username = usernameInput.value.trim().toLowerCase();
+  const password = passwordInput.value;
+
+  if (!username || !password) {
+    if (errEl) errEl.textContent = "Username dan password wajib diisi.";
     return;
   }
-  const user = USERS[u.toLowerCase()];
-  if (!user || user.pass !== p) {
-    if(errEl) errEl.textContent='Username atau password salah.';
-    shakeEl(src==='sb'?'.sb-login-box':'.login-card');
+
+  const user = USERS[username];
+
+  if (!user || user.pass !== password) {
+    if (errEl) errEl.textContent = "Username atau password salah.";
+    shakeEl(src === "sb" ? ".sb-login-box" : ".login-card");
     return;
   }
-  currentUser = { username: u, ...user };
-  if(errEl) errEl.textContent='';
-  goDashboard();
-}
 
-function goDashboard() {
-  document.getElementById('screen-landing').classList.remove('active');
-  document.getElementById('screen-dashboard').classList.add('active');
-  document.getElementById('tb-uname').textContent = currentUser.name;
-  document.getElementById('tb-initial').textContent = currentUser.name.charAt(0).toUpperCase();
-  // Set today's date as default on form
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('f-tanggal').value = today;
-  // Animate counters
-  document.querySelectorAll('.ds-val[data-target]').forEach(animateCounter);
-  document.querySelectorAll('.ds-val[data-target-pct]').forEach(el => {
-    const t = parseInt(el.dataset.targetPct);
-    animateCounterPct(el, t);
-  });
+  if (errEl) errEl.textContent = "";
+
+  localStorage.setItem("mbg_login", "true");
+  localStorage.setItem("mbg_user", username);
+  localStorage.setItem("mbg_name", user.name);
+
+  window.location.href = FORM_MONITORING_URL;
 }
 
 function doLogout() {
-  document.getElementById('modal-logout').classList.add('open');
-}
-function confirmLogout() {
-  closeModal('modal-logout');
-  currentUser = null;
-  document.getElementById('screen-dashboard').classList.remove('active');
-  document.getElementById('screen-landing').classList.add('active');
-  document.getElementById('ln-user').value='';
-  document.getElementById('ln-pass').value='';
-  navTo('home', null);
-}
-function showLoginModal() {
-  document.getElementById('ln-user').focus();
-  document.querySelector('.login-card').scrollIntoView({behavior:'smooth'});
+  localStorage.removeItem("mbg_login");
+  localStorage.removeItem("mbg_user");
+  localStorage.removeItem("mbg_name");
+  window.location.href = "/";
 }
 
+function showLoginModal() {
+  document.getElementById("ln-user").focus();
+  document.querySelector(".login-card").scrollIntoView({ behavior: "smooth" });
+}
+</script>
 /* ════════════════════════════════════════════════════
    NAVIGATION
 ════════════════════════════════════════════════════ */
