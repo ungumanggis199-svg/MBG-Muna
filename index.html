@@ -952,9 +952,9 @@ tr:hover td{background:rgba(255,255,255,.03)}
 
 <script>
 /* ════════════════════════════════════════════════════
-   AUTH
+   AUTH LOGIN
 ════════════════════════════════════════════════════ */
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxl7u7NeBrpaXxylVCRmKqhIapX2nRRZN0l5vRu2mDwP3CkJBmRDUopBmbiRoAix_YB/exec";
+
 const FORM_MONITORING_URL = "/form-monitoring.html";
 
 async function doLogin(src) {
@@ -968,13 +968,15 @@ async function doLogin(src) {
 
   const errEl = document.getElementById("ln-err");
 
-  const email = emailInput.value.trim().toLowerCase();
-  const password = passwordInput.value.trim();
+  const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
+  const password = passwordInput ? passwordInput.value.trim() : "";
 
   if (!email || !password) {
     if (errEl) errEl.textContent = "Email dan password wajib diisi.";
     return;
   }
+
+  if (errEl) errEl.textContent = "Memeriksa login...";
 
   try {
     const res = await fetch("/api/login", {
@@ -994,52 +996,6 @@ async function doLogin(src) {
       if (errEl) {
         errEl.textContent = result.message || "Email atau password salah.";
       }
-      return;
-    }
-
-    localStorage.setItem("mbg_email", email);
-    localStorage.setItem("mbg_password", password);
-    localStorage.setItem("mbg_sppg", result.sppg || "");
-
-    window.location.href = "/form-monitoring.html";
-
-  } catch (error) {
-    if (errEl) {
-      errEl.textContent = "Gagal terhubung ke server login.";
-    }
-
-    console.error(error);
-  }
-}
-
-    const result = await res.json();
-
-    if (!result.success) {
-      if (errEl) errEl.textContent = result.message || "Email atau password salah.";
-      return;
-    }
-
-    localStorage.setItem("mbg_email", email);
-    localStorage.setItem("mbg_password", password);
-    localStorage.setItem("mbg_sppg", result.sppg || "");
-
-    window.location.href = "/form-monitoring.html";
-
-  } catch (error) {
-    if (errEl) {
-      errEl.textContent = "Gagal terhubung ke server login.";
-    }
-
-    console.error(error);
-  }
-}
-      })
-    });
-
-    const result = await res.json();
-
-    if (!result.success) {
-      if (errEl) errEl.textContent = result.message || "Email atau password salah.";
       shakeEl(src === "sb" ? ".sb-login-box" : ".login-card");
       return;
     }
@@ -1048,10 +1004,16 @@ async function doLogin(src) {
     localStorage.setItem("mbg_password", password);
     localStorage.setItem("mbg_sppg", result.sppg || "");
 
+    if (errEl) errEl.textContent = "";
+
     window.location.href = FORM_MONITORING_URL;
 
   } catch (error) {
-    if (errEl) errEl.textContent = "Gagal terhubung ke server Apps Script.";
+    console.error(error);
+
+    if (errEl) {
+      errEl.textContent = "Gagal terhubung ke server login.";
+    }
   }
 }
 
@@ -1063,139 +1025,239 @@ function doLogout() {
 }
 
 function showLoginModal() {
-  document.getElementById("ln-user").focus();
-  document.querySelector(".login-card").scrollIntoView({ behavior: "smooth" });
+  const loginInput = document.getElementById("ln-user");
+  const loginCard = document.querySelector(".login-card");
+
+  if (loginCard) {
+    loginCard.scrollIntoView({ behavior: "smooth" });
+  }
+
+  if (loginInput) {
+    setTimeout(function() {
+      loginInput.focus();
+    }, 400);
+  }
 }
+
 /* ════════════════════════════════════════════════════
    NAVIGATION
 ════════════════════════════════════════════════════ */
+
 function navTo(page, btn) {
-  // Deactivate all pages
-  document.querySelectorAll('.dash-page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll(".dash-page").forEach(function(p) {
+    p.classList.remove("active");
+  });
 
-  // Activate target page
-  const pageEl = document.getElementById('page-' + page);
-  if (pageEl) pageEl.classList.add('active');
+  document.querySelectorAll(".nav-item").forEach(function(n) {
+    n.classList.remove("active");
+  });
 
-  // Activate nav item
+  const pageEl = document.getElementById("page-" + page);
+  if (pageEl) pageEl.classList.add("active");
+
   if (btn) {
-    btn.classList.add('active');
+    btn.classList.add("active");
   } else {
-    // match by page name
-    const map = {home:'Beranda',laporan:'Laporan MBG','form-laporan':'Laporan MBG',aduan:'Layanan Aduan',informasi:'Informasi',kontak:'Kontak'};
-    document.querySelectorAll('.nav-item').forEach(n => {
-      if(n.textContent.trim() === map[page]) n.classList.add('active');
+    const map = {
+      home: "Beranda",
+      laporan: "Laporan MBG",
+      "form-laporan": "Laporan MBG",
+      aduan: "Layanan Aduan",
+      informasi: "Informasi",
+      kontak: "Kontak"
+    };
+
+    document.querySelectorAll(".nav-item").forEach(function(n) {
+      if (n.textContent.trim() === map[page]) {
+        n.classList.add("active");
+      }
     });
   }
 }
 
 /* ════════════════════════════════════════════════════
-   FORM
+   FORM DEMO INTERNAL
 ════════════════════════════════════════════════════ */
+
 function simpanLaporan() {
-  const sppg   = document.getElementById('f-sppg').value;
-  const tgl    = document.getElementById('f-tanggal').value;
-  const menu   = document.getElementById('f-menu').value.trim();
-  const porsi  = document.getElementById('f-porsi').value;
+  const sppg = document.getElementById("f-sppg").value;
+  const tgl = document.getElementById("f-tanggal").value;
+  const menu = document.getElementById("f-menu").value.trim();
+  const porsi = document.getElementById("f-porsi").value;
+
   if (!sppg || !tgl || !menu || !porsi) {
-    showToast('⚠ Lengkapi field wajib terlebih dahulu.','#f59e0b');
+    showToast("⚠ Lengkapi field wajib terlebih dahulu.", "#f59e0b");
     return;
   }
-  // Add to table
-  const tbody = document.getElementById('laporan-tbody');
+
+  const tbody = document.getElementById("laporan-tbody");
   const d = new Date(tgl);
-  const tglStr = d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
-  const row = document.createElement('tr');
-  row.innerHTML = `<td>${sppg}</td><td>${tglStr}</td><td>${menu.substring(0,40)}${menu.length>40?'...':''}</td><td>${parseInt(porsi).toLocaleString('id-ID')}</td><td><span class="badge badge-g">✓ Selesai</span></td>`;
-  tbody.insertBefore(row, tbody.firstChild);
-  showToast('Laporan berhasil disimpan!');
-  // Reset form
-  document.getElementById('f-sppg').value='';
-  document.getElementById('f-menu').value='';
-  document.getElementById('f-porsi').value='';
-  document.getElementById('f-sekolah').value='';
-  document.getElementById('f-keterangan-gizi').value='';
-  ['kalori','protein','karbo','lemak','serat','vitc'].forEach(k=>document.getElementById('f-'+k).value='');
-  ['prev-menu','prev-dist'].forEach(id=>{
-    const el=document.getElementById(id);
-    el.style.display='none';
-    el.querySelector('img').src='';
+  const tglStr = d.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
   });
-  setTimeout(()=>navTo('laporan',null), 1200);
+
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${sppg}</td>
+    <td>${tglStr}</td>
+    <td>${menu.substring(0, 40)}${menu.length > 40 ? "..." : ""}</td>
+    <td>${parseInt(porsi).toLocaleString("id-ID")}</td>
+    <td><span class="badge badge-g">✓ Selesai</span></td>
+  `;
+
+  tbody.insertBefore(row, tbody.firstChild);
+
+  showToast("Laporan berhasil disimpan!");
+
+  document.getElementById("f-sppg").value = "";
+  document.getElementById("f-menu").value = "";
+  document.getElementById("f-porsi").value = "";
+  document.getElementById("f-sekolah").value = "";
+  document.getElementById("f-keterangan-gizi").value = "";
+
+  ["kalori", "protein", "karbo", "lemak", "serat", "vitc"].forEach(function(k) {
+    const input = document.getElementById("f-" + k);
+    if (input) input.value = "";
+  });
+
+  ["prev-menu", "prev-dist"].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = "none";
+      const img = el.querySelector("img");
+      if (img) img.src = "";
+    }
+  });
+
+  setTimeout(function() {
+    navTo("laporan", null);
+  }, 1200);
 }
 
 function previewFile(input, previewId) {
   const file = input.files[0];
   if (!file) return;
+
   const prev = document.getElementById(previewId);
   const reader = new FileReader();
-  reader.onload = e => {
-    prev.querySelector('img').src = e.target.result;
-    prev.style.display = 'block';
+
+  reader.onload = function(e) {
+    const img = prev.querySelector("img");
+    if (img) img.src = e.target.result;
+    prev.style.display = "block";
   };
+
   reader.readAsDataURL(file);
 }
 
 /* ════════════════════════════════════════════════════
    UI HELPERS
 ════════════════════════════════════════════════════ */
+
 function toggleEye(inputId, iconId) {
   const inp = document.getElementById(inputId);
   const ico = document.getElementById(iconId);
-  if (inp.type==='password') {
-    inp.type='text';
-    ico.innerHTML=`<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+
+  if (!inp || !ico) return;
+
+  if (inp.type === "password") {
+    inp.type = "text";
+    ico.innerHTML = `
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    `;
   } else {
-    inp.type='password';
-    ico.innerHTML=`<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+    inp.type = "password";
+    ico.innerHTML = `
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    `;
   }
 }
 
 function animateCounter(el) {
   const t = parseInt(el.dataset.target);
-  const dur=1200, step=16, inc=t/(dur/step);
-  let cur=0;
-  const tm=setInterval(()=>{
-    cur+=inc; if(cur>=t){el.textContent=t.toLocaleString('id-ID');clearInterval(tm);}
-    else el.textContent=Math.floor(cur).toLocaleString('id-ID');
-  },step);
-}
-function animateCounterPct(el, target) {
-  const dur=1200,step=16,inc=target/(dur/step);
-  let cur=0;
-  const tm=setInterval(()=>{
-    cur+=inc; if(cur>=target){el.textContent=target+'%';clearInterval(tm);}
-    else el.textContent=Math.floor(cur)+'%';
-  },step);
+  const dur = 1200;
+  const step = 16;
+  const inc = t / (dur / step);
+  let cur = 0;
+
+  const tm = setInterval(function() {
+    cur += inc;
+
+    if (cur >= t) {
+      el.textContent = t.toLocaleString("id-ID");
+      clearInterval(tm);
+    } else {
+      el.textContent = Math.floor(cur).toLocaleString("id-ID");
+    }
+  }, step);
 }
 
-// Run counters on landing
-document.querySelectorAll('.si-val[data-target]').forEach(animateCounter);
+function animateCounterPct(el, target) {
+  const dur = 1200;
+  const step = 16;
+  const inc = target / (dur / step);
+  let cur = 0;
+
+  const tm = setInterval(function() {
+    cur += inc;
+
+    if (cur >= target) {
+      el.textContent = target + "%";
+      clearInterval(tm);
+    } else {
+      el.textContent = Math.floor(cur) + "%";
+    }
+  }, step);
+}
+
+document.querySelectorAll(".si-val[data-target]").forEach(animateCounter);
 
 function showToast(msg, color) {
-  const t=document.getElementById('toast');
-  const txt=document.getElementById('toast-txt');
-  if(color) t.style.borderColor=color;
-  else t.style.borderColor='#2db55e';
-  txt.textContent=msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
+  const t = document.getElementById("toast");
+  const txt = document.getElementById("toast-txt");
+
+  if (!t || !txt) return;
+
+  t.style.borderColor = color || "#2db55e";
+  txt.textContent = msg;
+  t.classList.add("show");
+
+  setTimeout(function() {
+    t.classList.remove("show");
+  }, 3000);
 }
 
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-function shakeEl(sel){
-  const el=document.querySelector(sel);
-  if(!el)return;
-  el.style.animation='none';
-  el.style.transform='translateX(6px)';
-  setTimeout(()=>{el.style.transform='translateX(-6px)';},80);
-  setTimeout(()=>{el.style.transform='';},160);
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.remove("open");
 }
 
-// Close modal on overlay click
-document.querySelectorAll('.modal-overlay').forEach(o=>{
-  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+function shakeEl(sel) {
+  const el = document.querySelector(sel);
+  if (!el) return;
+
+  el.style.animation = "none";
+  el.style.transform = "translateX(6px)";
+
+  setTimeout(function() {
+    el.style.transform = "translateX(-6px)";
+  }, 80);
+
+  setTimeout(function() {
+    el.style.transform = "";
+  }, 160);
+}
+
+document.querySelectorAll(".modal-overlay").forEach(function(o) {
+  o.addEventListener("click", function(e) {
+    if (e.target === o) {
+      o.classList.remove("open");
+    }
+  });
 });
 </script>
 </body>
