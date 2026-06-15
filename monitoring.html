@@ -722,6 +722,150 @@
     grid-template-columns: 1fr;
   }
 }
+
+  .status-toolbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.status-toolbar label {
+  display: block;
+  margin-bottom: 6px;
+  color: #043927;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.status-toolbar input,
+.status-toolbar select {
+  width: 100%;
+  border: 1px solid #d9e5dd;
+  border-radius: 13px;
+  padding: 11px 12px;
+  background: #ffffff;
+  font-size: 13px;
+  outline: none;
+}
+
+.status-toolbar input:focus,
+.status-toolbar select:focus {
+  border-color: #15803d;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.10);
+}
+
+.status-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.status-mini {
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid #e5eee9;
+  background: #f8fbf9;
+}
+
+.status-mini span {
+  display: block;
+  font-size: 11px;
+  font-weight: 900;
+  color: #64748b;
+  margin-bottom: 5px;
+}
+
+.status-mini strong {
+  display: block;
+  font-size: 24px;
+  line-height: 1;
+  color: #043927;
+}
+
+.status-mini.updated {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+}
+
+.status-mini.not-updated {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.status-mini.total {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.sppg-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.sppg-status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e5eee9;
+  border-radius: 16px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.sppg-status-left {
+  min-width: 0;
+}
+
+.sppg-status-name {
+  font-size: 13px;
+  font-weight: 900;
+  color: #043927;
+  margin-bottom: 4px;
+}
+
+.sppg-status-info {
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.sppg-status-badge {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.sppg-status-badge.updated {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.sppg-status-badge.not-updated {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+@media (max-width: 720px) {
+  .status-toolbar,
+  .status-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .sppg-status-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}  
     
   </style>
 </head>
@@ -880,17 +1024,51 @@
     
 
     <section class="dashboard-grid">
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Grafik Laporan per SPPG</div>
-            <div class="panel-sub">Jumlah laporan yang masuk berdasarkan nama SPPG.</div>
-          </div>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="chartSppg"></canvas>
-        </div>
-      </div>
+     <div class="panel">
+  <div class="panel-head">
+    <div>
+      <div class="panel-title">Status Update SPPG</div>
+      <div class="panel-sub">Daftar seluruh SPPG yang sudah dan belum mengirim laporan pada tanggal terpilih.</div>
+    </div>
+  </div>
+
+  <div class="status-toolbar">
+    <div>
+      <label>Tanggal Monitoring</label>
+      <input type="date" id="statusDate">
+    </div>
+
+    <div>
+      <label>Filter Status</label>
+      <select id="statusFilter">
+        <option value="all">Semua Status</option>
+        <option value="updated">Sudah Update</option>
+        <option value="notUpdated">Belum Update</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="status-summary">
+    <div class="status-mini updated">
+      <span>Sudah Update</span>
+      <strong id="countUpdated">0</strong>
+    </div>
+
+    <div class="status-mini not-updated">
+      <span>Belum Update</span>
+      <strong id="countNotUpdated">0</strong>
+    </div>
+
+    <div class="status-mini total">
+      <span>Total SPPG</span>
+      <strong id="countTotalSppg">0</strong>
+    </div>
+  </div>
+
+  <div class="sppg-status-list" id="sppgStatusList">
+    <div class="empty">Memuat status SPPG...</div>
+  </div>
+</div>
 
       <div class="panel">
         <div class="panel-head">
@@ -956,11 +1134,10 @@
 
   <script>
 let monitoringData = [];
-let chartSppg = null;
+let allSppgList = [];
 let chartTrend = null;
 let reportChart = null;
 let activeReportTab = "daily";
-
     document.addEventListener("DOMContentLoaded", async function() {
       await loadMonitoringData();
 
@@ -984,11 +1161,14 @@ let activeReportTab = "daily";
           return;
         }
 
-        monitoringData = result.data || [];
+monitoringData = result.data || [];
+
+await loadAllSppgList();
 
 updateSummary(result.summary || {});
 buildSppgFilter();
 renderLatestList();
+initStatusSppg();
 renderCharts();
 initReportGenerator();
 renderTable();
@@ -1021,7 +1201,151 @@ renderTable();
         select.appendChild(option);
       });
     }
+async function loadAllSppgList() {
+  try {
+    const res = await fetch("/api/list-sppg");
+    const result = await res.json();
 
+    if (result.success && Array.isArray(result.data)) {
+      allSppgList = result.data.filter(Boolean);
+      return;
+    }
+
+    allSppgList = [...new Set(monitoringData.map(item => item.namaSppg))].filter(Boolean);
+
+  } catch (error) {
+    console.error(error);
+    allSppgList = [...new Set(monitoringData.map(item => item.namaSppg))].filter(Boolean);
+  }
+}
+
+function initStatusSppg() {
+  const statusDate = document.getElementById("statusDate");
+  const statusFilter = document.getElementById("statusFilter");
+
+  if (!statusDate || !statusFilter) return;
+
+  const latestDate = getLatestDateFromData
+    ? getLatestDateFromData()
+    : getLatestMonitoringDate();
+
+  statusDate.value = latestDate || getTodayInputValue();
+
+  statusDate.addEventListener("change", renderStatusSppg);
+  statusFilter.addEventListener("change", renderStatusSppg);
+
+  renderStatusSppg();
+}
+
+function renderStatusSppg() {
+  const listEl = document.getElementById("sppgStatusList");
+  const statusDate = document.getElementById("statusDate").value;
+  const statusFilter = document.getElementById("statusFilter").value;
+
+  if (!listEl) return;
+
+  const updatedMap = {};
+
+  monitoringData.forEach(function(item) {
+    const itemDate = normalizeDate(item.tanggal);
+    const sppgName = String(item.namaSppg || "").trim();
+
+    if (!sppgName || itemDate !== statusDate) return;
+
+    if (!updatedMap[sppgName]) {
+      updatedMap[sppgName] = {
+        count: 0,
+        lastTime: "",
+        menu: ""
+      };
+    }
+
+    updatedMap[sppgName].count += 1;
+    updatedMap[sppgName].lastTime = item.waktuSimpan || updatedMap[sppgName].lastTime;
+    updatedMap[sppgName].menu = item.menuMbg || updatedMap[sppgName].menu;
+  });
+
+  const sourceList = allSppgList.length > 0
+    ? allSppgList
+    : [...new Set(monitoringData.map(item => item.namaSppg))].filter(Boolean);
+
+  let statusRows = sourceList.map(function(sppg) {
+    const info = updatedMap[sppg];
+
+    return {
+      namaSppg: sppg,
+      updated: !!info,
+      count: info ? info.count : 0,
+      lastTime: info ? info.lastTime : "",
+      menu: info ? info.menu : ""
+    };
+  });
+
+  const totalUpdated = statusRows.filter(item => item.updated).length;
+  const totalNotUpdated = statusRows.filter(item => !item.updated).length;
+
+  document.getElementById("countUpdated").textContent = totalUpdated;
+  document.getElementById("countNotUpdated").textContent = totalNotUpdated;
+  document.getElementById("countTotalSppg").textContent = statusRows.length;
+
+  if (statusFilter === "updated") {
+    statusRows = statusRows.filter(item => item.updated);
+  }
+
+  if (statusFilter === "notUpdated") {
+    statusRows = statusRows.filter(item => !item.updated);
+  }
+
+  statusRows.sort(function(a, b) {
+    if (a.updated !== b.updated) {
+      return a.updated ? -1 : 1;
+    }
+
+    return a.namaSppg.localeCompare(b.namaSppg);
+  });
+
+  if (statusRows.length === 0) {
+    listEl.innerHTML = '<div class="empty">Tidak ada data sesuai filter.</div>';
+    return;
+  }
+
+  listEl.innerHTML = statusRows.map(function(item) {
+    return `
+      <div class="sppg-status-item">
+        <div class="sppg-status-left">
+          <div class="sppg-status-name">${escapeHtml(item.namaSppg)}</div>
+          <div class="sppg-status-info">
+            ${
+              item.updated
+                ? `${item.count} laporan masuk${item.lastTime ? " · Update: " + escapeHtml(item.lastTime) : ""}`
+                : "Belum ada laporan pada tanggal ini"
+            }
+            ${
+              item.updated && item.menu
+                ? `<br>Menu: ${escapeHtml(limitText(item.menu, 72))}`
+                : ""
+            }
+          </div>
+        </div>
+
+        <span class="sppg-status-badge ${item.updated ? "updated" : "not-updated"}">
+          ${item.updated ? "Sudah Update" : "Belum Update"}
+        </span>
+      </div>
+    `;
+  }).join("");
+}
+
+function getLatestMonitoringDate() {
+  const dates = monitoringData
+    .map(item => normalizeDate(item.tanggal))
+    .filter(Boolean)
+    .sort(function(a, b) {
+      return new Date(b) - new Date(a);
+    });
+
+  return dates[0] || "";
+}
     function renderLatestList() {
       const list = document.getElementById("latestList");
       const latest = monitoringData.slice(0, 5);
@@ -1044,10 +1368,9 @@ renderTable();
       }).join("");
     }
 
-    function renderCharts() {
-      renderSppgChart();
-      renderTrendChart();
-    }
+function renderCharts() {
+  renderTrendChart();
+}
 
     function renderSppgChart() {
       const ctx = document.getElementById("chartSppg");
@@ -1823,6 +2146,11 @@ function formatMonthLabel(value) {
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
+function limitText(text, max) {
+  const value = String(text || "");
+  return value.length > max ? value.substring(0, max) + "..." : value;
+}
+    
   </script>
 </body>
 </html>
