@@ -730,6 +730,34 @@ tr:hover td{background:rgba(255,255,255,.03)}
   }
 }
 
+/* ICON MENU LEBIH MENARIK */
+.mc-ico {
+  width: 72px !important;
+  height: 72px !important;
+  border-radius: 22px !important;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.28), transparent 30%),
+    linear-gradient(135deg, #25b868, #0f8a4c 55%, #086236) !important;
+  box-shadow:
+    0 14px 30px rgba(22, 163, 74, 0.25),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+  border: 1px solid rgba(224, 196, 114, 0.35);
+  position: relative;
+}
+
+.mc-ico::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 26px;
+  border: 1px solid rgba(200,168,75,0.18);
+  opacity: 0.8;
+}
+
+.mc-ico svg {
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.28));
+}  
+  
 </style>
 </head>
 <body>
@@ -767,12 +795,33 @@ tr:hover td{background:rgba(255,255,255,.03)}
 
       <div class="menu-grid">
         <div class="mc">
-          <div class="mc-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 17V13"/><path d="M12 17V9"/><path d="M16 17V12"/></svg></div>
+          <div class="mc-ico">
+  <svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="12" y="10" width="40" height="46" rx="8" fill="rgba(255,255,255,0.16)" stroke="white" stroke-width="3"/>
+    <path d="M23 24H41" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <path d="M23 32H37" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <path d="M23 40H33" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <rect x="20" y="46" width="6" height="6" rx="1.5" fill="#e0c472"/>
+    <rect x="30" y="42" width="6" height="10" rx="1.5" fill="#e0c472"/>
+    <rect x="40" y="36" width="6" height="16" rx="1.5" fill="#e0c472"/>
+    <circle cx="47" cy="17" r="7" fill="#e0c472"/>
+    <path d="M44 17L46 19L50 15" stroke="#063b24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</div>
           <div><div class="mc-h">1. Laporan Distribusi MBG</div><p class="mc-p">Melihat data penyaluran makanan bergizi gratis berdasarkan wilayah, sekolah, dan periode distribusi.</p></div>
           <button class="mc-btn" onclick="showLoginModal()">Buka Laporan <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
         </div>
         <div class="mc">
-          <div class="mc-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="12" cy="15" r="2"/><path d="M12 13v-2"/></svg></div>
+          <div class="mc-ico">
+  <svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 18C14 13.6 17.6 10 22 10H42C46.4 10 50 13.6 50 18V33C50 37.4 46.4 41 42 41H31L20 50V41H22C17.6 41 14 37.4 14 33V18Z" fill="rgba(255,255,255,0.16)" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M24 24H40" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <path d="M24 31H34" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="45" cy="42" r="10" fill="#e0c472"/>
+    <path d="M45 36V43" stroke="#063b24" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="45" cy="48" r="1.8" fill="#063b24"/>
+  </svg>
+</div>
           <div><div class="mc-h">2. Layanan Aduan MBG</div><p class="mc-p">Sampaikan laporan, keluhan, atau informasi terkait pelaksanaan Program MBG secara cepat dan transparan.</p></div>
           <button class="mc-btn" onclick="showLoginModal()">Buka Layanan <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
         </div>
