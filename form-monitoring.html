@@ -276,6 +276,32 @@
         grid-template-columns: 1fr;
       }
     }
+
+  .image-preview {
+  display: none;
+  margin-top: 10px;
+  border: 1px solid #d1e0d7;
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.image-preview img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border-radius: 10px;
+  display: block;
+  background: #f8fafc;
+}
+
+.image-preview-name {
+  display: block;
+  margin-top: 7px;
+  font-size: 12px;
+  color: #52657a;
+  word-break: break-all;
+}
   </style>
 </head>
 
@@ -340,26 +366,34 @@
           <div class="form-group">
             <label for="fotoMenu">Foto Menu MBG</label>
             <input
-              type="file"
-              id="fotoMenu"
-              name="fotoMenu"
-              accept="image/*"
-              required
-            />
-            <div class="upload-note">Format disarankan: JPG, JPEG, atau PNG.</div>
-          </div>
+  type="file"
+  id="fotoMenu"
+  name="fotoMenu"
+  accept="image/*"
+  onchange="previewSelectedImage(this, 'previewFotoMenu', 'previewFotoMenuName')"
+  required
+/>
+
+<div class="image-preview" id="previewFotoMenu">
+  <img src="" alt="Preview Foto Menu MBG">
+  <span class="image-preview-name" id="previewFotoMenuName"></span>
+</div>
 
           <div class="form-group">
             <label for="fotoDistribusi">Foto Distribusi</label>
             <input
-              type="file"
-              id="fotoDistribusi"
-              name="fotoDistribusi"
-              accept="image/*"
-              required
-            />
-            <div class="upload-note">Upload foto proses distribusi MBG.</div>
-          </div>
+  type="file"
+  id="fotoDistribusi"
+  name="fotoDistribusi"
+  accept="image/*"
+  onchange="previewSelectedImage(this, 'previewFotoDistribusi', 'previewFotoDistribusiName')"
+  required
+/>
+
+<div class="image-preview" id="previewFotoDistribusi">
+  <img src="" alt="Preview Foto Distribusi">
+  <span class="image-preview-name" id="previewFotoDistribusiName"></span>
+</div>
 
         </div>
 
@@ -524,6 +558,7 @@
         showMessage("Data Berhasil Disimpan", "success");
 
         form.reset();
+        resetImagePreviews();
 
         const sppg = localStorage.getItem("mbg_sppg");
         if (sppg && sppg.toLowerCase() !== "admin") {
@@ -615,6 +650,68 @@
     messageBox.textContent = message;
     messageBox.className = "message " + type;
   }
+
+  function previewSelectedImage(input, previewId, nameId) {
+  const file = input.files[0];
+  const previewBox = document.getElementById(previewId);
+  const previewImg = previewBox.querySelector("img");
+  const previewName = document.getElementById(nameId);
+
+  if (!file) {
+    previewBox.style.display = "none";
+    previewImg.src = "";
+    previewName.textContent = "";
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    showMessage("File harus berupa gambar JPG, JPEG, atau PNG.", "error");
+    input.value = "";
+    previewBox.style.display = "none";
+    previewImg.src = "";
+    previewName.textContent = "";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    previewImg.src = e.target.result;
+    previewName.textContent = file.name;
+    previewBox.style.display = "block";
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function resetImagePreviews() {
+  const previews = [
+    {
+      box: "previewFotoMenu",
+      name: "previewFotoMenuName"
+    },
+    {
+      box: "previewFotoDistribusi",
+      name: "previewFotoDistribusiName"
+    }
+  ];
+
+  previews.forEach(function(item) {
+    const box = document.getElementById(item.box);
+    const name = document.getElementById(item.name);
+
+    if (box) {
+      const img = box.querySelector("img");
+      if (img) img.src = "";
+      box.style.display = "none";
+    }
+
+    if (name) {
+      name.textContent = "";
+    }
+  });
+}
+    
 </script>
 </body>
 </html>
