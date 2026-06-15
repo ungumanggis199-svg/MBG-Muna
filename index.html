@@ -977,61 +977,23 @@ async function doLogin(src) {
   }
 
   try {
-    async function doLogin(src) {
-  const emailInput = src === "sb"
-    ? document.getElementById("sb-user")
-    : document.getElementById("ln-user");
-
-  const passwordInput = src === "sb"
-    ? document.getElementById("sb-pass")
-    : document.getElementById("ln-pass");
-
-  const errEl = document.getElementById("ln-err");
-
-  const email = emailInput.value.trim().toLowerCase();
-  const password = passwordInput.value.trim();
-
-  if (!email || !password) {
-    if (errEl) errEl.textContent = "Email dan password wajib diisi.";
-    return;
-  }
-
-  try {
-    async function doLogin(src) {
-  const emailInput = src === "sb"
-    ? document.getElementById("sb-user")
-    : document.getElementById("ln-user");
-
-  const passwordInput = src === "sb"
-    ? document.getElementById("sb-pass")
-    : document.getElementById("ln-pass");
-
-  const errEl = document.getElementById("ln-err");
-
-  const email = emailInput.value.trim().toLowerCase();
-  const password = passwordInput.value.trim();
-
-  if (!email || !password) {
-    if (errEl) errEl.textContent = "Email dan password wajib diisi.";
-    return;
-  }
-
-  try {
     const res = await fetch("/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        email,
-        password
+        email: email,
+        password: password
       })
     });
 
     const result = await res.json();
 
     if (!result.success) {
-      if (errEl) errEl.textContent = result.message || "Email atau password salah.";
+      if (errEl) {
+        errEl.textContent = result.message || "Email atau password salah.";
+      }
       return;
     }
 
