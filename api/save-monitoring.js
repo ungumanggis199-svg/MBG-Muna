@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       return res.status(500).json({
         success: false,
         message: "Respons Apps Script bukan JSON. Cek deploy Apps Script.",
-        detail: text.slice(0, 200)
+        detail: text.slice(0, 500)
       });
     }
 
