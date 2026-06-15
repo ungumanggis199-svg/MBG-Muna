@@ -597,21 +597,63 @@ tr:hover td{background:rgba(255,255,255,.03)}
 
     <!-- RIGHT -->
     <div class="ln-right">
-      <div class="login-card">
-        <div class="lc-avatar"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
-        <h2 class="lc-title">Login SPPG</h2>
-        <p class="lc-sub">Portal Operator SPPG</p>
-        <div class="lc-form">
-          <label class="lc-lbl">Email</label>
-          <div class="field"><span class="field-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span><input type="email" id="ln-user" placeholder="Masukkan email" onkeydown="if(event.key==='Enter')doLogin()"/>
-          <label class="lc-lbl">Password</label>
-          <div class="field"><span class="field-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input type="password" id="ln-pass" placeholder="Masukkan password" onkeydown="if(event.key==='Enter')doLogin()"/><button class="pw-eye" onclick="toggleEye('ln-pass','eye1')" type="button"><svg id="eye1" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
-          <div class="lc-err" id="ln-err"></div>
-          <button class="btn-masuk" onclick="doLogin()">Masuk</button>
-          <p class="lc-note"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Akses khusus Operator SPPG Kejari Muna</p>
-          <p class="lc-hint">Demo: user <b>admin</b> / pass <b>admin123</b></p>
-        </div>
-      </div>
+<div class="login-card">
+  <div class="lc-avatar">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="1.5">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+    </svg>
+  </div>
+
+  <h2 class="lc-title">Login SPPG</h2>
+  <p class="lc-sub">Portal Operator SPPG</p>
+
+  <div class="lc-form">
+    <label class="lc-lbl" for="ln-user">Email</label>
+    <div class="field">
+      <span class="field-ico">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </span>
+      <input type="email" id="ln-user" placeholder="Masukkan email" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+
+    <label class="lc-lbl" for="ln-pass">Password</label>
+    <div class="field">
+      <span class="field-ico">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </span>
+
+      <input type="password" id="ln-pass" placeholder="Masukkan password" onkeydown="if(event.key==='Enter')doLogin()"/>
+
+      <button class="pw-eye" onclick="toggleEye('ln-pass','eye1')" type="button">
+        <svg id="eye1" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="lc-err" id="ln-err"></div>
+
+    <button class="btn-masuk" onclick="doLogin()" type="button">
+      Masuk
+    </button>
+
+    <p class="lc-note">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Akses khusus Operator SPPG Kejaksaan Negeri Muna
+    </p>
+  </div>
+</div>
       <div class="quote-card">
         <span class="qm qm-o">&ldquo;</span>
         <p class="qt">Bersama Mengawal Program MBG<br>Untuk Generasi Sehat Indonesia</p>
