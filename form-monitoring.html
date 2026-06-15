@@ -4,17 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Form Monitoring Distribusi MBG</title>
+  <title>Form Monitoring Distribusi MBG - Kejaksaan Negeri Muna</title>
 
   <style>
     :root {
-      --green-dark: #002f24;
+      --green-dark: #003b2d;
       --green-main: #006b43;
       --green-soft: #0f8a5f;
       --gold: #d7b45a;
       --white: #ffffff;
-      --gray: #d1d5db;
+      --text-dark: #0f172a;
+      --gray: #64748b;
+      --border: #d9e2dc;
       --danger: #dc2626;
+      --success: #16a34a;
     }
 
     * {
@@ -23,33 +26,37 @@
 
     body {
       margin: 0;
+      min-height: 100vh;
       font-family: Arial, Helvetica, sans-serif;
       background:
-        linear-gradient(rgba(0, 45, 33, 0.92), rgba(0, 45, 33, 0.96)),
-        url("background-kejaksaan.jpg");
+        linear-gradient(
+          rgba(255, 255, 255, 0.18),
+          rgba(255, 255, 255, 0.18)
+        ),
+        url("https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Background%20Form.png");
       background-size: cover;
       background-position: center;
-      min-height: 100vh;
-      color: var(--white);
+      background-repeat: no-repeat;
+      color: var(--text-dark);
     }
 
     .page-wrapper {
       width: 100%;
       min-height: 100vh;
-      padding: 30px 18px;
+      padding: 32px 18px;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
     }
 
     .form-card {
       width: 100%;
-      max-width: 850px;
-      background: rgba(0, 53, 39, 0.88);
-      border: 1px solid rgba(215, 180, 90, 0.7);
-      border-radius: 18px;
-      padding: 28px;
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+      max-width: 880px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 20px 55px rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(0, 77, 54, 0.18);
       backdrop-filter: blur(10px);
     }
 
@@ -57,49 +64,59 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      border-bottom: 1px solid rgba(215, 180, 90, 0.45);
       padding-bottom: 18px;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
+      border-bottom: 2px solid rgba(0, 77, 54, 0.12);
     }
 
     .logo {
-      width: 72px;
-      height: 72px;
+      width: 78px;
+      height: 78px;
       object-fit: contain;
+      flex-shrink: 0;
     }
 
-    .header-text-small {
-      font-size: 15px;
-      letter-spacing: 0.5px;
-      color: #f5f5f5;
-      text-transform: uppercase;
-    }
-
-    .header-text-main {
-      font-size: 25px;
+    .header-small {
+      font-size: 14px;
       font-weight: 700;
-      color: var(--white);
+      color: var(--green-main);
       text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header-main {
       margin-top: 4px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--green-dark);
+      text-transform: uppercase;
+      line-height: 1.15;
+    }
+
+    .header-sub {
+      margin-top: 6px;
+      font-size: 14px;
+      color: var(--gray);
     }
 
     .title {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 26px;
     }
 
     .title h1 {
       margin: 0;
-      font-size: 28px;
-      color: var(--gold);
+      font-size: 30px;
+      line-height: 1.2;
+      color: var(--green-dark);
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.5px;
     }
 
     .title p {
       margin: 8px 0 0;
+      color: var(--gray);
       font-size: 14px;
-      color: #e5e7eb;
     }
 
     .form-grid {
@@ -109,7 +126,7 @@
     }
 
     .form-group {
-      margin-bottom: 18px;
+      width: 100%;
     }
 
     .form-group.full {
@@ -118,10 +135,10 @@
 
     label {
       display: block;
-      font-weight: 600;
       margin-bottom: 8px;
       font-size: 14px;
-      color: #f9fafb;
+      font-weight: 700;
+      color: var(--green-dark);
     }
 
     select,
@@ -129,62 +146,59 @@
     textarea,
     input[type="file"] {
       width: 100%;
-      border: 1px solid rgba(215, 180, 90, 0.45);
-      border-radius: 10px;
-      padding: 12px 13px;
-      background: rgba(0, 37, 28, 0.72);
-      color: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 14px;
       font-size: 14px;
+      color: var(--text-dark);
+      background: #ffffff;
       outline: none;
+      transition: 0.2s ease;
     }
 
     select:focus,
     input[type="date"]:focus,
     textarea:focus,
     input[type="file"]:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(215, 180, 90, 0.18);
+      border-color: var(--green-main);
+      box-shadow: 0 0 0 4px rgba(0, 107, 67, 0.12);
     }
 
     textarea {
-      min-height: 115px;
+      min-height: 110px;
       resize: vertical;
       line-height: 1.5;
     }
 
-    select option {
-      background: #003b2d;
-      color: white;
-    }
-
     input[type="file"] {
       cursor: pointer;
+      padding: 11px 12px;
     }
 
     .upload-note {
       margin-top: 6px;
       font-size: 12px;
-      color: #d1d5db;
+      color: var(--gray);
     }
 
     .button-wrapper {
+      margin-top: 28px;
       display: flex;
       justify-content: center;
-      margin-top: 24px;
     }
 
     .btn-save {
-      min-width: 180px;
+      min-width: 190px;
+      padding: 14px 38px;
       border: none;
       border-radius: 999px;
       background: linear-gradient(135deg, #16a34a, #15803d);
-      color: var(--white);
-      padding: 14px 34px;
+      color: #ffffff;
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
+      box-shadow: 0 10px 24px rgba(22, 163, 74, 0.35);
       transition: 0.2s ease;
-      box-shadow: 0 8px 20px rgba(22, 163, 74, 0.35);
     }
 
     .btn-save:hover {
@@ -193,39 +207,52 @@
     }
 
     .btn-save:disabled {
-      background: #6b7280;
+      background: #94a3b8;
       cursor: not-allowed;
-      box-shadow: none;
       transform: none;
+      box-shadow: none;
     }
 
     .message {
       display: none;
       margin-top: 18px;
-      padding: 13px;
-      border-radius: 10px;
+      padding: 13px 16px;
+      border-radius: 12px;
       text-align: center;
-      font-weight: 600;
       font-size: 14px;
+      font-weight: 700;
     }
 
     .message.success {
       display: block;
-      background: rgba(22, 163, 74, 0.18);
-      border: 1px solid #22c55e;
-      color: #bbf7d0;
+      color: #166534;
+      background: #dcfce7;
+      border: 1px solid #86efac;
     }
 
     .message.error {
       display: block;
-      background: rgba(220, 38, 38, 0.18);
-      border: 1px solid #ef4444;
-      color: #fecaca;
+      color: #991b1b;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
     }
 
-    @media (max-width: 720px) {
+    .footer-note {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--gray);
+      font-size: 12px;
+    }
+
+    @media (max-width: 760px) {
+      .page-wrapper {
+        padding: 20px 12px;
+        align-items: flex-start;
+      }
+
       .form-card {
         padding: 22px;
+        border-radius: 18px;
       }
 
       .header {
@@ -233,12 +260,12 @@
       }
 
       .logo {
-        width: 58px;
-        height: 58px;
+        width: 62px;
+        height: 62px;
       }
 
-      .header-text-main {
-        font-size: 19px;
+      .header-main {
+        font-size: 20px;
       }
 
       .title h1 {
@@ -257,11 +284,16 @@
     <section class="form-card">
 
       <header class="header">
-        <img src="logo-kejaksaan.png" alt="Logo Kejaksaan" class="logo" />
+        <img
+          src="https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Logo-Kejaksaan%20%281%29%281%29.png"
+          alt="Logo Kejaksaan"
+          class="logo"
+        />
 
         <div>
-          <div class="header-text-small">Kejaksaan Republik Indonesia</div>
-          <div class="header-text-main">Kejaksaan Negeri Muna</div>
+          <div class="header-small">Kejaksaan Republik Indonesia</div>
+          <div class="header-main">Kejaksaan Negeri Muna</div>
+          <div class="header-sub">Monitoring Program Makanan Bergizi Gratis</div>
         </div>
       </header>
 
@@ -271,7 +303,6 @@
       </div>
 
       <form id="formMonitoring">
-
         <div class="form-grid">
 
           <div class="form-group">
@@ -281,6 +312,8 @@
               <option value="SPPG 1">SPPG 1</option>
               <option value="SPPG 2">SPPG 2</option>
               <option value="SPPG 3">SPPG 3</option>
+              <option value="SPPG 4">SPPG 4</option>
+              <option value="SPPG 5">SPPG 5</option>
             </select>
           </div>
 
@@ -304,7 +337,7 @@
             <textarea
               id="nilaiGizi"
               name="nilaiGizi"
-              placeholder="Contoh: Karbohidrat, protein, lemak, vitamin, mineral..."
+              placeholder="Contoh: Karbohidrat, protein, lemak, vitamin, mineral, dan estimasi kalori..."
               required
             ></textarea>
           </div>
@@ -318,7 +351,7 @@
               accept="image/*"
               required
             />
-            <div class="upload-note">Format disarankan: JPG, JPEG, PNG.</div>
+            <div class="upload-note">Format disarankan: JPG, JPEG, atau PNG.</div>
           </div>
 
           <div class="form-group">
@@ -343,6 +376,9 @@
 
         <div id="messageBox" class="message"></div>
 
+        <div class="footer-note">
+          Kejaksaan Negeri Muna · Monitoring Distribusi MBG
+        </div>
       </form>
 
     </section>
@@ -373,7 +409,7 @@
 
       setTimeout(function() {
         showMessage(
-          "Form sudah siap. Pada tahap berikutnya, tombol Simpan akan disambungkan ke Google Apps Script.",
+          "Form tahap 1 sudah berjalan. Tahap berikutnya tombol Simpan akan disambungkan ke Google Apps Script.",
           "success"
         );
 
