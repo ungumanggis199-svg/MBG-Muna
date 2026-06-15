@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Form Monitoring Distribusi MBG</title>
+
+  <style>
+    :root {
+      --green-dark: #002f24;
+      --green-main: #006b43;
+      --green-soft: #0f8a5f;
+      --gold: #d7b45a;
+      --white: #ffffff;
+      --gray: #d1d5db;
+      --danger: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(rgba(0, 45, 33, 0.92), rgba(0, 45, 33, 0.96)),
+        url("background-kejaksaan.jpg");
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+      color: var(--white);
+    }
+
+    .page-wrapper {
+      width: 100%;
+      min-height: 100vh;
+      padding: 30px 18px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 850px;
+      background: rgba(0, 53, 39, 0.88);
+      border: 1px solid rgba(215, 180, 90, 0.7);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid rgba(215, 180, 90, 0.45);
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+    }
+
+    .header-text-small {
+      font-size: 15px;
+      letter-spacing: 0.5px;
+      color: #f5f5f5;
+      text-transform: uppercase;
+    }
+
+    .header-text-main {
+      font-size: 25px;
+      font-weight: 700;
+      color: var(--white);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 28px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .title p {
+      margin: 8px 0 0;
+      font-size: 14px;
+      color: #e5e7eb;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #f9fafb;
+    }
+
+    select,
+    input[type="date"],
+    textarea,
+    input[type="file"] {
+      width: 100%;
+      border: 1px solid rgba(215, 180, 90, 0.45);
+      border-radius: 10px;
+      padding: 12px 13px;
+      background: rgba(0, 37, 28, 0.72);
+      color: var(--white);
+      font-size: 14px;
+      outline: none;
+    }
+
+    select:focus,
+    input[type="date"]:focus,
+    textarea:focus,
+    input[type="file"]:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(215, 180, 90, 0.18);
+    }
+
+    textarea {
+      min-height: 115px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    select option {
+      background: #003b2d;
+      color: white;
+    }
+
+    input[type="file"] {
+      cursor: pointer;
+    }
+
+    .upload-note {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #d1d5db;
+    }
+
+    .button-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .btn-save {
+      min-width: 180px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: var(--white);
+      padding: 14px 34px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+      box-shadow: 0 8px 20px rgba(22, 163, 74, 0.35);
+    }
+
+    .btn-save:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #22c55e, #15803d);
+    }
+
+    .btn-save:disabled {
+      background: #6b7280;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .message {
+      display: none;
+      margin-top: 18px;
+      padding: 13px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .message.success {
+      display: block;
+      background: rgba(22, 163, 74, 0.18);
+      border: 1px solid #22c55e;
+      color: #bbf7d0;
+    }
+
+    .message.error {
+      display: block;
+      background: rgba(220, 38, 38, 0.18);
+      border: 1px solid #ef4444;
+      color: #fecaca;
+    }
+
+    @media (max-width: 720px) {
+      .form-card {
+        padding: 22px;
+      }
+
+      .header {
+        align-items: flex-start;
+      }
+
+      .logo {
+        width: 58px;
+        height: 58px;
+      }
+
+      .header-text-main {
+        font-size: 19px;
+      }
+
+      .title h1 {
+        font-size: 22px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page-wrapper">
+    <section class="form-card">
+
+      <header class="header">
+        <img src="logo-kejaksaan.png" alt="Logo Kejaksaan" class="logo" />
+
+        <div>
+          <div class="header-text-small">Kejaksaan Republik Indonesia</div>
+          <div class="header-text-main">Kejaksaan Negeri Muna</div>
+        </div>
+      </header>
+
+      <div class="title">
+        <h1>Monitoring Distribusi MBG</h1>
+        <p>Form pengisian laporan distribusi Program Makanan Bergizi Gratis</p>
+      </div>
+
+      <form id="formMonitoring">
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label for="namaSppg">Nama SPPG</label>
+            <select id="namaSppg" name="namaSppg" required>
+              <option value="">Pilih Nama SPPG</option>
+              <option value="SPPG 1">SPPG 1</option>
+              <option value="SPPG 2">SPPG 2</option>
+              <option value="SPPG 3">SPPG 3</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tanggal">Tanggal</label>
+            <input type="date" id="tanggal" name="tanggal" required />
+          </div>
+
+          <div class="form-group full">
+            <label for="menuMbg">Menu MBG</label>
+            <textarea
+              id="menuMbg"
+              name="menuMbg"
+              placeholder="Contoh: Nasi, ayam, sayur, buah, dan susu..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group full">
+            <label for="nilaiGizi">Nilai Gizi</label>
+            <textarea
+              id="nilaiGizi"
+              name="nilaiGizi"
+              placeholder="Contoh: Karbohidrat, protein, lemak, vitamin, mineral..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="fotoMenu">Foto Menu MBG</label>
+            <input
+              type="file"
+              id="fotoMenu"
+              name="fotoMenu"
+              accept="image/*"
+              required
+            />
+            <div class="upload-note">Format disarankan: JPG, JPEG, PNG.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="fotoDistribusi">Foto Distribusi</label>
+            <input
+              type="file"
+              id="fotoDistribusi"
+              name="fotoDistribusi"
+              accept="image/*"
+              required
+            />
+            <div class="upload-note">Upload foto proses distribusi MBG.</div>
+          </div>
+
+        </div>
+
+        <div class="button-wrapper">
+          <button type="submit" class="btn-save" id="btnSimpan">
+            Simpan
+          </button>
+        </div>
+
+        <div id="messageBox" class="message"></div>
+
+      </form>
+
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("formMonitoring");
+    const messageBox = document.getElementById("messageBox");
+    const btnSimpan = document.getElementById("btnSimpan");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const namaSppg = document.getElementById("namaSppg").value.trim();
+      const tanggal = document.getElementById("tanggal").value;
+      const menuMbg = document.getElementById("menuMbg").value.trim();
+      const nilaiGizi = document.getElementById("nilaiGizi").value.trim();
+      const fotoMenu = document.getElementById("fotoMenu").files[0];
+      const fotoDistribusi = document.getElementById("fotoDistribusi").files[0];
+
+      if (!namaSppg || !tanggal || !menuMbg || !nilaiGizi || !fotoMenu || !fotoDistribusi) {
+        showMessage("Mohon lengkapi seluruh data terlebih dahulu.", "error");
+        return;
+      }
+
+      btnSimpan.disabled = true;
+      btnSimpan.textContent = "Memeriksa...";
+
+      setTimeout(function() {
+        showMessage(
+          "Form sudah siap. Pada tahap berikutnya, tombol Simpan akan disambungkan ke Google Apps Script.",
+          "success"
+        );
+
+        btnSimpan.disabled = false;
+        btnSimpan.textContent = "Simpan";
+      }, 700);
+    });
+
+    function showMessage(message, type) {
+      messageBox.textContent = message;
+      messageBox.className = "message " + type;
+    }
+  </script>
+</body>
+</html>
