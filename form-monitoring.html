@@ -498,7 +498,11 @@
         }
 
       } else {
-        showMessage(result.message || "Data gagal disimpan.", "error");
+        showMessage(
+  (result.message || "Data gagal disimpan.") + 
+  (result.detail ? " Detail: " + result.detail : ""),
+  "error"
+);
       }
 
     } catch (error) {
