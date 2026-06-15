@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzqFpjF5B_QnX7MO4RSm3IBQ9B0dZnPPP6qbJqCyXp_w4Uc_T6pVigcWmVBdE6ynBGW/exec";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxl7u7NeBrpaXxylVCRmKqhIapX2nRRZN0l5vRu2mDwP3CkJBmRDUopBmbiRoAix_YB/exec";
 
   try {
     const { email, password } = req.body || {};
@@ -25,20 +25,21 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         action: "login",
-        email,
-        password
+        email: email,
+        password: password
       })
     });
 
     const text = await gasResponse.text();
 
     let result;
+
     try {
       result = JSON.parse(text);
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: "Respons Apps Script bukan JSON. Cek deployment Apps Script.",
+        message: "Respons Apps Script bukan JSON. Cek deploy Apps Script.",
         detail: text.slice(0, 200)
       });
     }
