@@ -1409,31 +1409,36 @@
     }
 
     function renderPhotoBox(label, url) {
-      if (!url) {
-        return `
-          <div class="doc-photo-box">
-            <div class="doc-photo-label">${escapeHtml(label)}</div>
-            <div class="doc-empty">Belum ada foto</div>
-          </div>
-        `;
-      }
+  if (!url) {
+    return `
+      <div class="doc-photo-box">
+        <div class="doc-photo-label">${escapeHtml(label)}</div>
+        <div class="doc-empty">Belum ada foto</div>
+      </div>
+    `;
+  }
 
-      const imgUrl = driveImageUrl(url);
+  const imgUrl = driveImageUrl(url);
 
-      return `
-        <div class="doc-photo-box">
-          <div class="doc-photo-label">${escapeHtml(label)}</div>
-          <img
-            src="${escapeAttr(imgUrl)}"
-            alt="${escapeAttr(label)}"
-            crossorigin="anonymous"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-          />
-          <a class="doc-fallback" href="${escapeAttr(url)}" target="_blank">Buka Foto</a>
-        </div>
-      `;
-    }
+  return `
+    <div class="doc-photo-box">
+      <div class="doc-photo-label">${escapeHtml(label)}</div>
 
+      <a href="${escapeAttr(url)}" target="_blank" class="doc-image-link">
+        <img
+          src="${escapeAttr(imgUrl)}"
+          alt="${escapeAttr(label)}"
+          loading="lazy"
+          onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"
+        />
+      </a>
+
+      <a class="doc-fallback" href="${escapeAttr(url)}" target="_blank">
+        Buka Foto
+      </a>
+    </div>
+  `;
+}
     function renderRecap() {
       const rows = getFilteredRows();
       const scopeSppg = getScopeSppgList();
