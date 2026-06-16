@@ -1683,15 +1683,82 @@ function setStatsLoading(isLoading) {
     updateAllWitaNotes();
   });
 })();
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  loadIndexStats();
-
-  setInterval(function () {
-    loadIndexStats();
-  }, 30000);
-});
 </script>
-  </script>
+
+<script>
+(function () {
+  const STAT_API_URL = "/api/index-stats";
+
+  function getWitaTimeNowFixed() {
+    return new Intl.DateTimeFormat("id-ID", {
+      timeZone: "Asia/Makassar",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    }).format(new Date()).replace(".", ":");
+  }
+
+  function updateAllWitaNotesFixed() {
+    const waktu = getWitaTimeNowFixed();
+    document.querySelectorAll(".si-note").forEach(function (note) {
+      note.textContent = "Update " + waktu + " WITA";
+    });
+  }
+
+  function setStatValueFixed(id, value, fallback) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const angka = Number(value);
+    const finalValue = Number.isFinite(angka) ? angka : Number(fallback || 0);
+
+    el.classList.remove("is-loading");
+    el.textContent = finalValue.toLocaleString("id-ID");
+  }
+
+  async function refreshIndexStatsFixed() {
+    updateAllWitaNotesFixed();
+
+    try {
+      const response = await fetch(STAT_API_URL + "?t=" + Date.now(), {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+          "Pragma": "no-cache"
+        }
+      });
+
+      const result = await response.json();
+      console.log("[index-stats]", result);
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Gagal mengambil statistik index.");
+      }
+
+      const data = result.data || {};
+
+      setStatValueFixed("statTotalSppg", data.totalSppgAktif ?? 27, 27);
+      setStatValueFixed("statTotalSekolah", data.totalSekolahPenerima ?? 128, 128);
+      setStatValueFixed("statSppgMelapor", data.totalSppgMelaporHariIni ?? 0, 0);
+      setStatValueFixed("statTotalAduan", data.totalAduan ?? 0, 0);
+    } catch (error) {
+      console.error("[index-stats-error]", error);
+    } finally {
+      updateAllWitaNotesFixed();
+    }
+  }
+
+  window.loadIndexStats = refreshIndexStatsFixed;
+  window.updateAllWitaNotes = updateAllWitaNotesFixed;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    refreshIndexStatsFixed();
+    setInterval(refreshIndexStatsFixed, 30000);
+  });
+
+  window.addEventListener("load", refreshIndexStatsFixed);
+})();
+</script>
 </body>
 </html>
