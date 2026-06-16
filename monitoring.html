@@ -3,25 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Monitoring Distribusi MBG - Kejaksaan Negeri Muna</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     :root {
-      --green-dark: #043927;
-      --green-main: #0f5132;
-      --green-soft: #15803d;
-      --green-light: #dcfce7;
+      --green-900: #0a4f2d;
+      --green-800: #0f6a3a;
+      --green-700: #15803d;
+      --green-600: #16a34a;
+      --green-100: #eaf7ee;
+      --green-050: #f7fbf8;
       --gold: #d7b45a;
-      --white: #ffffff;
-      --text: #0f172a;
+      --text: #102015;
       --muted: #64748b;
-      --border: #d9e5dd;
+      --border: #dbe8de;
       --danger: #dc2626;
-      --shadow: 0 18px 45px rgba(15, 23, 42, 0.10);
+      --danger-soft: #fee2e2;
+      --success-soft: #dcfce7;
+      --warning-soft: #fef3c7;
+      --panel-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
     }
 
     * {
@@ -34,33 +36,17 @@
       font-family: Arial, Helvetica, sans-serif;
       color: var(--text);
       background:
-        linear-gradient(
-          120deg,
-          rgba(255,255,255,0.88),
-          rgba(255,255,255,0.82)
-        ),
+        linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)),
         url("https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Background%20Form.png");
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background:
-        radial-gradient(circle at 15% 20%, rgba(215,180,90,0.18), transparent 28%),
-        radial-gradient(circle at 80% 12%, rgba(21,128,61,0.13), transparent 30%),
-        radial-gradient(circle at 60% 90%, rgba(4,57,39,0.12), transparent 32%);
-      z-index: -1;
-    }
-
     .page {
-      max-width: 1220px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 24px 18px 42px;
+      padding: 20px 16px 36px;
     }
 
     .topbar {
@@ -69,12 +55,11 @@
       align-items: center;
       gap: 18px;
       padding: 18px 22px;
-      border: 1px solid rgba(4,57,39,0.12);
-      border-radius: 24px;
-      background: rgba(255,255,255,0.88);
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow);
-      margin-bottom: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.90);
+      border: 1px solid rgba(10,79,45,0.12);
+      box-shadow: var(--panel-shadow);
+      margin-bottom: 18px;
     }
 
     .brand {
@@ -84,416 +69,763 @@
     }
 
     .brand img {
-      width: 70px;
-      height: 70px;
+      width: 72px;
+      height: 72px;
       object-fit: contain;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
     }
 
     .brand-small {
       font-size: 13px;
       font-weight: 800;
-      color: var(--green-main);
       text-transform: uppercase;
       letter-spacing: 0.04em;
+      color: var(--green-800);
     }
 
     .brand-main {
-      margin-top: 4px;
-      font-size: 28px;
+      margin-top: 3px;
+      font-size: 30px;
       font-weight: 900;
       line-height: 1.05;
-      color: var(--green-dark);
+      color: var(--green-900);
       text-transform: uppercase;
     }
 
     .brand-sub {
-      margin-top: 6px;
+      margin-top: 5px;
       font-size: 13px;
       color: var(--muted);
+    }
+
+    .btn-back,
+    .btn-export {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 900;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .btn-back {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 112px;
-      text-decoration: none;
-      color: var(--green-dark);
-      border: 1px solid rgba(4,57,39,0.18);
-      border-radius: 999px;
-      padding: 11px 18px;
-      font-size: 13px;
-      font-weight: 800;
-      background: rgba(255,255,255,0.78);
-      transition: 0.2s ease;
+      color: var(--green-900);
+      background: #ffffff;
+      border: 1px solid rgba(10,79,45,0.18);
     }
 
-    .btn-back:hover {
-      transform: translateY(-1px);
-      border-color: var(--gold);
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1.5fr 0.9fr;
-      gap: 18px;
-      margin-bottom: 20px;
-    }
-
-    .hero-card {
-      border-radius: 24px;
-      padding: 28px;
+    .btn-export {
       color: #ffffff;
-      background:
-        linear-gradient(135deg, rgba(4,57,39,0.96), rgba(15,81,50,0.88)),
-        radial-gradient(circle at 80% 20%, rgba(215,180,90,0.30), transparent 34%);
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
+      background: linear-gradient(135deg, var(--green-900), var(--green-700));
+      box-shadow: 0 10px 22px rgba(21, 128, 61, 0.20);
     }
 
-    .hero-card::after {
-      content: "";
-      position: absolute;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      right: -80px;
-      top: -90px;
-      background: rgba(215,180,90,0.16);
-    }
-
-    .hero-kicker {
-      position: relative;
-      z-index: 1;
-      display: inline-flex;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.12);
-      color: #fde68a;
-      font-size: 12px;
-      font-weight: 800;
-      margin-bottom: 14px;
-    }
-
-    .hero h1 {
-      position: relative;
-      z-index: 1;
-      margin: 0;
-      font-size: 34px;
-      line-height: 1.1;
-      text-transform: uppercase;
-    }
-
-    .hero p {
-      position: relative;
-      z-index: 1;
-      margin: 12px 0 0;
-      max-width: 620px;
-      color: rgba(255,255,255,0.82);
-      line-height: 1.65;
-      font-size: 14px;
-    }
-
-    .update-card {
-      border-radius: 24px;
-      padding: 24px;
-      background: rgba(255,255,255,0.90);
-      border: 1px solid rgba(4,57,39,0.12);
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .update-label {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .update-value {
-      color: var(--green-dark);
-      font-size: 22px;
-      font-weight: 900;
-      line-height: 1.3;
-    }
-
-    .update-note {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
+    .controls-card {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(10,79,45,0.12);
+      border-radius: 22px;
+      box-shadow: var(--panel-shadow);
+      padding: 18px;
       margin-bottom: 18px;
     }
 
-    .summary-card {
-      background: rgba(255,255,255,0.90);
-      border: 1px solid rgba(4,57,39,0.12);
-      border-radius: 20px;
-      padding: 18px;
-      box-shadow: 0 12px 28px rgba(15,23,42,0.07);
+    .controls-top {
       display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
       gap: 14px;
-      align-items: center;
+      margin-bottom: 14px;
     }
 
-    .summary-icon {
-      width: 46px;
-      height: 46px;
-      flex-shrink: 0;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-      color: var(--green-main);
-      font-size: 21px;
+    .controls-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--green-900);
+      text-transform: uppercase;
+      line-height: 1.1;
     }
 
-    .summary-label {
-      font-size: 12px;
-      font-weight: 800;
+    .controls-sub {
+      margin-top: 5px;
       color: var(--muted);
+      font-size: 13px;
+    }
+
+    .report-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .report-tab {
+      border: 1px solid #c9ddd0;
+      background: #ffffff;
+      color: var(--green-900);
+      border-radius: 999px;
+      padding: 11px 18px;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .report-tab.active {
+      background: var(--green-900);
+      color: #ffffff;
+      border-color: var(--green-900);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--green-900);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      background: #ffffff;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--green-700);
+      box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.10);
+    }
+
+    .error-box {
+      display: none;
+      margin-bottom: 16px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      color: #991b1b;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .report-area {
+      background: rgba(255,255,255,0.95);
+      border: 1px solid rgba(10,79,45,0.12);
+      border-radius: 24px;
+      box-shadow: var(--panel-shadow);
+      padding: 18px;
+    }
+
+    .report-header {
+      display: grid;
+      grid-template-columns: 180px 1fr 180px;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 16px;
+      border-bottom: 3px solid #d8e8dc;
+      margin-bottom: 18px;
+    }
+
+    .report-logo-box {
+      text-align: center;
+    }
+
+    .report-logo-box img {
+      width: 86px;
+      height: 86px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 8px;
+    }
+
+    .report-logo-text {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--green-900);
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    .report-title-main {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--green-900);
+      text-transform: uppercase;
+      line-height: 1.15;
+    }
+
+    .report-title-sub {
+      margin-top: 6px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #111827;
+      text-transform: uppercase;
+    }
+
+    .report-title-note {
+      margin-top: 8px;
+      color: #374151;
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    .period-box {
+      border-radius: 16px;
+      padding: 16px 14px;
+      background: linear-gradient(135deg, var(--green-900), var(--green-700));
+      color: #ffffff;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(21, 128, 61, 0.16);
+    }
+
+    .period-label {
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      opacity: 0.92;
       margin-bottom: 5px;
     }
 
-    .summary-value {
-      font-size: 27px;
+    .period-value {
+      font-size: 18px;
       font-weight: 900;
-      color: var(--green-dark);
-      line-height: 1;
+      line-height: 1.15;
+      text-transform: uppercase;
     }
 
-    .dashboard-grid {
+    .report-grid {
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
+      grid-template-columns: 300px 1fr;
       gap: 16px;
       margin-bottom: 18px;
     }
 
     .panel {
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(4,57,39,0.12);
-      border-radius: 22px;
-      padding: 18px;
-      box-shadow: var(--shadow);
+      border: 1px solid rgba(10,79,45,0.12);
+      border-radius: 18px;
+      background: #ffffff;
+      overflow: hidden;
     }
 
-    .panel-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .panel-title {
-      color: var(--green-dark);
-      font-size: 16px;
+    .panel-title-bar {
+      background: linear-gradient(135deg, var(--green-900), var(--green-700));
+      color: #ffffff;
+      padding: 10px 14px;
       font-weight: 900;
+      font-size: 15px;
+      text-transform: uppercase;
     }
 
-    .panel-sub {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
+    .panel-body {
+      padding: 14px;
     }
 
-    .chart-wrap {
-      height: 280px;
-      position: relative;
-    }
-
-    .latest-list {
+    .executive-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      max-height: 280px;
-      overflow-y: auto;
-      padding-right: 4px;
+      gap: 12px;
     }
 
-    .latest-item {
-      border: 1px solid #e4eee8;
-      border-radius: 16px;
-      padding: 12px;
-      background: #fbfdfc;
-    }
-
-    .latest-top {
+    .exec-item {
       display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 6px;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e8f1eb;
     }
 
-    .latest-name {
-      font-size: 13px;
+    .exec-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .exec-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: var(--green-100);
+      color: var(--green-800);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .exec-value {
+      font-size: 18px;
       font-weight: 900;
-      color: var(--green-dark);
+      color: var(--green-900);
+      line-height: 1;
+      margin-bottom: 4px;
     }
 
-    .latest-date {
-      font-size: 11px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .latest-menu {
+    .exec-label {
       font-size: 12px;
       color: #334155;
       line-height: 1.45;
     }
 
-    .toolbar {
+    .summary-grid {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr;
+      grid-template-columns: repeat(4, 1fr);
       gap: 12px;
       margin-bottom: 14px;
     }
 
-    .toolbar input,
-    .toolbar select {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 13px 14px;
-      font-size: 14px;
-      background: rgba(255,255,255,0.94);
-      outline: none;
+    .summary-card {
+      border: 1px solid #e5eee9;
+      border-radius: 16px;
+      padding: 14px;
+      background: linear-gradient(135deg, #f8fbf9, #ffffff);
     }
 
-    .toolbar input:focus,
-    .toolbar select:focus {
-      border-color: var(--green-soft);
-      box-shadow: 0 0 0 3px rgba(21,128,61,0.10);
+    .summary-label {
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--muted);
+      margin-bottom: 7px;
     }
 
-    .table-card {
-      background: rgba(255,255,255,0.94);
-      border: 1px solid rgba(4,57,39,0.12);
-      border-radius: 22px;
+    .summary-value {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--green-900);
+      line-height: 1;
+    }
+
+    .summary-desc {
+      margin-top: 8px;
+      font-size: 11px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .status-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .status-box {
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid #e5eee9;
+      background: #ffffff;
+    }
+
+    .status-box.good {
+      background: #ecfdf5;
+      border-color: #bbf7d0;
+    }
+
+    .status-box.warn {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+
+    .status-box.danger {
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+
+    .status-box.neutral {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+    }
+
+    .status-box .small {
+      font-size: 12px;
+      font-weight: 900;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    .status-box .big {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--green-900);
+      line-height: 1;
+    }
+
+    .section {
+      margin-top: 18px;
+      border: 1px solid rgba(10,79,45,0.12);
+      border-radius: 18px;
+      background: #ffffff;
       overflow: hidden;
-      box-shadow: var(--shadow);
     }
 
-    .table-head {
-      padding: 16px 18px;
-      border-bottom: 1px solid var(--border);
+    .section-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
+      padding: 12px 14px;
+      background: #f7fbf8;
+      border-bottom: 1px solid #e3ede6;
     }
 
-    .table-title {
+    .section-title {
+      font-size: 16px;
       font-weight: 900;
-      color: var(--green-dark);
+      color: var(--green-900);
+      text-transform: uppercase;
     }
 
-    .table-note {
+    .section-sub {
+      font-size: 12px;
       color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .section-body {
+      padding: 14px;
+    }
+
+    .gallery-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .gallery-chip {
+      border: 1px solid #d8e5dc;
+      background: #ffffff;
+      color: var(--green-900);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 900;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .gallery-chip.active {
+      background: var(--green-900);
+      border-color: var(--green-900);
+      color: #ffffff;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .doc-card {
+      border: 1px solid #e4eee8;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #ffffff;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .doc-head {
+      padding: 10px 12px;
+      border-bottom: 1px solid #edf3ee;
+    }
+
+    .doc-sppg {
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--green-900);
+      line-height: 1.3;
+    }
+
+    .doc-date {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .doc-images {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .doc-photo-box {
+      border: 1px solid #e6eee8;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+
+    .doc-photo-label {
+      padding: 7px 8px;
+      font-size: 10px;
+      font-weight: 900;
+      color: var(--green-900);
+      background: #f5faf6;
+      border-bottom: 1px solid #e6eee8;
+    }
+
+    .doc-photo-box img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+      background: #f8fafc;
+    }
+
+    .doc-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 150px;
+      text-align: center;
+      padding: 10px;
+      color: #94a3b8;
       font-size: 12px;
       font-weight: 700;
     }
 
-    .table-wrap {
+    .doc-fallback {
+      display: none;
+      min-height: 150px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--green-900);
+      text-decoration: none;
+    }
+
+    .recap-wrap {
       overflow-x: auto;
     }
 
-    table {
+    .recap-table {
       width: 100%;
-      min-width: 980px;
+      min-width: 1200px;
       border-collapse: collapse;
     }
 
-    th {
-      text-align: left;
-      padding: 12px 14px;
+    .recap-table th,
+    .recap-table td {
+      border-bottom: 1px solid #edf3ee;
+      padding: 8px 8px;
+      text-align: center;
+      font-size: 12px;
+      vertical-align: middle;
+    }
+
+    .recap-table th {
       background: #f3f8f5;
-      color: var(--green-dark);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      border-bottom: 1px solid var(--border);
-    }
-
-    td {
-      padding: 13px 14px;
-      border-bottom: 1px solid #edf2ef;
-      vertical-align: top;
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    tr:hover td {
-      background: #fbfdfc;
-    }
-
-    .badge {
-      display: inline-flex;
-      padding: 5px 10px;
-      border-radius: 999px;
-      background: var(--green-light);
-      color: #166534;
+      color: var(--green-900);
       font-weight: 900;
-      font-size: 12px;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
 
-    .btn-link {
+    .recap-table th.sticky-left,
+    .recap-table td.sticky-left {
+      position: sticky;
+      left: 0;
+      background: #ffffff;
+      z-index: 2;
+      text-align: left;
+      min-width: 220px;
+      max-width: 220px;
+    }
+
+    .recap-table th.sticky-left {
+      background: #f3f8f5;
+      z-index: 3;
+    }
+
+    .recap-table td.sticky-left strong {
+      color: var(--green-900);
+    }
+
+    .date-col {
+      min-width: 38px;
+      width: 38px;
+    }
+
+    .status-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
       display: inline-flex;
-      text-decoration: none;
-      color: #ffffff;
-      background: var(--green-soft);
-      padding: 7px 10px;
-      border-radius: 9px;
-      font-weight: 800;
+      align-items: center;
+      justify-content: center;
       font-size: 12px;
-      margin-right: 4px;
-      margin-bottom: 4px;
+      font-weight: 900;
+      line-height: 1;
+      position: relative;
     }
 
-    .empty {
+    .status-icon.ok {
+      background: #16a34a;
+      color: #ffffff;
+    }
+
+    .status-icon.no {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    .status-count {
+      position: absolute;
+      right: -6px;
+      top: -6px;
+      min-width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: #111827;
+      color: #ffffff;
+      font-size: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+    }
+
+    .percent-pill {
+      display: inline-flex;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 11px;
+    }
+
+    .percent-pill.good {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .percent-pill.warn {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .percent-pill.bad {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #334155;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    .legend-dot.ok {
+      background: #16a34a;
+    }
+
+    .legend-dot.no {
+      background: #dc2626;
+    }
+
+    .empty-state {
       text-align: center;
       padding: 24px;
       color: var(--muted);
       font-weight: 800;
     }
 
-    .error {
-      display: none;
-      margin-bottom: 16px;
-      padding: 14px;
-      border-radius: 14px;
-      color: #991b1b;
-      background: #fee2e2;
-      border: 1px solid #fca5a5;
-      text-align: center;
-      font-weight: 800;
+    .report-footer {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid #e5eee9;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: #475569;
     }
 
-    @media (max-width: 920px) {
-      .hero,
-      .dashboard-grid {
+    .pdf-mode .controls-card,
+    .pdf-mode .topbar .btn-back,
+    .pdf-mode .btn-export {
+      display: none !important;
+    }
+
+    .pdf-mode .page {
+      max-width: none;
+      padding: 0;
+    }
+
+    .pdf-mode .report-area {
+      border-radius: 0;
+      box-shadow: none;
+      border: none;
+    }
+
+    @media (max-width: 1100px) {
+      .filter-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .report-grid {
         grid-template-columns: 1fr;
       }
 
-      .summary {
+      .summary-grid,
+      .status-strip,
+      .gallery-grid {
         grid-template-columns: repeat(2, 1fr);
       }
 
-      .toolbar {
+      .report-header {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar,
+      .controls-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .filter-grid,
+      .summary-grid,
+      .status-strip,
+      .gallery-grid {
         grid-template-columns: 1fr;
       }
 
@@ -501,577 +833,21 @@
         font-size: 22px;
       }
 
-      .hero h1 {
-        font-size: 26px;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
+      .report-title-main {
+        font-size: 18px;
       }
 
-      .brand img {
-        width: 58px;
-        height: 58px;
+      .report-logo-box img {
+        width: 72px;
+        height: 72px;
       }
 
-      .summary {
+      .doc-images {
         grid-template-columns: 1fr;
       }
-
-      .summary-card {
-        padding: 16px;
-      }
     }
-  .report-panel {
-  margin-bottom: 18px;
-}
-
-.report-action {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.btn-export {
-  border: none;
-  border-radius: 999px;
-  padding: 11px 18px;
-  background: linear-gradient(135deg, #0f5132, #15803d);
-  color: #ffffff;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 10px 22px rgba(21, 128, 61, 0.18);
-}
-
-.btn-export:hover {
-  transform: translateY(-1px);
-}
-
-.report-tabs {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-
-.report-tab {
-  border: 1px solid rgba(15, 81, 50, 0.18);
-  background: #ffffff;
-  color: #0f5132;
-  border-radius: 999px;
-  padding: 10px 16px;
-  font-weight: 900;
-  cursor: pointer;
-}
-
-.report-tab.active {
-  background: #0f5132;
-  color: #ffffff;
-  border-color: #0f5132;
-}
-
-.report-controls {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.report-control label {
-  display: block;
-  margin-bottom: 7px;
-  color: #043927;
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.report-control input,
-.report-control select {
-  width: 100%;
-  border: 1px solid #d9e5dd;
-  border-radius: 13px;
-  padding: 12px 13px;
-  background: #ffffff;
-  font-size: 14px;
-}
-
-.report-export-area {
-  background: #ffffff;
-  border: 1px solid rgba(4, 57, 39, 0.12);
-  border-radius: 18px;
-  padding: 18px;
-}
-
-.report-print-head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid #e5eee9;
-  margin-bottom: 14px;
-}
-
-.report-print-head img {
-  width: 56px;
-  height: 56px;
-  object-fit: contain;
-}
-
-.report-print-org {
-  font-size: 12px;
-  font-weight: 900;
-  color: #0f5132;
-  text-transform: uppercase;
-}
-
-.report-print-title {
-  margin-top: 3px;
-  font-size: 20px;
-  font-weight: 900;
-  color: #043927;
-  text-transform: uppercase;
-}
-
-.report-print-sub {
-  margin-top: 3px;
-  font-size: 12px;
-  color: #64748b;
-}
-
-.report-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.report-mini-card {
-  border: 1px solid #e5eee9;
-  border-radius: 14px;
-  padding: 13px;
-  background: #f8fbf9;
-}
-
-.report-mini-label {
-  font-size: 11px;
-  color: #64748b;
-  font-weight: 900;
-  margin-bottom: 6px;
-}
-
-.report-mini-value {
-  font-size: 22px;
-  font-weight: 900;
-  color: #043927;
-}
-
-.report-chart-box {
-  height: 260px;
-  border: 1px solid #e5eee9;
-  border-radius: 16px;
-  padding: 12px;
-  margin-bottom: 14px;
-}
-
-.report-table-wrap {
-  overflow-x: auto;
-}
-
-.report-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 860px;
-}
-
-.report-table th {
-  background: #f3f8f5;
-  color: #043927;
-  text-align: left;
-  padding: 10px;
-  font-size: 11px;
-  text-transform: uppercase;
-  border-bottom: 1px solid #d9e5dd;
-}
-
-.report-table td {
-  padding: 10px;
-  font-size: 12px;
-  line-height: 1.45;
-  border-bottom: 1px solid #edf2ef;
-}
-
-.report-footer {
-  margin-top: 12px;
-  color: #64748b;
-  font-size: 11px;
-  text-align: right;
-}
-
-.pdf-mode .btn-export,
-.pdf-mode .report-tabs,
-.pdf-mode .report-controls {
-  display: none !important;
-}
-
-@media (max-width: 800px) {
-  .report-controls,
-  .report-summary-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-  .status-toolbar {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.status-toolbar label {
-  display: block;
-  margin-bottom: 6px;
-  color: #043927;
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.status-toolbar input,
-.status-toolbar select {
-  width: 100%;
-  border: 1px solid #d9e5dd;
-  border-radius: 13px;
-  padding: 11px 12px;
-  background: #ffffff;
-  font-size: 13px;
-  outline: none;
-}
-
-.status-toolbar input:focus,
-.status-toolbar select:focus {
-  border-color: #15803d;
-  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.10);
-}
-
-.status-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.status-mini {
-  border-radius: 16px;
-  padding: 12px;
-  border: 1px solid #e5eee9;
-  background: #f8fbf9;
-}
-
-.status-mini span {
-  display: block;
-  font-size: 11px;
-  font-weight: 900;
-  color: #64748b;
-  margin-bottom: 5px;
-}
-
-.status-mini strong {
-  display: block;
-  font-size: 24px;
-  line-height: 1;
-  color: #043927;
-}
-
-.status-mini.updated {
-  background: #ecfdf5;
-  border-color: #bbf7d0;
-}
-
-.status-mini.not-updated {
-  background: #fff7ed;
-  border-color: #fed7aa;
-}
-
-.status-mini.total {
-  background: #f8fafc;
-  border-color: #e2e8f0;
-}
-
-.sppg-status-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 280px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.sppg-status-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid #e5eee9;
-  border-radius: 16px;
-  padding: 12px;
-  background: #ffffff;
-}
-
-.sppg-status-left {
-  min-width: 0;
-}
-
-.sppg-status-name {
-  font-size: 13px;
-  font-weight: 900;
-  color: #043927;
-  margin-bottom: 4px;
-}
-
-.sppg-status-info {
-  font-size: 11px;
-  color: #64748b;
-  line-height: 1.4;
-}
-
-.sppg-status-badge {
-  flex-shrink: 0;
-  border-radius: 999px;
-  padding: 7px 10px;
-  font-size: 11px;
-  font-weight: 900;
-  white-space: nowrap;
-}
-
-.sppg-status-badge.updated {
-  color: #166534;
-  background: #dcfce7;
-}
-
-.sppg-status-badge.not-updated {
-  color: #9a3412;
-  background: #ffedd5;
-}
-
-@media (max-width: 720px) {
-  .status-toolbar,
-  .status-summary {
-    grid-template-columns: 1fr;
-  }
-
-  .sppg-status-item {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-}  
-  /* INFOGRAFIS LAPORAN PDF */
-.report-infographic-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.report-info-card {
-  border: 1px solid #e5eee9;
-  border-radius: 16px;
-  padding: 14px;
-  background: linear-gradient(135deg, #f8fbf9, #ffffff);
-  position: relative;
-  overflow: hidden;
-}
-
-.report-info-card::after {
-  content: "";
-  position: absolute;
-  right: -24px;
-  top: -24px;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background: rgba(21, 128, 61, 0.08);
-}
-
-.report-info-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 14px;
-  background: #dcfce7;
-  color: #0f5132;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  margin-bottom: 10px;
-}
-
-.report-info-label {
-  font-size: 11px;
-  color: #64748b;
-  font-weight: 900;
-  margin-bottom: 5px;
-}
-
-.report-info-value {
-  font-size: 22px;
-  font-weight: 900;
-  color: #043927;
-  line-height: 1;
-}
-
-.report-info-desc {
-  margin-top: 7px;
-  font-size: 11px;
-  color: #64748b;
-  line-height: 1.45;
-}
-
-.report-progress {
-  width: 100%;
-  height: 8px;
-  background: #e5eee9;
-  border-radius: 999px;
-  margin-top: 10px;
-  overflow: hidden;
-}
-
-.report-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #0f5132, #16a34a);
-  border-radius: 999px;
-}
-
-.report-section-title {
-  margin: 18px 0 10px;
-  padding: 10px 12px;
-  border-left: 5px solid #0f5132;
-  background: #f3f8f5;
-  border-radius: 10px;
-  color: #043927;
-  font-size: 13px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.report-evidence-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.evidence-card {
-  border: 1px solid #e5eee9;
-  border-radius: 16px;
-  padding: 12px;
-  background: #ffffff;
-  break-inside: avoid;
-  page-break-inside: avoid;
-}
-
-.evidence-head {
-  margin-bottom: 10px;
-}
-
-.evidence-title {
-  font-size: 13px;
-  font-weight: 900;
-  color: #043927;
-}
-
-.evidence-meta {
-  margin-top: 4px;
-  font-size: 11px;
-  color: #64748b;
-}
-
-.evidence-images {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.evidence-photo-box {
-  border: 1px solid #e5eee9;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f8fafc;
-}
-
-.evidence-photo-label {
-  padding: 7px 9px;
-  font-size: 10px;
-  font-weight: 900;
-  color: #043927;
-  background: #f3f8f5;
-  border-bottom: 1px solid #e5eee9;
-}
-
-.evidence-photo-box img {
-  width: 100%;
-  height: 145px;
-  object-fit: cover;
-  display: block;
-  background: #f8fafc;
-}
-
-.photo-fallback {
-  display: none;
-  min-height: 145px;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 12px;
-  font-size: 12px;
-  color: #0f5132;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.no-photo-box {
-  min-height: 145px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8fafc;
-  color: #94a3b8;
-  font-size: 12px;
-  font-weight: 800;
-  text-align: center;
-  padding: 12px;
-}
-
-@media print {
-  .report-infographic-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .report-evidence-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .evidence-card {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-}
-
-@media (max-width: 800px) {
-  .report-infographic-grid,
-  .report-evidence-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .evidence-images {
-    grid-template-columns: 1fr;
-  }
-}  
   </style>
 </head>
-
 <body>
   <main class="page">
     <header class="topbar">
@@ -1083,741 +859,783 @@
         <div>
           <div class="brand-small">Kejaksaan Republik Indonesia</div>
           <div class="brand-main">Kejaksaan Negeri Muna</div>
-          <div class="brand-sub">Monitoring Program Makanan Bergizi Gratis</div>
+          <div class="brand-sub">Monitoring Program Makanan Bergizi Gratis (MBG)</div>
         </div>
       </div>
 
-      <a href="/" class="btn-back">Kembali</a>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a href="/" class="btn-back">Kembali</a>
+        <button type="button" class="btn-export" onclick="exportReportPDF()">Export PDF</button>
+      </div>
     </header>
 
-    <section class="hero">
-      <div class="hero-card">
-        <div class="hero-kicker">Dashboard Publik MBG</div>
-        <h1>Monitoring Distribusi MBG</h1>
-        <p>
-          Menampilkan rekapitulasi laporan distribusi Program Makanan Bergizi Gratis secara informatif,
-          transparan, dan mudah dipantau oleh publik.
-        </p>
+    <div id="errorBox" class="error-box"></div>
+
+    <section class="controls-card">
+      <div class="controls-top">
+        <div>
+          <div class="controls-title">Laporan Monitoring Distribusi MBG</div>
+          <div class="controls-sub">Pilih jenis laporan, periode, dan SPPG untuk menampilkan dashboard monitoring yang interaktif.</div>
+        </div>
       </div>
 
-      <div class="update-card">
-        <div class="update-label">Update Terakhir</div>
-        <div class="update-value" id="updateTerakhir">-</div>
-        <div class="update-note">
-          Data diperbarui otomatis berdasarkan laporan yang dikirim oleh operator SPPG.
+      <div class="report-tabs">
+        <button class="report-tab active" data-tab="daily" type="button">Laporan Harian</button>
+        <button class="report-tab" data-tab="monthly" type="button">Laporan Bulanan</button>
+        <button class="report-tab" data-tab="sppgMonthly" type="button">Bulanan per SPPG</button>
+      </div>
+
+      <div class="filter-grid">
+        <div class="field" id="fieldDate">
+          <label>Tanggal Laporan</label>
+          <input type="date" id="reportDate" />
+        </div>
+
+        <div class="field" id="fieldMonth">
+          <label>Bulan Laporan</label>
+          <input type="month" id="reportMonth" />
+        </div>
+
+        <div class="field" id="fieldSppg">
+          <label>Nama SPPG</label>
+          <select id="reportSppg">
+            <option value="">Pilih SPPG</option>
+          </select>
+        </div>
+
+        <div style="display:flex; align-items:end;">
+          <button type="button" class="btn-export" onclick="renderDashboard()" style="width:100%;">Tampilkan</button>
         </div>
       </div>
     </section>
 
-    <section class="summary">
-      <div class="summary-card">
-        <div class="summary-icon">📄</div>
+    <section class="report-area" id="pdfReportArea">
+      <div class="report-header">
+        <div class="report-logo-box">
+          <img
+            src="https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Logo-Kejaksaan%20%281%29%281%29.png"
+            alt="Logo Kejaksaan"
+          />
+          <div class="report-logo-text">Kejaksaan Negeri Muna</div>
+          <div style="font-size:12px; color:#334155;">Monitoring Distribusi MBG</div>
+        </div>
+
         <div>
-          <div class="summary-label">Total Laporan</div>
-          <div class="summary-value" id="totalLaporan">0</div>
+          <div class="report-title-main">Laporan Monitoring Distribusi MBG</div>
+          <div class="report-title-sub" id="reportTitleSub">Laporan Harian</div>
+          <div class="report-title-note">Transparan, Akuntabel, Untuk Masyarakat Muna yang Sehat</div>
+        </div>
+
+        <div class="period-box">
+          <div class="period-label" id="periodLabel">Periode</div>
+          <div class="period-value" id="periodValue">-</div>
         </div>
       </div>
 
-      <div class="summary-card">
-        <div class="summary-icon">🏫</div>
-        <div>
-          <div class="summary-label">SPPG Melapor</div>
-          <div class="summary-value" id="totalSppg">0</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-icon">📅</div>
-        <div>
-          <div class="summary-label">Laporan Hari Ini</div>
-          <div class="summary-value" id="laporanHariIni">0</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-icon">✅</div>
-        <div>
-          <div class="summary-label">Status Data</div>
-          <div class="summary-value" style="font-size:20px;">Aktif</div>
-        </div>
-      </div>
-    </section>
-
-    <div id="errorBox" class="error"></div>
-    <section class="panel report-panel">
-  <div class="panel-head">
-    <div>
-      <div class="panel-title">Generator Laporan Monitoring MBG</div>
-      <div class="panel-sub">Pilih jenis laporan, lihat grafik, lalu ekspor ke PDF.</div>
-    </div>
-
-    <div class="report-action">
-      <button class="btn-export" type="button" onclick="exportReportPDF()">
-        Export PDF
-      </button>
-    </div>
-  </div>
-
-  <div class="report-tabs">
-    <button class="report-tab active" type="button" data-report-tab="daily">
-      Laporan Harian
-    </button>
-
-    <button class="report-tab" type="button" data-report-tab="monthly">
-      Laporan Bulanan
-    </button>
-
-    <button class="report-tab" type="button" data-report-tab="sppgMonthly">
-      Bulanan per SPPG
-    </button>
-  </div>
-
-  <div class="report-controls">
-    <div class="report-control" id="controlReportDate">
-      <label>Tanggal Laporan</label>
-      <input type="date" id="reportDate">
-    </div>
-
-    <div class="report-control" id="controlReportMonth">
-      <label>Bulan Laporan</label>
-      <input type="month" id="reportMonth">
-    </div>
-
-    <div class="report-control" id="controlReportSppg">
-      <label>Nama SPPG</label>
-      <select id="reportSppg">
-        <option value="">Pilih SPPG</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="report-export-area" id="reportExportArea">
-    <div class="report-print-head">
-      <img
-        src="https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Logo-Kejaksaan%20%281%29%281%29.png"
-        alt="Logo Kejaksaan"
-      >
-
-      <div>
-        <div class="report-print-org">Kejaksaan Republik Indonesia</div>
-        <div class="report-print-title" id="reportTitle">Laporan Harian MBG</div>
-        <div class="report-print-sub" id="reportSubtitle">Periode laporan</div>
-      </div>
-    </div>
-
-    <div class="report-summary-grid" id="reportSummaryCards"></div>
-
-    <div class="report-infographic-grid" id="reportInfographicGrid"></div>
-<div class="report-section-title">
-  Dokumentasi Foto Menu dan Distribusi
-</div>
-
-<div class="report-evidence-grid" id="reportEvidenceGrid"></div>
-
-    <div class="report-table-wrap">
-      <table class="report-table">
-        <thead id="reportThead"></thead>
-        <tbody id="reportTbody"></tbody>
-      </table>
-    </div>
-
-    <div class="report-footer" id="reportFooter">
-      Kejaksaan Negeri Muna · Monitoring Distribusi MBG
-    </div>
-  </div>
-</section>
-    
-
-    <section class="dashboard-grid">
-     <div class="panel">
-  <div class="panel-head">
-    <div>
-      <div class="panel-title">Status Update SPPG</div>
-      <div class="panel-sub">Daftar seluruh SPPG yang sudah dan belum mengirim laporan pada tanggal terpilih.</div>
-    </div>
-  </div>
-
-  <div class="status-toolbar">
-    <div>
-      <label>Tanggal Monitoring</label>
-      <input type="date" id="statusDate">
-    </div>
-
-    <div>
-      <label>Filter Status</label>
-      <select id="statusFilter">
-        <option value="all">Semua Status</option>
-        <option value="updated">Sudah Update</option>
-        <option value="notUpdated">Belum Update</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="status-summary">
-    <div class="status-mini updated">
-      <span>Sudah Update</span>
-      <strong id="countUpdated">0</strong>
-    </div>
-
-    <div class="status-mini not-updated">
-      <span>Belum Update</span>
-      <strong id="countNotUpdated">0</strong>
-    </div>
-
-    <div class="status-mini total">
-      <span>Total SPPG</span>
-      <strong id="countTotalSppg">0</strong>
-    </div>
-  </div>
-
-  <div class="sppg-status-list" id="sppgStatusList">
-    <div class="empty">Memuat status SPPG...</div>
-  </div>
-</div>
-
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Laporan Terbaru</div>
-            <div class="panel-sub">5 laporan terakhir yang tersimpan.</div>
+      <!-- BAGIAN 1 -->
+      <div class="report-grid">
+        <div class="panel">
+          <div class="panel-title-bar">Ringkasan Eksekutif</div>
+          <div class="panel-body">
+            <div class="executive-list" id="executiveList"></div>
           </div>
         </div>
-        <div class="latest-list" id="latestList">
-          <div class="empty">Memuat laporan terbaru...</div>
-        </div>
-      </div>
-    </section>
 
-    <section class="panel" style="margin-bottom:18px;">
-      <div class="panel-head">
         <div>
-          <div class="panel-title">Tren Laporan Harian</div>
-          <div class="panel-sub">Pergerakan jumlah laporan distribusi berdasarkan tanggal.</div>
+          <div class="summary-grid" id="summaryGrid"></div>
+          <div class="status-strip" id="statusStrip"></div>
         </div>
       </div>
-      <div class="chart-wrap">
-        <canvas id="chartTrend"></canvas>
-      </div>
-    </section>
 
-    <section class="toolbar">
-      <input type="text" id="searchInput" placeholder="Cari SPPG, menu, atau nilai gizi..." />
-      <select id="filterSppg">
-        <option value="">Semua SPPG</option>
-      </select>
-      <input type="date" id="filterTanggal" />
-    </section>
+      <!-- BAGIAN 2 -->
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Dokumentasi Foto Menu MBG dan Distribusi</div>
+            <div class="section-sub">Menampilkan dokumentasi berdasarkan periode laporan yang dipilih.</div>
+          </div>
 
-    <section class="table-card">
-      <div class="table-head">
-        <div class="table-title">Data Detail Distribusi MBG</div>
-        <div class="table-note" id="tableNote">Memuat data...</div>
-      </div>
+          <div class="gallery-filter">
+            <button class="gallery-chip active" data-gallery="all" type="button">Semua</button>
+            <button class="gallery-chip" data-gallery="menu" type="button">Foto Menu</button>
+            <button class="gallery-chip" data-gallery="distribution" type="button">Foto Distribusi</button>
+          </div>
+        </div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Nama SPPG</th>
-              <th>Tanggal</th>
-              <th>Menu MBG</th>
-              <th>Nilai Gizi</th>
-              <th>Dokumentasi</th>
-              <th>Waktu Simpan</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="monitoringTbody">
-            <tr>
-              <td colspan="7" class="empty">Memuat data monitoring...</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="section-body">
+          <div class="gallery-grid" id="galleryGrid"></div>
+        </div>
+      </section>
+
+      <!-- BAGIAN 3 -->
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Rekapitulasi Input SPPG</div>
+            <div class="section-sub">Centang hijau berarti sudah upload/simpan data pada tanggal tersebut. Silang merah berarti belum upload.</div>
+          </div>
+        </div>
+
+        <div class="section-body">
+          <div class="recap-wrap">
+            <table class="recap-table">
+              <thead id="recapHead"></thead>
+              <tbody id="recapBody"></tbody>
+            </table>
+          </div>
+
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-dot ok">✓</span>
+              <span>Sudah Upload / Simpan Data</span>
+            </div>
+
+            <div class="legend-item">
+              <span class="legend-dot no">✕</span>
+              <span>Belum Upload / Simpan Data</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="report-footer">
+        <div>Kejaksaan Negeri Muna · Monitoring Distribusi MBG</div>
+        <div id="footerGenerated">-</div>
       </div>
     </section>
   </main>
 
   <script>
-let monitoringData = [];
-let allSppgList = [];
-let chartTrend = null;
-let reportChart = null;
-let activeReportTab = "daily";
-    document.addEventListener("DOMContentLoaded", async function() {
-      await loadMonitoringData();
+    let monitoringData = [];
+    let allSppgList = [];
+    let activeTab = "daily";
+    let activeGallery = "all";
 
-      document.getElementById("searchInput").addEventListener("input", renderTable);
-      document.getElementById("filterSppg").addEventListener("change", renderTable);
-      document.getElementById("filterTanggal").addEventListener("change", renderTable);
+    document.addEventListener("DOMContentLoaded", async function () {
+      bindEvents();
+      await loadInitialData();
     });
 
-    async function loadMonitoringData() {
+    function bindEvents() {
+      document.querySelectorAll(".report-tab").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".report-tab").forEach(function (item) {
+            item.classList.remove("active");
+          });
+
+          btn.classList.add("active");
+          activeTab = btn.dataset.tab;
+          toggleFilterFields();
+          renderDashboard();
+        });
+      });
+
+      document.querySelectorAll(".gallery-chip").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".gallery-chip").forEach(function (item) {
+            item.classList.remove("active");
+          });
+
+          btn.classList.add("active");
+          activeGallery = btn.dataset.gallery;
+          renderGallery();
+        });
+      });
+
+      document.getElementById("reportDate").addEventListener("change", renderDashboard);
+      document.getElementById("reportMonth").addEventListener("change", renderDashboard);
+      document.getElementById("reportSppg").addEventListener("change", renderDashboard);
+    }
+
+    async function loadInitialData() {
       const errorBox = document.getElementById("errorBox");
-      const tbody = document.getElementById("monitoringTbody");
 
       try {
-        const res = await fetch("/api/public-monitoring");
-        const result = await res.json();
+        const [monitoringRes, sppgRes] = await Promise.all([
+          fetch("/api/public-monitoring"),
+          fetch("/api/list-sppg")
+        ]);
 
-        if (!result.success) {
-          errorBox.style.display = "block";
-          errorBox.textContent = result.message || "Gagal mengambil data monitoring.";
-          tbody.innerHTML = '<tr><td colspan="7" class="empty">Data gagal dimuat.</td></tr>';
-          return;
+        const monitoringJson = await monitoringRes.json();
+        const sppgJson = await sppgRes.json();
+
+        if (!monitoringJson.success) {
+          throw new Error(monitoringJson.message || "Gagal mengambil data monitoring.");
         }
 
-monitoringData = result.data || [];
+        monitoringData = Array.isArray(monitoringJson.data) ? monitoringJson.data : [];
+        allSppgList = sppgJson && sppgJson.success && Array.isArray(sppgJson.data)
+          ? sppgJson.data.filter(Boolean)
+          : [...new Set(monitoringData.map(item => item.namaSppg).filter(Boolean))];
 
-await loadAllSppgList();
-
-updateSummary(result.summary || {});
-buildSppgFilter();
-renderLatestList();
-initStatusSppg();
-renderCharts();
-initReportGenerator();
-renderTable();
+        populateSppgSelect();
+        setDefaultFilters();
+        toggleFilterFields();
+        renderDashboard();
 
       } catch (error) {
         console.error(error);
         errorBox.style.display = "block";
-        errorBox.textContent = "Gagal terhubung ke server monitoring.";
-        tbody.innerHTML = '<tr><td colspan="7" class="empty">Data gagal dimuat.</td></tr>';
+        errorBox.textContent = error.message || "Gagal memuat data monitoring.";
       }
     }
 
-    function updateSummary(summary) {
-      document.getElementById("totalLaporan").textContent = summary.totalLaporan || 0;
-      document.getElementById("totalSppg").textContent = summary.totalSppg || 0;
-      document.getElementById("laporanHariIni").textContent = summary.laporanHariIni || 0;
-      document.getElementById("updateTerakhir").textContent = summary.updateTerakhir || "-";
-    }
+    function populateSppgSelect() {
+      const select = document.getElementById("reportSppg");
+      select.innerHTML = '<option value="">Pilih SPPG</option>';
 
-    function buildSppgFilter() {
-      const select = document.getElementById("filterSppg");
-      const sppgList = [...new Set(monitoringData.map(item => item.namaSppg))].filter(Boolean);
-
-      select.innerHTML = '<option value="">Semua SPPG</option>';
-
-      sppgList.forEach(function(sppg) {
+      allSppgList.forEach(function (sppg) {
         const option = document.createElement("option");
         option.value = sppg;
         option.textContent = sppg;
         select.appendChild(option);
       });
-    }
-async function loadAllSppgList() {
-  try {
-    const res = await fetch("/api/list-sppg");
-    const result = await res.json();
 
-    if (result.success && Array.isArray(result.data)) {
-      allSppgList = result.data.filter(Boolean);
-      return;
+      if (allSppgList.length > 0) {
+        select.value = allSppgList[0];
+      }
     }
 
-    allSppgList = [...new Set(monitoringData.map(item => item.namaSppg))].filter(Boolean);
-
-  } catch (error) {
-    console.error(error);
-    allSppgList = [...new Set(monitoringData.map(item => item.namaSppg))].filter(Boolean);
-  }
-}
-
-function initStatusSppg() {
-  const statusDate = document.getElementById("statusDate");
-  const statusFilter = document.getElementById("statusFilter");
-
-  if (!statusDate || !statusFilter) return;
-
-  const latestDate = getLatestDateFromData
-    ? getLatestDateFromData()
-    : getLatestMonitoringDate();
-
-  statusDate.value = latestDate || getTodayInputValue();
-
-  statusDate.addEventListener("change", renderStatusSppg);
-  statusFilter.addEventListener("change", renderStatusSppg);
-
-  renderStatusSppg();
-}
-
-function renderStatusSppg() {
-  const listEl = document.getElementById("sppgStatusList");
-  const statusDate = document.getElementById("statusDate").value;
-  const statusFilter = document.getElementById("statusFilter").value;
-
-  if (!listEl) return;
-
-  const updatedMap = {};
-
-  monitoringData.forEach(function(item) {
-    const itemDate = normalizeDate(item.tanggal);
-    const sppgName = String(item.namaSppg || "").trim();
-
-    if (!sppgName || itemDate !== statusDate) return;
-
-    if (!updatedMap[sppgName]) {
-      updatedMap[sppgName] = {
-        count: 0,
-        lastTime: "",
-        menu: ""
-      };
+    function setDefaultFilters() {
+      const latestDate = getLatestDateFromData() || getTodayInputValue();
+      document.getElementById("reportDate").value = latestDate;
+      document.getElementById("reportMonth").value = latestDate.slice(0, 7);
     }
 
-    updatedMap[sppgName].count += 1;
-    updatedMap[sppgName].lastTime = item.waktuSimpan || updatedMap[sppgName].lastTime;
-    updatedMap[sppgName].menu = item.menuMbg || updatedMap[sppgName].menu;
-  });
+    function toggleFilterFields() {
+      const fieldDate = document.getElementById("fieldDate");
+      const fieldMonth = document.getElementById("fieldMonth");
+      const fieldSppg = document.getElementById("fieldSppg");
 
-  const sourceList = allSppgList.length > 0
-    ? allSppgList
-    : [...new Set(monitoringData.map(item => item.namaSppg))].filter(Boolean);
-
-  let statusRows = sourceList.map(function(sppg) {
-    const info = updatedMap[sppg];
-
-    return {
-      namaSppg: sppg,
-      updated: !!info,
-      count: info ? info.count : 0,
-      lastTime: info ? info.lastTime : "",
-      menu: info ? info.menu : ""
-    };
-  });
-
-  const totalUpdated = statusRows.filter(item => item.updated).length;
-  const totalNotUpdated = statusRows.filter(item => !item.updated).length;
-
-  document.getElementById("countUpdated").textContent = totalUpdated;
-  document.getElementById("countNotUpdated").textContent = totalNotUpdated;
-  document.getElementById("countTotalSppg").textContent = statusRows.length;
-
-  if (statusFilter === "updated") {
-    statusRows = statusRows.filter(item => item.updated);
-  }
-
-  if (statusFilter === "notUpdated") {
-    statusRows = statusRows.filter(item => !item.updated);
-  }
-
-  statusRows.sort(function(a, b) {
-    if (a.updated !== b.updated) {
-      return a.updated ? -1 : 1;
+      if (activeTab === "daily") {
+        fieldDate.style.display = "block";
+        fieldMonth.style.display = "none";
+        fieldSppg.style.display = "none";
+      } else if (activeTab === "monthly") {
+        fieldDate.style.display = "none";
+        fieldMonth.style.display = "block";
+        fieldSppg.style.display = "none";
+      } else {
+        fieldDate.style.display = "none";
+        fieldMonth.style.display = "block";
+        fieldSppg.style.display = "block";
+      }
     }
 
-    return a.namaSppg.localeCompare(b.namaSppg);
-  });
+    function renderDashboard() {
+      renderReportHeader();
+      renderExecutive();
+      renderSummary();
+      renderStatusStrip();
+      renderGallery();
+      renderRecap();
+      renderFooter();
+    }
 
-  if (statusRows.length === 0) {
-    listEl.innerHTML = '<div class="empty">Tidak ada data sesuai filter.</div>';
-    return;
-  }
+    function renderReportHeader() {
+      const titleSub = document.getElementById("reportTitleSub");
+      const periodLabel = document.getElementById("periodLabel");
+      const periodValue = document.getElementById("periodValue");
 
-  listEl.innerHTML = statusRows.map(function(item) {
-    return `
-      <div class="sppg-status-item">
-        <div class="sppg-status-left">
-          <div class="sppg-status-name">${escapeHtml(item.namaSppg)}</div>
-          <div class="sppg-status-info">
-            ${
-              item.updated
-                ? `${item.count} laporan masuk${item.lastTime ? " · Update: " + escapeHtml(item.lastTime) : ""}`
-                : "Belum ada laporan pada tanggal ini"
-            }
-            ${
-              item.updated && item.menu
-                ? `<br>Menu: ${escapeHtml(limitText(item.menu, 72))}`
-                : ""
-            }
-          </div>
-        </div>
+      if (activeTab === "daily") {
+        titleSub.textContent = "Laporan Harian";
+        periodLabel.textContent = "Tanggal";
+        periodValue.textContent = formatTanggalShortCard(document.getElementById("reportDate").value);
+      } else if (activeTab === "monthly") {
+        titleSub.textContent = "Laporan Bulanan";
+        periodLabel.textContent = "Bulan";
+        periodValue.textContent = formatMonthLabel(document.getElementById("reportMonth").value);
+      } else {
+        titleSub.textContent = "Laporan Bulanan per SPPG";
+        periodLabel.textContent = "SPPG";
+        periodValue.textContent = document.getElementById("reportSppg").value || "-";
+      }
+    }
 
-        <span class="sppg-status-badge ${item.updated ? "updated" : "not-updated"}">
-          ${item.updated ? "Sudah Update" : "Belum Update"}
-        </span>
-      </div>
-    `;
-  }).join("");
-}
+    function getFilteredRows() {
+      const dateValue = document.getElementById("reportDate").value;
+      const monthValue = document.getElementById("reportMonth").value;
+      const sppgValue = document.getElementById("reportSppg").value;
 
-function getLatestMonitoringDate() {
-  const dates = monitoringData
-    .map(item => normalizeDate(item.tanggal))
-    .filter(Boolean)
-    .sort(function(a, b) {
-      return new Date(b) - new Date(a);
-    });
+      return monitoringData.filter(function (item) {
+        const itemDate = normalizeDate(item.tanggal);
+        const itemMonth = itemDate ? itemDate.slice(0, 7) : "";
 
-  return dates[0] || "";
-}
-    function renderLatestList() {
-      const list = document.getElementById("latestList");
-      const latest = monitoringData.slice(0, 5);
+        if (activeTab === "daily") {
+          return itemDate === dateValue;
+        }
 
-      if (latest.length === 0) {
-        list.innerHTML = '<div class="empty">Belum ada laporan tersimpan.</div>';
-        return;
+        if (activeTab === "monthly") {
+          return itemMonth === monthValue;
+        }
+
+        return itemMonth === monthValue && item.namaSppg === sppgValue;
+      });
+    }
+
+    function getScopeSppgList() {
+      if (activeTab === "sppgMonthly") {
+        const selected = document.getElementById("reportSppg").value;
+        return selected ? [selected] : [];
       }
 
-      list.innerHTML = latest.map(function(item) {
+      return allSppgList.length > 0
+        ? allSppgList
+        : [...new Set(monitoringData.map(item => item.namaSppg).filter(Boolean))];
+    }
+
+    function getScopeDates() {
+      if (activeTab === "daily") {
+        return [document.getElementById("reportDate").value];
+      }
+
+      return getDatesInMonth(document.getElementById("reportMonth").value);
+    }
+
+    function buildPresenceMap(rows) {
+      const map = {};
+
+      rows.forEach(function (item) {
+        const sppg = String(item.namaSppg || "").trim();
+        const date = normalizeDate(item.tanggal);
+
+        if (!sppg || !date) return;
+
+        const key = sppg + "||" + date;
+
+        if (!map[key]) {
+          map[key] = {
+            count: 0,
+            rows: []
+          };
+        }
+
+        map[key].count += 1;
+        map[key].rows.push(item);
+      });
+
+      return map;
+    }
+
+    function renderExecutive() {
+      const rows = getFilteredRows();
+      const scopeSppg = getScopeSppgList();
+      const scopeDates = getScopeDates();
+      const presenceMap = buildPresenceMap(rows);
+
+      let checkedCells = 0;
+      scopeSppg.forEach(function (sppg) {
+        scopeDates.forEach(function (date) {
+          const key = sppg + "||" + date;
+          if (presenceMap[key]) checkedCells += 1;
+        });
+      });
+
+      const totalSlots = scopeSppg.length * scopeDates.length;
+      const compliance = totalSlots > 0 ? Math.round((checkedCells / totalSlots) * 100) : 0;
+
+      const updatedSppgSet = new Set(rows.map(item => item.namaSppg).filter(Boolean));
+      const notUpdated = Math.max(scopeSppg.length - updatedSppgSet.size, 0);
+
+      const totalFotoMenu = rows.filter(item => item.linkFotoMenu).length;
+      const totalFotoDistribusi = rows.filter(item => item.linkFotoDistribusi).length;
+
+      const items = [
+        { icon: "🏫", value: scopeSppg.length, label: "SPPG Aktif" },
+        { icon: "📝", value: rows.length, label: "Total Monitoring" },
+        { icon: "📅", value: scopeDates.length, label: activeTab === "daily" ? "Tanggal Monitoring" : "Hari Monitoring" },
+        { icon: "✅", value: compliance + "%", label: "Kepatuhan Input" },
+        { icon: "🍱", value: totalFotoMenu, label: "Total Foto Menu" },
+        { icon: "🚚", value: totalFotoDistribusi, label: "Total Foto Distribusi" },
+        { icon: "❌", value: notUpdated, label: "SPPG Belum Upload" }
+      ];
+
+      const executiveList = document.getElementById("executiveList");
+      executiveList.innerHTML = items.map(function (item) {
         return `
-          <div class="latest-item">
-            <div class="latest-top">
-              <div class="latest-name">${escapeHtml(item.namaSppg)}</div>
-              <div class="latest-date">${escapeHtml(formatTanggal(item.tanggal))}</div>
+          <div class="exec-item">
+            <div class="exec-icon">${item.icon}</div>
+            <div>
+              <div class="exec-value">${escapeHtml(item.value)}</div>
+              <div class="exec-label">${escapeHtml(item.label)}</div>
             </div>
-            <div class="latest-menu">${escapeHtml(limitText(item.menuMbg, 90))}</div>
           </div>
         `;
       }).join("");
     }
 
-function renderCharts() {
-  renderTrendChart();
-}
+    function renderSummary() {
+      const rows = getFilteredRows();
+      const scopeSppg = getScopeSppgList();
+      const scopeDates = getScopeDates();
+      const presenceMap = buildPresenceMap(rows);
 
-    function renderSppgChart() {
-      const ctx = document.getElementById("chartSppg");
-
-      const grouped = {};
-
-      monitoringData.forEach(function(item) {
-        const key = item.namaSppg || "Tidak diketahui";
-        grouped[key] = (grouped[key] || 0) + 1;
+      let checkedCells = 0;
+      scopeSppg.forEach(function (sppg) {
+        scopeDates.forEach(function (date) {
+          const key = sppg + "||" + date;
+          if (presenceMap[key]) checkedCells += 1;
+        });
       });
 
-      const sorted = Object.entries(grouped)
-        .sort(function(a, b) {
-          return b[1] - a[1];
-        })
-        .slice(0, 8);
+      const totalSlots = scopeSppg.length * scopeDates.length;
+      const percent = totalSlots > 0 ? Math.round((checkedCells / totalSlots) * 100) : 0;
 
-      const labels = sorted.map(item => item[0]);
-      const values = sorted.map(item => item[1]);
+      const updatedSppg = new Set(rows.map(item => item.namaSppg).filter(Boolean)).size;
+      const avgPerDay = scopeDates.length > 0 ? (rows.length / scopeDates.length).toFixed(2) : "0.00";
 
-      if (chartSppg) chartSppg.destroy();
-
-      chartSppg = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: labels,
-          datasets: [{
-            label: "Jumlah Laporan",
-            data: values,
-            borderWidth: 0,
-            borderRadius: 10,
-            backgroundColor: "rgba(21, 128, 61, 0.82)"
-          }]
+      const cards = [
+        {
+          label: "Total Laporan",
+          value: rows.length,
+          desc: "Jumlah seluruh laporan pada periode yang dipilih."
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return context.raw + " laporan";
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              ticks: {
-                color: "#64748b",
-                font: {
-                  size: 11,
-                  weight: "bold"
-                }
-              },
-              grid: {
-                display: false
-              }
-            },
-            y: {
-              beginAtZero: true,
-              ticks: {
-                precision: 0,
-                color: "#64748b"
-              },
-              grid: {
-                color: "rgba(100,116,139,0.14)"
-              }
-            }
-          }
+        {
+          label: "SPPG Melapor",
+          value: updatedSppg,
+          desc: "Jumlah SPPG yang telah mengirim data."
+        },
+        {
+          label: "Rata-rata Monitoring / Hari",
+          value: avgPerDay,
+          desc: "Rerata jumlah laporan per hari pada periode ini."
+        },
+        {
+          label: "Persentase Monitoring",
+          value: percent + "%",
+          desc: "Perbandingan data yang masuk terhadap seluruh slot monitoring."
         }
-      });
+      ];
+
+      document.getElementById("summaryGrid").innerHTML = cards.map(function (card) {
+        return `
+          <div class="summary-card">
+            <div class="summary-label">${escapeHtml(card.label)}</div>
+            <div class="summary-value">${escapeHtml(card.value)}</div>
+            <div class="summary-desc">${escapeHtml(card.desc)}</div>
+          </div>
+        `;
+      }).join("");
     }
 
-    function renderTrendChart() {
-      const ctx = document.getElementById("chartTrend");
+    function renderStatusStrip() {
+      const rows = getFilteredRows();
+      const scopeSppg = getScopeSppgList();
+      const scopeDates = getScopeDates();
+      const presenceMap = buildPresenceMap(rows);
 
-      const grouped = {};
-
-      monitoringData.forEach(function(item) {
-        const key = normalizeDate(item.tanggal);
-        if (!key) return;
-        grouped[key] = (grouped[key] || 0) + 1;
+      let checkedCells = 0;
+      scopeSppg.forEach(function (sppg) {
+        scopeDates.forEach(function (date) {
+          const key = sppg + "||" + date;
+          if (presenceMap[key]) checkedCells += 1;
+        });
       });
 
-      const sorted = Object.entries(grouped)
-        .sort(function(a, b) {
-          return new Date(a[0]) - new Date(b[0]);
-        })
-        .slice(-10);
+      const totalSlots = scopeSppg.length * scopeDates.length;
+      const compliance = totalSlots > 0 ? Math.round((checkedCells / totalSlots) * 100) : 0;
+      const notUploadedCells = Math.max(totalSlots - checkedCells, 0);
+      const availableDocs = rows.filter(item => item.linkFotoMenu || item.linkFotoDistribusi).length;
 
-      const labels = sorted.map(item => formatTanggalShort(item[0]));
-      const values = sorted.map(item => item[1]);
-
-      if (chartTrend) chartTrend.destroy();
-
-      chartTrend = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels: labels,
-          datasets: [{
-            label: "Laporan Harian",
-            data: values,
-            fill: true,
-            tension: 0.38,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            borderWidth: 3,
-            borderColor: "rgba(15, 81, 50, 0.95)",
-            backgroundColor: "rgba(21, 128, 61, 0.13)",
-            pointBackgroundColor: "#d7b45a"
-          }]
+      const statuses = [
+        {
+          cls: compliance >= 85 ? "good" : compliance >= 60 ? "warn" : "danger",
+          small: "Status Kepatuhan",
+          big: compliance >= 85 ? "Sangat Baik" : compliance >= 60 ? "Cukup" : "Perlu Perhatian"
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return context.raw + " laporan";
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              ticks: {
-                color: "#64748b",
-                font: {
-                  size: 11,
-                  weight: "bold"
-                }
-              },
-              grid: {
-                display: false
-              }
-            },
-            y: {
-              beginAtZero: true,
-              ticks: {
-                precision: 0,
-                color: "#64748b"
-              },
-              grid: {
-                color: "rgba(100,116,139,0.14)"
-              }
-            }
-          }
+        {
+          cls: "neutral",
+          small: "Slot Terisi",
+          big: checkedCells + " / " + totalSlots
+        },
+        {
+          cls: notUploadedCells > 0 ? "danger" : "good",
+          small: "Belum Upload",
+          big: notUploadedCells
+        },
+        {
+          cls: availableDocs > 0 ? "good" : "neutral",
+          small: "Dokumentasi Tersedia",
+          big: availableDocs
         }
-      });
+      ];
+
+      document.getElementById("statusStrip").innerHTML = statuses.map(function (item) {
+        return `
+          <div class="status-box ${item.cls}">
+            <div class="small">${escapeHtml(item.small)}</div>
+            <div class="big">${escapeHtml(item.big)}</div>
+          </div>
+        `;
+      }).join("");
     }
 
-    function renderTable() {
-      const tbody = document.getElementById("monitoringTbody");
-      const note = document.getElementById("tableNote");
+    function renderGallery() {
+      const rows = getFilteredRows();
+      const gallery = document.getElementById("galleryGrid");
 
-      const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
-      const sppg = document.getElementById("filterSppg").value;
-      const tanggal = document.getElementById("filterTanggal").value;
+      let docs = rows.slice();
 
-      const filtered = monitoringData.filter(function(item) {
-        const text = [
-          item.namaSppg,
-          item.tanggal,
-          item.menuMbg,
-          item.nilaiGizi,
-          item.waktuSimpan
-        ].join(" ").toLowerCase();
+      if (activeGallery === "menu") {
+        docs = docs.filter(item => item.linkFotoMenu);
+      }
 
-        const matchKeyword = !keyword || text.includes(keyword);
-        const matchSppg = !sppg || item.namaSppg === sppg;
-        const matchTanggal = !tanggal || normalizeDate(item.tanggal) === tanggal;
+      if (activeGallery === "distribution") {
+        docs = docs.filter(item => item.linkFotoDistribusi);
+      }
 
-        return matchKeyword && matchSppg && matchTanggal;
-      });
+      docs = docs.slice(0, 20);
 
-      note.textContent = filtered.length + " data ditampilkan";
-
-      if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty">Tidak ada data yang sesuai.</td></tr>';
+      if (docs.length === 0) {
+        gallery.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;">Tidak ada dokumentasi pada periode ini.</div>';
         return;
       }
 
-      tbody.innerHTML = filtered.map(function(item) {
+      gallery.innerHTML = docs.map(function (item) {
+        return `
+          <div class="doc-card">
+            <div class="doc-head">
+              <div class="doc-sppg">${escapeHtml(item.namaSppg || "-")}</div>
+              <div class="doc-date">${escapeHtml(formatTanggal(item.tanggal))}</div>
+            </div>
+
+            <div class="doc-images">
+              ${renderPhotoBox("Foto Menu", item.linkFotoMenu)}
+              ${renderPhotoBox("Foto Distribusi", item.linkFotoDistribusi)}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderPhotoBox(label, url) {
+      if (!url) {
+        return `
+          <div class="doc-photo-box">
+            <div class="doc-photo-label">${escapeHtml(label)}</div>
+            <div class="doc-empty">Belum ada foto</div>
+          </div>
+        `;
+      }
+
+      const imgUrl = driveImageUrl(url);
+
+      return `
+        <div class="doc-photo-box">
+          <div class="doc-photo-label">${escapeHtml(label)}</div>
+          <img
+            src="${escapeAttr(imgUrl)}"
+            alt="${escapeAttr(label)}"
+            crossorigin="anonymous"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <a class="doc-fallback" href="${escapeAttr(url)}" target="_blank">Buka Foto</a>
+        </div>
+      `;
+    }
+
+    function renderRecap() {
+      const rows = getFilteredRows();
+      const scopeSppg = getScopeSppgList();
+      const scopeDates = getScopeDates();
+      const presenceMap = buildPresenceMap(rows);
+
+      const recapHead = document.getElementById("recapHead");
+      const recapBody = document.getElementById("recapBody");
+
+      if (scopeSppg.length === 0 || scopeDates.length === 0) {
+        recapHead.innerHTML = "";
+        recapBody.innerHTML = '<tr><td class="empty-state">Tidak ada data rekapitulasi.</td></tr>';
+        return;
+      }
+
+      recapHead.innerHTML = `
+        <tr>
+          <th class="sticky-left">Nama SPPG</th>
+          ${scopeDates.map(function (date) {
+            return `<th class="date-col">${escapeHtml(formatDateCell(date))}</th>`;
+          }).join("")}
+          <th>Total Hari Input</th>
+          <th>% Kepatuhan</th>
+          <th>Status</th>
+        </tr>
+      `;
+
+      recapBody.innerHTML = scopeSppg.map(function (sppg) {
+        let totalInputDays = 0;
+        const dateCells = scopeDates.map(function (date) {
+          const key = sppg + "||" + date;
+          const found = presenceMap[key];
+
+          if (found) {
+            totalInputDays += 1;
+            return `
+              <td class="date-col" title="${escapeAttr(sppg + ' - ' + formatTanggal(date) + ' : ' + found.count + ' laporan')}">
+                <span class="status-icon ok">
+                  ✓
+                  ${found.count > 1 ? `<span class="status-count">${found.count}</span>` : ""}
+                </span>
+              </td>
+            `;
+          }
+
+          return `
+            <td class="date-col" title="${escapeAttr(sppg + ' - ' + formatTanggal(date) + ' : belum upload')}">
+              <span class="status-icon no">✕</span>
+            </td>
+          `;
+        }).join("");
+
+        const percent = scopeDates.length > 0 ? Math.round((totalInputDays / scopeDates.length) * 100) : 0;
+        const statusClass = percent >= 85 ? "good" : percent >= 60 ? "warn" : "bad";
+        const statusText = percent >= 85 ? "Sangat Baik" : percent >= 60 ? "Cukup" : "Perlu Perhatian";
+
         return `
           <tr>
-            <td><strong>${escapeHtml(item.namaSppg)}</strong></td>
-            <td>${escapeHtml(formatTanggal(item.tanggal))}</td>
-            <td>${escapeHtml(item.menuMbg)}</td>
-            <td>${escapeHtml(item.nilaiGizi)}</td>
-            <td>
-              ${item.linkFotoMenu ? `<a class="btn-link" href="${item.linkFotoMenu}" target="_blank">Foto Menu</a>` : "-"}
-              ${item.linkFotoDistribusi ? `<a class="btn-link" href="${item.linkFotoDistribusi}" target="_blank">Foto Distribusi</a>` : ""}
-            </td>
-            <td>${escapeHtml(item.waktuSimpan || "-")}</td>
-            <td><span class="badge">Tersimpan</span></td>
+            <td class="sticky-left"><strong>${escapeHtml(sppg)}</strong></td>
+            ${dateCells}
+            <td>${totalInputDays}</td>
+            <td><span class="percent-pill ${statusClass}">${percent}%</span></td>
+            <td><span class="percent-pill ${statusClass}">${statusText}</span></td>
           </tr>
         `;
       }).join("");
     }
 
+    async function exportReportPDF() {
+      const element = document.getElementById("pdfReportArea");
+      const title = buildExportTitle();
+      const filename = title + ".pdf";
+
+      document.body.classList.add("pdf-mode");
+      await waitForImages(element);
+
+      const opt = {
+        margin: 6,
+        filename: filename,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          allowTaint: false,
+          imageTimeout: 15000,
+          scrollY: 0
+        },
+        jsPDF: {
+          unit: "mm",
+          format: "a4",
+          orientation: "landscape"
+        },
+        pagebreak: {
+          mode: ["avoid-all", "css", "legacy"]
+        }
+      };
+
+      html2pdf()
+        .set(opt)
+        .from(element)
+        .save()
+        .then(function () {
+          document.body.classList.remove("pdf-mode");
+        })
+        .catch(function (error) {
+          console.error(error);
+          document.body.classList.remove("pdf-mode");
+          alert("Gagal membuat PDF. Silakan coba lagi.");
+        });
+    }
+
+    function buildExportTitle() {
+      const today = new Date().toISOString().slice(0, 10);
+
+      if (activeTab === "daily") {
+        return "laporan-harian-mbg-" + document.getElementById("reportDate").value + "-" + today;
+      }
+
+      if (activeTab === "monthly") {
+        return "laporan-bulanan-mbg-" + document.getElementById("reportMonth").value + "-" + today;
+      }
+
+      const sppg = (document.getElementById("reportSppg").value || "sppg")
+        .toLowerCase()
+        .replaceAll(" ", "-");
+      return "laporan-bulanan-sppg-" + sppg + "-" + document.getElementById("reportMonth").value + "-" + today;
+    }
+
+    function renderFooter() {
+      document.getElementById("footerGenerated").textContent =
+        "Dicetak " + new Date().toLocaleString("id-ID");
+    }
+
+    function getLatestDateFromData() {
+      const dates = monitoringData
+        .map(item => normalizeDate(item.tanggal))
+        .filter(Boolean)
+        .sort(function (a, b) {
+          return new Date(b) - new Date(a);
+        });
+
+      return dates[0] || "";
+    }
+
+    function getTodayInputValue() {
+      const date = new Date();
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function getDatesInMonth(monthValue) {
+      if (!monthValue) return [];
+
+      const [yearStr, monthStr] = monthValue.split("-");
+      const year = Number(yearStr);
+      const month = Number(monthStr);
+
+      if (!year || !month) return [];
+
+      const lastDate = new Date(year, month, 0).getDate();
+      const dates = [];
+
+      for (let day = 1; day <= lastDate; day++) {
+        dates.push(`${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`);
+      }
+
+      return dates;
+    }
+
     function normalizeDate(value) {
-  if (!value) return "";
+      if (!value) return "";
 
-  const raw = String(value).trim();
+      const raw = String(value).trim();
 
-  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
-    return raw;
-  }
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        return raw;
+      }
 
-  const ddmmyyyy = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-  if (ddmmyyyy) {
-    const d = String(ddmmyyyy[1]).padStart(2, "0");
-    const m = String(ddmmyyyy[2]).padStart(2, "0");
-    const y = ddmmyyyy[3];
+      const ddmmyyyy = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+      if (ddmmyyyy) {
+        const d = String(ddmmyyyy[1]).padStart(2, "0");
+        const m = String(ddmmyyyy[2]).padStart(2, "0");
+        const y = ddmmyyyy[3];
+        return `${y}-${m}-${d}`;
+      }
 
-    return `${y}-${m}-${d}`;
-  }
+      const date = new Date(raw);
+      if (isNaN(date.getTime())) return raw;
 
-  const date = new Date(raw);
-  if (isNaN(date.getTime())) return raw;
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
 
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-
-  return `${y}-${m}-${d}`;
-}
+      return `${y}-${m}-${d}`;
+    }
 
     function formatTanggal(value) {
       if (!value) return "-";
 
-      const normalized = normalizeDate(value);
-      const date = new Date(normalized + "T00:00:00");
-
+      const date = new Date(normalizeDate(value) + "T00:00:00");
       if (isNaN(date.getTime())) return value;
 
       return date.toLocaleDateString("id-ID", {
@@ -1827,716 +1645,73 @@ function renderCharts() {
       });
     }
 
-    function formatTanggalShort(value) {
+    function formatTanggalShortCard(value) {
       if (!value) return "-";
 
-      const date = new Date(value + "T00:00:00");
+      const date = new Date(normalizeDate(value) + "T00:00:00");
       if (isNaN(date.getTime())) return value;
 
       return date.toLocaleDateString("id-ID", {
         day: "2-digit",
-        month: "short"
+        month: "short",
+        year: "numeric"
       });
     }
 
-    function limitText(text, max) {
-      const value = String(text || "");
-      return value.length > max ? value.substring(0, max) + "..." : value;
+    function formatMonthLabel(value) {
+      if (!value) return "-";
+
+      const date = new Date(value + "-01T00:00:00");
+      if (isNaN(date.getTime())) return value;
+
+      return date.toLocaleDateString("id-ID", {
+        month: "long",
+        year: "numeric"
+      }).toUpperCase();
     }
 
-    function initReportGenerator() {
-  populateReportSppg();
+    function formatDateCell(value) {
+      if (!value) return "-";
+      const d = Number(value.slice(-2));
+      return d;
+    }
 
-  const latestDate = getLatestDateFromData() || getTodayInputValue();
-  const latestMonth = latestDate ? latestDate.slice(0, 7) : getTodayInputValue().slice(0, 7);
+    function driveImageUrl(url) {
+      const id = extractDriveFileId(url);
+      if (!id) return url;
+      return "https://drive.google.com/thumbnail?id=" + id + "&sz=w1000";
+    }
 
-  document.getElementById("reportDate").value = latestDate;
-  document.getElementById("reportMonth").value = latestMonth;
+    function extractDriveFileId(url) {
+      const value = String(url || "");
 
-  document.querySelectorAll(".report-tab").forEach(function(btn) {
-    btn.addEventListener("click", function() {
-      document.querySelectorAll(".report-tab").forEach(function(item) {
-        item.classList.remove("active");
+      let match = value.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) return match[1];
+
+      match = value.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) return match[1];
+
+      return "";
+    }
+
+    function waitForImages(container) {
+      const images = Array.from(container.querySelectorAll("img"));
+
+      const promises = images.map(function (img) {
+        return new Promise(function (resolve) {
+          if (img.complete) {
+            resolve();
+            return;
+          }
+
+          img.onload = function () { resolve(); };
+          img.onerror = function () { resolve(); };
+        });
       });
 
-      btn.classList.add("active");
-      activeReportTab = btn.dataset.reportTab;
-      toggleReportControls();
-      renderReportGenerator();
-    });
-  });
-
-  document.getElementById("reportDate").addEventListener("change", renderReportGenerator);
-  document.getElementById("reportMonth").addEventListener("change", renderReportGenerator);
-  document.getElementById("reportSppg").addEventListener("change", renderReportGenerator);
-
-  toggleReportControls();
-  renderReportGenerator();
-}
-
-function toggleReportControls() {
-  document.getElementById("controlReportDate").style.display =
-    activeReportTab === "daily" ? "block" : "none";
-
-  document.getElementById("controlReportMonth").style.display =
-    activeReportTab === "daily" ? "none" : "block";
-
-  document.getElementById("controlReportSppg").style.display =
-    activeReportTab === "sppgMonthly" ? "block" : "none";
-}
-
-function populateReportSppg() {
-  const select = document.getElementById("reportSppg");
-  const sppgList = [...new Set(monitoringData.map(item => item.namaSppg))].filter(Boolean);
-
-  select.innerHTML = '<option value="">Pilih SPPG</option>';
-
-  sppgList.forEach(function(sppg) {
-    const option = document.createElement("option");
-    option.value = sppg;
-    option.textContent = sppg;
-    select.appendChild(option);
-  });
-
-  if (sppgList.length > 0) {
-    select.value = sppgList[0];
-  }
-}
-
-function renderReportGenerator() {
-  const rows = getRowsForActiveReport();
-  const title = getReportTitle();
-  const subtitle = getReportSubtitle();
-
-  document.getElementById("reportTitle").textContent = title;
-  document.getElementById("reportSubtitle").textContent = subtitle;
-
-  renderReportSummary(rows);
-  renderReportInfographic(rows);
-  renderReportEvidence(rows);
-  renderReportTable(rows);
-
-  const now = new Date();
-  document.getElementById("reportFooter").textContent =
-    "Kejaksaan Negeri Muna · Monitoring Distribusi MBG · Dicetak " +
-    now.toLocaleString("id-ID");
-}
-
-function getRowsForActiveReport() {
-  const reportDate = document.getElementById("reportDate").value;
-  const reportMonth = document.getElementById("reportMonth").value;
-  const reportSppg = document.getElementById("reportSppg").value;
-
-  return monitoringData.filter(function(item) {
-    const itemDate = normalizeDate(item.tanggal);
-    const itemMonth = itemDate ? itemDate.slice(0, 7) : "";
-
-    if (activeReportTab === "daily") {
-      return itemDate === reportDate;
+      return Promise.all(promises);
     }
 
-    if (activeReportTab === "monthly") {
-      return itemMonth === reportMonth;
-    }
-
-    if (activeReportTab === "sppgMonthly") {
-      return itemMonth === reportMonth && item.namaSppg === reportSppg;
-    }
-
-    return false;
-  });
-}
-
-function getReportTitle() {
-  if (activeReportTab === "daily") {
-    return "Laporan Harian Distribusi MBG";
-  }
-
-  if (activeReportTab === "monthly") {
-    return "Laporan Bulanan Distribusi MBG";
-  }
-
-  return "Laporan Bulanan per SPPG";
-}
-
-function getReportSubtitle() {
-  const reportDate = document.getElementById("reportDate").value;
-  const reportMonth = document.getElementById("reportMonth").value;
-  const reportSppg = document.getElementById("reportSppg").value;
-
-  if (activeReportTab === "daily") {
-    return "Tanggal: " + formatTanggal(reportDate);
-  }
-
-  if (activeReportTab === "monthly") {
-    return "Bulan: " + formatMonthLabel(reportMonth);
-  }
-
-  return "SPPG: " + (reportSppg || "-") + " · Bulan: " + formatMonthLabel(reportMonth);
-}
-
-function renderReportSummary(rows) {
-  const sppgSet = new Set(rows.map(item => item.namaSppg).filter(Boolean));
-  const tanggalSet = new Set(rows.map(item => normalizeDate(item.tanggal)).filter(Boolean));
-  const menuCount = rows.filter(item => item.menuMbg).length;
-
-  const cards = [
-    {
-      label: "Total Laporan",
-      value: rows.length
-    },
-    {
-      label: "SPPG Melapor",
-      value: sppgSet.size
-    },
-    {
-      label: "Hari Tercatat",
-      value: tanggalSet.size
-    },
-    {
-      label: "Menu Tercatat",
-      value: menuCount
-    }
-  ];
-
-  document.getElementById("reportSummaryCards").innerHTML = cards.map(function(card) {
-    return `
-      <div class="report-mini-card">
-        <div class="report-mini-label">${escapeHtml(card.label)}</div>
-        <div class="report-mini-value">${escapeHtml(card.value)}</div>
-      </div>
-    `;
-  }).join("");
-}
-
-function renderReportChart(rows) {
-  const canvas = document.getElementById("reportChart");
-
-  if (reportChart) {
-    reportChart.destroy();
-  }
-
-  let labels = [];
-  let values = [];
-  let chartType = "bar";
-  let labelName = "Jumlah Laporan";
-
-  if (activeReportTab === "daily") {
-    const grouped = groupBy(rows, "namaSppg");
-
-    labels = Object.keys(grouped);
-    values = labels.map(key => grouped[key].length);
-    chartType = "bar";
-  }
-
-  if (activeReportTab === "monthly") {
-    const grouped = {};
-
-    rows.forEach(function(item) {
-      const key = normalizeDate(item.tanggal);
-      if (!key) return;
-      grouped[key] = (grouped[key] || 0) + 1;
-    });
-
-    const sorted = Object.entries(grouped).sort(function(a, b) {
-      return new Date(a[0]) - new Date(b[0]);
-    });
-
-    labels = sorted.map(item => formatTanggalShort(item[0]));
-    values = sorted.map(item => item[1]);
-    chartType = "line";
-  }
-
-  if (activeReportTab === "sppgMonthly") {
-    const grouped = {};
-
-    rows.forEach(function(item) {
-      const key = normalizeDate(item.tanggal);
-      if (!key) return;
-      grouped[key] = (grouped[key] || 0) + 1;
-    });
-
-    const sorted = Object.entries(grouped).sort(function(a, b) {
-      return new Date(a[0]) - new Date(b[0]);
-    });
-
-    labels = sorted.map(item => formatTanggalShort(item[0]));
-    values = sorted.map(item => item[1]);
-    chartType = "bar";
-  }
-
-  if (labels.length === 0) {
-    labels = ["Tidak ada data"];
-    values = [0];
-  }
-
-  reportChart = new Chart(canvas, {
-    type: chartType,
-    data: {
-      labels: labels,
-      datasets: [{
-        label: labelName,
-        data: values,
-        borderRadius: chartType === "bar" ? 8 : 0,
-        borderWidth: chartType === "line" ? 3 : 0,
-        tension: 0.36,
-        fill: chartType === "line",
-        backgroundColor: chartType === "line"
-          ? "rgba(21, 128, 61, 0.14)"
-          : "rgba(21, 128, 61, 0.82)",
-        borderColor: "rgba(15, 81, 50, 0.95)",
-        pointBackgroundColor: "#d7b45a"
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: false,
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return context.raw + " laporan";
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          grid: {
-            display: false
-          },
-          ticks: {
-            color: "#64748b",
-            font: {
-              size: 11,
-              weight: "bold"
-            }
-          }
-        },
-        y: {
-          beginAtZero: true,
-          ticks: {
-            precision: 0,
-            color: "#64748b"
-          },
-          grid: {
-            color: "rgba(100,116,139,0.14)"
-          }
-        }
-      }
-    }
-  });
-}
-
-function renderReportTable(rows) {
-  if (activeReportTab === "daily") {
-    renderDailyReportTable(rows);
-    return;
-  }
-
-  if (activeReportTab === "monthly") {
-    renderMonthlyReportTable(rows);
-    return;
-  }
-
-  renderSppgMonthlyReportTable(rows);
-}
-
-function renderDailyReportTable(rows) {
-  document.getElementById("reportThead").innerHTML = `
-    <tr>
-      <th>Nama SPPG</th>
-      <th>Tanggal</th>
-      <th>Menu MBG</th>
-      <th>Nilai Gizi</th>
-      <th>Dokumentasi</th>
-      <th>Waktu Simpan</th>
-    </tr>
-  `;
-
-  if (rows.length === 0) {
-    document.getElementById("reportTbody").innerHTML =
-      '<tr><td colspan="6" class="empty">Belum ada laporan pada periode ini.</td></tr>';
-    return;
-  }
-
-  document.getElementById("reportTbody").innerHTML = rows.map(function(item) {
-    return `
-      <tr>
-        <td><strong>${escapeHtml(item.namaSppg)}</strong></td>
-        <td>${escapeHtml(formatTanggal(item.tanggal))}</td>
-        <td>${escapeHtml(item.menuMbg)}</td>
-        <td>${escapeHtml(item.nilaiGizi)}</td>
-        <td>
-          ${item.linkFotoMenu ? `<a href="${item.linkFotoMenu}" target="_blank">Foto Menu</a>` : "-"}
-          ${item.linkFotoDistribusi ? ` · <a href="${item.linkFotoDistribusi}" target="_blank">Foto Distribusi</a>` : ""}
-        </td>
-        <td>${escapeHtml(item.waktuSimpan || "-")}</td>
-      </tr>
-    `;
-  }).join("");
-}
-
-function renderMonthlyReportTable(rows) {
-  document.getElementById("reportThead").innerHTML = `
-    <tr>
-      <th>Tanggal</th>
-      <th>Jumlah Laporan</th>
-      <th>SPPG Melapor</th>
-      <th>Daftar SPPG</th>
-    </tr>
-  `;
-
-  if (rows.length === 0) {
-    document.getElementById("reportTbody").innerHTML =
-      '<tr><td colspan="4" class="empty">Belum ada laporan pada bulan ini.</td></tr>';
-    return;
-  }
-
-  const grouped = {};
-
-  rows.forEach(function(item) {
-    const date = normalizeDate(item.tanggal);
-    if (!grouped[date]) grouped[date] = [];
-    grouped[date].push(item);
-  });
-
-  const sorted = Object.entries(grouped).sort(function(a, b) {
-    return new Date(a[0]) - new Date(b[0]);
-  });
-
-  document.getElementById("reportTbody").innerHTML = sorted.map(function(entry) {
-    const date = entry[0];
-    const items = entry[1];
-    const sppgList = [...new Set(items.map(item => item.namaSppg))].filter(Boolean);
-
-    return `
-      <tr>
-        <td>${escapeHtml(formatTanggal(date))}</td>
-        <td><strong>${items.length}</strong> laporan</td>
-        <td>${sppgList.length} SPPG</td>
-        <td>${escapeHtml(sppgList.join(", "))}</td>
-      </tr>
-    `;
-  }).join("");
-}
-
-function renderSppgMonthlyReportTable(rows) {
-  document.getElementById("reportThead").innerHTML = `
-    <tr>
-      <th>Tanggal</th>
-      <th>Menu MBG</th>
-      <th>Nilai Gizi</th>
-      <th>Dokumentasi</th>
-      <th>Waktu Simpan</th>
-    </tr>
-  `;
-
-  if (rows.length === 0) {
-    document.getElementById("reportTbody").innerHTML =
-      '<tr><td colspan="5" class="empty">Belum ada laporan SPPG pada bulan ini.</td></tr>';
-    return;
-  }
-
-  document.getElementById("reportTbody").innerHTML = rows.map(function(item) {
-    return `
-      <tr>
-        <td>${escapeHtml(formatTanggal(item.tanggal))}</td>
-        <td>${escapeHtml(item.menuMbg)}</td>
-        <td>${escapeHtml(item.nilaiGizi)}</td>
-        <td>
-          ${item.linkFotoMenu ? `<a href="${item.linkFotoMenu}" target="_blank">Foto Menu</a>` : "-"}
-          ${item.linkFotoDistribusi ? ` · <a href="${item.linkFotoDistribusi}" target="_blank">Foto Distribusi</a>` : ""}
-        </td>
-        <td>${escapeHtml(item.waktuSimpan || "-")}</td>
-      </tr>
-    `;
-  }).join("");
-}
-function renderReportInfographic(rows) {
-  const container = document.getElementById("reportInfographicGrid");
-  if (!container) return;
-
-  const sppgSet = new Set(rows.map(item => item.namaSppg).filter(Boolean));
-  const tanggalSet = new Set(rows.map(item => normalizeDate(item.tanggal)).filter(Boolean));
-
-  const withFotoMenu = rows.filter(item => item.linkFotoMenu).length;
-  const withFotoDistribusi = rows.filter(item => item.linkFotoDistribusi).length;
-  const documented = rows.filter(item => item.linkFotoMenu || item.linkFotoDistribusi).length;
-
-  let coverage = 0;
-
-  if (activeReportTab === "daily" && allSppgList && allSppgList.length > 0) {
-    coverage = Math.round((sppgSet.size / allSppgList.length) * 100);
-  } else if (rows.length > 0) {
-    coverage = Math.round((documented / rows.length) * 100);
-  }
-
-  const cards = [
-    {
-      icon: "📊",
-      label: "Total Laporan",
-      value: rows.length,
-      desc: "Jumlah laporan yang masuk pada periode ini.",
-      progress: rows.length > 0 ? 100 : 0
-    },
-    {
-      icon: "🏫",
-      label: "SPPG Melapor",
-      value: sppgSet.size,
-      desc: "Jumlah SPPG yang mengirimkan laporan.",
-      progress: coverage
-    },
-    {
-      icon: "🍱",
-      label: "Foto Menu",
-      value: withFotoMenu,
-      desc: "Dokumentasi menu MBG yang tersedia.",
-      progress: rows.length > 0 ? Math.round((withFotoMenu / rows.length) * 100) : 0
-    },
-    {
-      icon: "🚚",
-      label: "Foto Distribusi",
-      value: withFotoDistribusi,
-      desc: "Bukti distribusi MBG yang tersedia.",
-      progress: rows.length > 0 ? Math.round((withFotoDistribusi / rows.length) * 100) : 0
-    }
-  ];
-
-  container.innerHTML = cards.map(function(card) {
-    return `
-      <div class="report-info-card">
-        <div class="report-info-icon">${card.icon}</div>
-        <div class="report-info-label">${escapeHtml(card.label)}</div>
-        <div class="report-info-value">${escapeHtml(card.value)}</div>
-        <div class="report-info-desc">${escapeHtml(card.desc)}</div>
-        <div class="report-progress">
-          <div class="report-progress-fill" style="width:${Math.max(0, Math.min(card.progress, 100))}%"></div>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-function renderReportEvidence(rows) {
-  const container = document.getElementById("reportEvidenceGrid");
-  if (!container) return;
-
-  const rowsWithPhoto = rows
-    .filter(item => item.linkFotoMenu || item.linkFotoDistribusi)
-    .slice(0, 12);
-
-  if (rowsWithPhoto.length === 0) {
-    container.innerHTML = `
-      <div class="empty" style="grid-column:1 / -1;">
-        Belum ada dokumentasi foto pada periode laporan ini.
-      </div>
-    `;
-    return;
-  }
-
-  container.innerHTML = rowsWithPhoto.map(function(item, index) {
-    return `
-      <div class="evidence-card">
-        <div class="evidence-head">
-          <div class="evidence-title">${escapeHtml(item.namaSppg || "-")}</div>
-          <div class="evidence-meta">
-            ${escapeHtml(formatTanggal(item.tanggal))} · ${escapeHtml(item.waktuSimpan || "-")}
-          </div>
-        </div>
-
-        <div class="evidence-images">
-          ${renderEvidencePhoto("Foto Menu MBG", item.linkFotoMenu)}
-          ${renderEvidencePhoto("Foto Distribusi", item.linkFotoDistribusi)}
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-function renderEvidencePhoto(label, url) {
-  if (!url) {
-    return `
-      <div class="evidence-photo-box">
-        <div class="evidence-photo-label">${escapeHtml(label)}</div>
-        <div class="no-photo-box">Foto belum tersedia</div>
-      </div>
-    `;
-  }
-
-  const imageUrl = driveImageUrl(url);
-
-  return `
-    <div class="evidence-photo-box">
-      <div class="evidence-photo-label">${escapeHtml(label)}</div>
-
-      <img
-        src="${escapeAttr(imageUrl)}"
-        crossorigin="anonymous"
-        alt="${escapeAttr(label)}"
-        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-      >
-
-      <a
-        class="photo-fallback"
-        href="${escapeAttr(url)}"
-        target="_blank"
-      >
-        Buka ${escapeHtml(label)}
-      </a>
-    </div>
-  `;
-}
-
-function driveImageUrl(url) {
-  const id = extractDriveFileId(url);
-
-  if (!id) {
-    return url;
-  }
-
-  return "https://drive.google.com/thumbnail?id=" + id + "&sz=w1000";
-}
-
-function extractDriveFileId(url) {
-  const value = String(url || "");
-
-  let match = value.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (match && match[1]) return match[1];
-
-  match = value.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (match && match[1]) return match[1];
-
-  return "";
-}
-
-function escapeAttr(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
-}
-async function exportReportPDF() {
-  const element = document.getElementById("reportExportArea");
-  const title = getReportTitle().replaceAll(" ", "-").toLowerCase();
-  const date = new Date().toISOString().slice(0, 10);
-  const filename = title + "-" + date + ".pdf";
-
-  document.body.classList.add("pdf-mode");
-
-  await waitForImages(element);
-
-  const options = {
-    margin: 8,
-    filename: filename,
-    image: {
-      type: "jpeg",
-      quality: 0.98
-    },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      allowTaint: false,
-      scrollY: 0,
-      imageTimeout: 15000
-    },
-    jsPDF: {
-      unit: "mm",
-      format: "a4",
-      orientation: "portrait"
-    },
-    pagebreak: {
-      mode: ["avoid-all", "css", "legacy"]
-    }
-  };
-
-  html2pdf()
-    .set(options)
-    .from(element)
-    .save()
-    .then(function() {
-      document.body.classList.remove("pdf-mode");
-    })
-    .catch(function(error) {
-      console.error(error);
-      document.body.classList.remove("pdf-mode");
-      alert("Gagal membuat PDF. Silakan coba lagi.");
-    });
-}
-
-function waitForImages(container) {
-  const images = Array.from(container.querySelectorAll("img"));
-
-  const promises = images.map(function(img) {
-    return new Promise(function(resolve) {
-      if (img.complete) {
-        resolve();
-        return;
-      }
-
-      img.onload = function() {
-        resolve();
-      };
-
-      img.onerror = function() {
-        resolve();
-      };
-    });
-  });
-
-  return Promise.all(promises);
-}
-
-function groupBy(rows, key) {
-  return rows.reduce(function(result, item) {
-    const groupKey = item[key] || "Tidak diketahui";
-
-    if (!result[groupKey]) {
-      result[groupKey] = [];
-    }
-
-    result[groupKey].push(item);
-    return result;
-  }, {});
-}
-
-function getLatestDateFromData() {
-  const dates = monitoringData
-    .map(item => normalizeDate(item.tanggal))
-    .filter(Boolean)
-    .sort(function(a, b) {
-      return new Date(b) - new Date(a);
-    });
-
-  return dates[0] || "";
-}
-
-function getTodayInputValue() {
-  const date = new Date();
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-
-  return `${y}-${m}-${d}`;
-}
-
-function formatMonthLabel(value) {
-  if (!value) return "-";
-
-  const date = new Date(value + "-01T00:00:00");
-  if (isNaN(date.getTime())) return value;
-
-  return date.toLocaleDateString("id-ID", {
-    month: "long",
-    year: "numeric"
-  });
-}
-    
     function escapeHtml(value) {
       return String(value || "")
         .replaceAll("&", "&amp;")
@@ -2545,11 +1720,14 @@ function formatMonthLabel(value) {
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
-function limitText(text, max) {
-  const value = String(text || "");
-  return value.length > max ? value.substring(0, max) + "..." : value;
-}
-    
+
+    function escapeAttr(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
   </script>
 </body>
 </html>
