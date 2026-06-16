@@ -894,6 +894,168 @@
         grid-template-columns: 1fr;
       }
     }
+.recap-mobile {
+  display: none;
+}
+
+.mobile-recap-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-recap-card {
+  border: 1px solid #dcebe1;
+  border-radius: 16px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.mobile-recap-head {
+  padding: 12px 12px 10px;
+  background: #f7fbf8;
+  border-bottom: 1px solid #e5eee9;
+}
+
+.mobile-recap-name {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--green-900);
+  line-height: 1.35;
+}
+
+.mobile-date-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+  gap: 8px;
+  padding: 12px;
+}
+
+.mobile-date-item {
+  border-radius: 12px;
+  padding: 8px 6px;
+  text-align: center;
+  border: 1px solid #e5eee9;
+  background: #f8fafc;
+}
+
+.mobile-date-item.ok {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+}
+
+.mobile-date-item.no {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.mobile-date-day {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--green-900);
+}
+
+.mobile-status-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.mobile-status-icon.ok {
+  background: #16a34a;
+}
+
+.mobile-status-icon.no {
+  background: #dc2626;
+}
+
+.mobile-recap-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+
+.mobile-summary-box {
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5eee9;
+  padding: 9px 8px;
+  text-align: center;
+}
+
+.mobile-summary-label {
+  font-size: 10px;
+  font-weight: 900;
+  color: #64748b;
+  margin-bottom: 5px;
+}
+
+.mobile-summary-value {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--green-900);
+}
+
+@media (max-width: 720px) {
+  .recap-desktop {
+    display: none !important;
+  }
+
+  .recap-mobile {
+    display: block;
+  }
+
+  .section-body {
+    padding: 10px;
+  }
+
+  .section-title {
+    font-size: 14px;
+  }
+
+  .section-sub {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .legend {
+    gap: 10px;
+    font-size: 11px;
+  }
+
+  .legend-dot {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (min-width: 721px) {
+  .recap-desktop {
+    display: block;
+  }
+
+  .recap-mobile {
+    display: none;
+  }
+}
+
+.pdf-mode .recap-desktop {
+  display: block !important;
+}
+
+.pdf-mode .recap-mobile {
+  display: none !important;
+}
+    
   </style>
 </head>
 <body>
@@ -1025,12 +1187,14 @@
         </div>
 
         <div class="section-body">
-          <div class="recap-wrap">
-            <table class="recap-table">
-              <thead id="recapHead"></thead>
-              <tbody id="recapBody"></tbody>
-            </table>
-          </div>
+          <div class="recap-wrap recap-desktop">
+  <table class="recap-table">
+    <thead id="recapHead"></thead>
+    <tbody id="recapBody"></tbody>
+  </table>
+</div>
+
+<div id="recapMobile" class="recap-mobile"></div>
 
           <div class="legend">
             <div class="legend-item">
@@ -1096,8 +1260,18 @@
   enforceOperationalDateSelection();
   renderDashboard();
 });
+      let recapResizeTimer = null;
+
+window.addEventListener("resize", function() {
+  clearTimeout(recapResizeTimer);
+
+  recapResizeTimer = setTimeout(function() {
+    renderRecap();
+  }, 200);
+});
       document.getElementById("reportMonth").addEventListener("change", renderDashboard);
       document.getElementById("reportSppg").addEventListener("change", renderDashboard);
+      
     }
 
     async function loadInitialData() {
@@ -1604,85 +1778,190 @@ function getScopeDates() {
   `;
 }
     function renderRecap() {
-      const rows = getFilteredRows();
-      const scopeSppg = getScopeSppgList();
-      const scopeDates = getScopeDates();
-      const presenceMap = buildPresenceMap(rows);
+  const rows = getFilteredRows();
+  const scopeSppg = getScopeSppgList();
+  const scopeDates = getScopeDates();
+  const presenceMap = buildPresenceMap(rows);
 
-      const recapHead = document.getElementById("recapHead");
-      const recapBody = document.getElementById("recapBody");
+  const recapHead = document.getElementById("recapHead");
+  const recapBody = document.getElementById("recapBody");
+  const recapMobile = document.getElementById("recapMobile");
 
-if (scopeSppg.length === 0 || scopeDates.length === 0) {
-  recapHead.innerHTML = "";
+  const isMobile = window.matchMedia("(max-width: 720px)").matches;
 
-  const selectedDate = document.getElementById("reportDate").value;
-  const selectedMonth = document.getElementById("reportMonth").value;
-  let emptyMessage = "Tidak ada data rekapitulasi.";
-
-  if (activeTab === "daily" && selectedDate && !isOperationalDate(selectedDate)) {
-    const reason = getNonOperationalReason(selectedDate);
-    emptyMessage = "Tanggal " + formatTanggal(selectedDate) + " adalah " + reason + ". SPPG tidak wajib upload/simpan data pada hari tersebut.";
-  } else if (activeTab !== "daily" && selectedMonth) {
-    emptyMessage = "Tidak ada tanggal operasional pada periode ini.";
+  if (isMobile) {
+    if (recapHead) recapHead.innerHTML = "";
+    if (recapBody) recapBody.innerHTML = "";
+    renderRecapMobile(scopeSppg, scopeDates, presenceMap);
+    return;
   }
 
-  recapBody.innerHTML = '<tr><td class="empty-state">' + escapeHtml(emptyMessage) + '</td></tr>';
-  return;
+  if (recapMobile) {
+    recapMobile.innerHTML = "";
+  }
+
+  if (scopeSppg.length === 0 || scopeDates.length === 0) {
+    recapHead.innerHTML = "";
+
+    const emptyMessage = getRecapEmptyMessage();
+
+    recapBody.innerHTML =
+      '<tr><td class="empty-state">' + escapeHtml(emptyMessage) + '</td></tr>';
+
+    return;
+  }
+
+  recapHead.innerHTML = `
+    <tr>
+      <th class="sticky-left">Nama SPPG</th>
+      ${scopeDates.map(function(date) {
+        return `<th class="date-col">${escapeHtml(formatDateCell(date))}</th>`;
+      }).join("")}
+      <th>Total Hari Input</th>
+      <th>% Kepatuhan</th>
+      <th>Status</th>
+    </tr>
+  `;
+
+  recapBody.innerHTML = scopeSppg.map(function(sppg) {
+    let totalInputDays = 0;
+
+    const dateCells = scopeDates.map(function(date) {
+      const key = sppg + "||" + date;
+      const found = presenceMap[key];
+
+      if (found) {
+        totalInputDays += 1;
+
+        return `
+          <td class="date-col" title="${escapeAttr(sppg + ' - ' + formatTanggal(date) + ' : ' + found.count + ' laporan')}">
+            <span class="status-icon ok">
+              ✓
+              ${found.count > 1 ? `<span class="status-count">${found.count}</span>` : ""}
+            </span>
+          </td>
+        `;
+      }
+
+      return `
+        <td class="date-col" title="${escapeAttr(sppg + ' - ' + formatTanggal(date) + ' : belum upload')}">
+          <span class="status-icon no">✕</span>
+        </td>
+      `;
+    }).join("");
+
+    const percent = scopeDates.length > 0
+      ? Math.round((totalInputDays / scopeDates.length) * 100)
+      : 0;
+
+    const statusClass = percent >= 85 ? "good" : percent >= 60 ? "warn" : "bad";
+    const statusText = percent >= 85 ? "Sangat Baik" : percent >= 60 ? "Cukup" : "Perlu Perhatian";
+
+    return `
+      <tr>
+        <td class="sticky-left"><strong>${escapeHtml(sppg)}</strong></td>
+        ${dateCells}
+        <td>${totalInputDays}</td>
+        <td><span class="percent-pill ${statusClass}">${percent}%</span></td>
+        <td><span class="percent-pill ${statusClass}">${statusText}</span></td>
+      </tr>
+    `;
+  }).join("");
 }
 
-      recapHead.innerHTML = `
-        <tr>
-          <th class="sticky-left">Nama SPPG</th>
-          ${scopeDates.map(function (date) {
-            return `<th class="date-col">${escapeHtml(formatDateCell(date))}</th>`;
-          }).join("")}
-          <th>Total Hari Input</th>
-          <th>% Kepatuhan</th>
-          <th>Status</th>
-        </tr>
-      `;
+function renderRecapMobile(scopeSppg, scopeDates, presenceMap) {
+  const recapMobile = document.getElementById("recapMobile");
 
-      recapBody.innerHTML = scopeSppg.map(function (sppg) {
+  if (!recapMobile) return;
+
+  if (scopeSppg.length === 0 || scopeDates.length === 0) {
+    recapMobile.innerHTML =
+      '<div class="empty-state">' + escapeHtml(getRecapEmptyMessage()) + '</div>';
+    return;
+  }
+
+  recapMobile.innerHTML = `
+    <div class="mobile-recap-list">
+      ${scopeSppg.map(function(sppg) {
         let totalInputDays = 0;
-        const dateCells = scopeDates.map(function (date) {
+
+        const dateItems = scopeDates.map(function(date) {
           const key = sppg + "||" + date;
           const found = presenceMap[key];
 
           if (found) {
             totalInputDays += 1;
-            return `
-              <td class="date-col" title="${escapeAttr(sppg + ' - ' + formatTanggal(date) + ' : ' + found.count + ' laporan')}">
-                <span class="status-icon ok">
-                  ✓
-                  ${found.count > 1 ? `<span class="status-count">${found.count}</span>` : ""}
-                </span>
-              </td>
-            `;
           }
 
           return `
-            <td class="date-col" title="${escapeAttr(sppg + ' - ' + formatTanggal(date) + ' : belum upload')}">
-              <span class="status-icon no">✕</span>
-            </td>
+            <div class="mobile-date-item ${found ? "ok" : "no"}" title="${escapeAttr(formatTanggal(date))}">
+              <span class="mobile-date-day">${escapeHtml(formatDateCell(date))}</span>
+              <span class="mobile-status-icon ${found ? "ok" : "no"}">
+                ${found ? "✓" : "✕"}
+              </span>
+            </div>
           `;
         }).join("");
 
-        const percent = scopeDates.length > 0 ? Math.round((totalInputDays / scopeDates.length) * 100) : 0;
+        const percent = scopeDates.length > 0
+          ? Math.round((totalInputDays / scopeDates.length) * 100)
+          : 0;
+
         const statusClass = percent >= 85 ? "good" : percent >= 60 ? "warn" : "bad";
         const statusText = percent >= 85 ? "Sangat Baik" : percent >= 60 ? "Cukup" : "Perlu Perhatian";
 
         return `
-          <tr>
-            <td class="sticky-left"><strong>${escapeHtml(sppg)}</strong></td>
-            ${dateCells}
-            <td>${totalInputDays}</td>
-            <td><span class="percent-pill ${statusClass}">${percent}%</span></td>
-            <td><span class="percent-pill ${statusClass}">${statusText}</span></td>
-          </tr>
-        `;
-      }).join("");
-    }
+          <div class="mobile-recap-card">
+            <div class="mobile-recap-head">
+              <div class="mobile-recap-name">${escapeHtml(sppg)}</div>
+            </div>
 
+            <div class="mobile-date-grid">
+              ${dateItems}
+            </div>
+
+            <div class="mobile-recap-summary">
+              <div class="mobile-summary-box">
+                <div class="mobile-summary-label">Input</div>
+                <div class="mobile-summary-value">${totalInputDays}</div>
+              </div>
+
+              <div class="mobile-summary-box">
+                <div class="mobile-summary-label">Kepatuhan</div>
+                <div class="mobile-summary-value">
+                  <span class="percent-pill ${statusClass}">${percent}%</span>
+                </div>
+              </div>
+
+              <div class="mobile-summary-box">
+                <div class="mobile-summary-label">Status</div>
+                <div class="mobile-summary-value">
+                  <span class="percent-pill ${statusClass}">${escapeHtml(statusText)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function getRecapEmptyMessage() {
+  const selectedDate = document.getElementById("reportDate").value;
+  const selectedMonth = document.getElementById("reportMonth").value;
+
+  if (activeTab === "daily" && selectedDate && !isOperationalDate(selectedDate)) {
+    const reason = getNonOperationalReason(selectedDate);
+    return "Tanggal " + formatTanggal(selectedDate) + " adalah " + reason + ". SPPG tidak wajib upload/simpan data pada hari tersebut.";
+  }
+
+  if (activeTab !== "daily" && selectedMonth) {
+    return "Tidak ada tanggal operasional pada periode ini.";
+  }
+
+  return "Tidak ada data rekapitulasi.";
+}
     async function exportReportPDF() {
       const element = document.getElementById("pdfReportArea");
       const title = buildExportTitle();
