@@ -1300,7 +1300,149 @@
   break-inside: avoid !important;
   page-break-inside: avoid !important;
 }
-    
+    /* EXPORT PDF STABIL UNTUK PC DAN HP */
+.mbg-pdf-export-host {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 1200px !important;
+  min-width: 1200px !important;
+  max-width: 1200px !important;
+  background: #ffffff !important;
+  z-index: -9999 !important;
+  pointer-events: none !important;
+  overflow: visible !important;
+}
+
+.mbg-pdf-export-host,
+.mbg-pdf-export-host * {
+  box-sizing: border-box !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.mbg-pdf-export-host .report-area {
+  width: 1200px !important;
+  min-width: 1200px !important;
+  max-width: 1200px !important;
+  margin: 0 !important;
+  padding: 18px !important;
+  background: #ffffff !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.mbg-pdf-export-host .report-header {
+  display: grid !important;
+  grid-template-columns: 180px 1fr 180px !important;
+  align-items: center !important;
+  gap: 16px !important;
+  text-align: left !important;
+}
+
+.mbg-pdf-export-host .report-logo-box {
+  text-align: center !important;
+}
+
+.mbg-pdf-export-host .report-grid {
+  display: grid !important;
+  grid-template-columns: 300px 1fr !important;
+  gap: 16px !important;
+}
+
+.mbg-pdf-export-host .summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 12px !important;
+}
+
+.mbg-pdf-export-host .status-strip {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 12px !important;
+}
+
+.mbg-pdf-export-host .gallery-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 12px !important;
+}
+
+.mbg-pdf-export-host .doc-images {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+}
+
+.mbg-pdf-export-host .doc-photo-box img {
+  height: 120px !important;
+  object-fit: cover !important;
+}
+
+.mbg-pdf-export-host .recap-desktop {
+  display: block !important;
+}
+
+.mbg-pdf-export-host .recap-mobile {
+  display: none !important;
+}
+
+.mbg-pdf-export-host .recap-wrap {
+  overflow: visible !important;
+}
+
+.mbg-pdf-export-host .recap-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.mbg-pdf-export-host .recap-table th,
+.mbg-pdf-export-host .recap-table td {
+  font-size: 9px !important;
+  padding: 5px 3px !important;
+}
+
+.mbg-pdf-export-host .recap-table th.sticky-left,
+.mbg-pdf-export-host .recap-table td.sticky-left {
+  position: static !important;
+  left: auto !important;
+  min-width: 185px !important;
+  max-width: 185px !important;
+  width: 185px !important;
+  background: #ffffff !important;
+}
+
+.mbg-pdf-export-host .recap-table th.sticky-left {
+  background: #f3f8f5 !important;
+}
+
+.mbg-pdf-export-host .date-col {
+  min-width: 26px !important;
+  width: 26px !important;
+}
+
+.mbg-pdf-export-host .status-icon {
+  width: 17px !important;
+  height: 17px !important;
+  font-size: 9px !important;
+}
+
+.mbg-pdf-export-host .percent-pill {
+  font-size: 9px !important;
+  padding: 4px 7px !important;
+}
+
+.mbg-pdf-export-host .section,
+.mbg-pdf-export-host .panel,
+.mbg-pdf-export-host .summary-card,
+.mbg-pdf-export-host .status-box,
+.mbg-pdf-export-host .doc-card {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
   </style>
 </head>
 <body>
@@ -2209,7 +2351,7 @@ function getRecapEmptyMessage() {
 
   return "Tidak ada data rekapitulasi.";
 }
-    async function exportReportPDF() {
+   async function exportReportPDF() {
   const sourceElement = document.getElementById("pdfReportArea");
   const title = buildExportTitle();
   const filename = title + ".pdf";
@@ -2219,13 +2361,28 @@ function getRecapEmptyMessage() {
     return;
   }
 
+  if (typeof html2canvas === "undefined") {
+    alert("Library html2canvas belum terbaca.");
+    return;
+  }
+
+  const jsPDFCtor =
+    window.jspdf && window.jspdf.jsPDF
+      ? window.jspdf.jsPDF
+      : window.jsPDF;
+
+  if (!jsPDFCtor) {
+    alert("Library jsPDF belum terbaca.");
+    return;
+  }
+
   let exportHost = null;
 
   try {
     isExportingPDF = true;
 
-    // Render ulang supaya rekap yang dipakai adalah versi desktop,
-    // bukan versi mobile card.
+    // Render ulang agar rekap yang dipakai adalah tabel desktop,
+    // bukan tampilan mobile card.
     renderDashboard();
 
     await new Promise(function(resolve) {
@@ -2233,56 +2390,99 @@ function getRecapEmptyMessage() {
     });
 
     exportHost = document.createElement("div");
-    exportHost.className = "export-pdf-host";
+    exportHost.className = "mbg-pdf-export-host";
 
     const clonedReport = sourceElement.cloneNode(true);
     clonedReport.id = "pdfReportAreaExport";
-    clonedReport.classList.add("pdf-export-area");
 
     exportHost.appendChild(clonedReport);
     document.body.appendChild(exportHost);
 
     await waitForImages(clonedReport);
 
-    const opt = {
-      margin: [6, 6, 6, 6],
-      filename: filename,
-      image: {
-        type: "jpeg",
-        quality: 0.98
-      },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: "#ffffff",
-        imageTimeout: 20000,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: 1320,
-        width: 1320
-      },
-      jsPDF: {
-        unit: "mm",
-        format: "a4",
-        orientation: "landscape"
-      },
-      pagebreak: {
-        mode: ["css", "legacy"],
-        avoid: [
-          ".summary-card",
-          ".status-box",
-          ".panel",
-          ".doc-card",
-          ".legend"
-        ]
-      }
-    };
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
 
-    await html2pdf()
-      .set(opt)
-      .from(clonedReport)
-      .save();
+    await new Promise(function(resolve) {
+      setTimeout(resolve, 300);
+    });
+
+    const exportWidth = 1200;
+
+    const canvas = await html2canvas(clonedReport, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: "#ffffff",
+      logging: false,
+      imageTimeout: 20000,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: exportWidth,
+      width: exportWidth
+    });
+
+    const pdf = new jsPDFCtor("landscape", "mm", "a4");
+
+    const pageWidth = 297;
+    const pageHeight = 210;
+    const margin = 6;
+
+    const imgWidthMm = pageWidth - margin * 2;
+    const usableHeightMm = pageHeight - margin * 2;
+
+    const pxPerMm = canvas.width / imgWidthMm;
+    const pageSliceHeightPx = Math.floor(usableHeightMm * pxPerMm);
+
+    const pageCanvas = document.createElement("canvas");
+    const pageContext = pageCanvas.getContext("2d");
+
+    let sourceY = 0;
+    let pageIndex = 0;
+
+    while (sourceY < canvas.height) {
+      const sliceHeightPx = Math.min(pageSliceHeightPx, canvas.height - sourceY);
+
+      pageCanvas.width = canvas.width;
+      pageCanvas.height = sliceHeightPx;
+
+      pageContext.fillStyle = "#ffffff";
+      pageContext.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+
+      pageContext.drawImage(
+        canvas,
+        0,
+        sourceY,
+        canvas.width,
+        sliceHeightPx,
+        0,
+        0,
+        canvas.width,
+        sliceHeightPx
+      );
+
+      const imgData = pageCanvas.toDataURL("image/jpeg", 0.98);
+      const sliceHeightMm = sliceHeightPx / pxPerMm;
+
+      if (pageIndex > 0) {
+        pdf.addPage("a4", "landscape");
+      }
+
+      pdf.addImage(
+        imgData,
+        "JPEG",
+        margin,
+        margin,
+        imgWidthMm,
+        sliceHeightMm
+      );
+
+      sourceY += sliceHeightPx;
+      pageIndex += 1;
+    }
+
+    pdf.save(filename);
 
   } catch (error) {
     console.error(error);
@@ -2296,7 +2496,6 @@ function getRecapEmptyMessage() {
     renderDashboard();
   }
 }
-
     function buildExportTitle() {
       const today = new Date().toISOString().slice(0, 10);
 
