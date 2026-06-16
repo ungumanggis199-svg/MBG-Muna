@@ -421,7 +421,11 @@
           form.reset();
           resetPreview();
         } else {
-          showMessage(result.message || "Aduan gagal dikirim.", "error");
+          showMessage(
+  (result.message || "Aduan gagal dikirim.") +
+  (result.detail ? " Detail: " + result.detail : ""),
+  "error"
+);
         }
 
       } catch (error) {
