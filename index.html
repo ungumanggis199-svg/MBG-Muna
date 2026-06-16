@@ -757,7 +757,25 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .mc-ico svg {
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.28));
 }  
-  
+  .si-val {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.si-val.is-loading {
+  opacity: 0.45;
+  animation: statPulse 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes statPulse {
+  from {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  to {
+    transform: translateY(-2px);
+    opacity: 0.8;
+  }
+}
 </style>
 </head>
 <body>
@@ -1516,15 +1534,22 @@ document.querySelectorAll(".modal-overlay").forEach(function(o) {
   });
 });
  async function loadIndexStats() {
+  setStatsLoading(true);
+
+  if (window.updateAllWitaNotes) {
+    window.updateAllWitaNotes();
+  }
+
   try {
     const res = await fetch("/api/index-stats?t=" + Date.now(), {
-  cache: "no-store"
-});
+      cache: "no-store"
+    });
+
     const result = await res.json();
 
     if (!result.success) {
       console.error(result.message || "Gagal mengambil statistik index.");
-      updateRealtimeNotes();
+      setStatsLoading(false);
       return;
     }
 
@@ -1535,26 +1560,21 @@ document.querySelectorAll(".modal-overlay").forEach(function(o) {
     setText("statSppgMelapor", data.totalSppgMelaporHariIni || 0);
     setText("statTotalAduan", data.totalAduan || 0);
 
-    updateRealtimeNotes();
+    if (window.updateAllWitaNotes) {
+      window.updateAllWitaNotes();
+    }
 
   } catch (error) {
     console.error("Gagal memuat statistik index:", error);
-    updateRealtimeNotes();
+    setStatsLoading(false);
+
+    if (window.updateAllWitaNotes) {
+      window.updateAllWitaNotes();
+    }
   }
 }
 
-function setText(id, value) {
-  const el = document.getElementById(id);
-  if (!el) return;
-
-  if (typeof value === "number") {
-    el.textContent = value.toLocaleString("id-ID");
-  } else {
-    el.textContent = value;
-  }
-}
-
-function getCurrentWitaTime() {
+  function getCurrentWitaTime() {
   return new Intl.DateTimeFormat("id-ID", {
     timeZone: "Asia/Makassar",
     hour: "2-digit",
@@ -1570,22 +1590,64 @@ if (window.updateAllWitaNotes) {
   window.updateAllWitaNotes();
 }
 }
-
 function setText(id, value) {
-  const el = document.getElementById(id);
-
-  if (!el) return;
-
-  if (typeof value === "number") {
-    el.textContent = value.toLocaleString("id-ID");
-  } else {
-    el.textContent = value;
-  }
+  animateNumber(id, Number(value || 0));
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-  loadIndexStats();
-});
+function animateNumber(id, targetValue) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  const oldValue = Number(
+    String(el.textContent || "0").replace(/\./g, "").replace(/,/g, "")
+  ) || 0;
+
+  const target = Number(targetValue || 0);
+  const duration = 900;
+  const startTime = performance.now();
+
+  el.classList.remove("is-loading");
+
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function frame(now) {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = easeOutCubic(progress);
+    const current = Math.round(oldValue + (target - oldValue) * eased);
+
+    el.textContent = current.toLocaleString("id-ID");
+
+    if (progress < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      el.textContent = target.toLocaleString("id-ID");
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
+function setStatsLoading(isLoading) {
+  const ids = [
+    "statTotalSppg",
+    "statTotalSekolah",
+    "statSppgMelapor",
+    "statTotalAduan"
+  ];
+
+  ids.forEach(function(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    if (isLoading) {
+      el.classList.add("is-loading");
+    } else {
+      el.classList.remove("is-loading");
+    }
+  });
+}
 </script>
   <script>
 (function () {
