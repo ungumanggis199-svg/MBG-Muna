@@ -33,7 +33,6 @@ export default async function handler(req, res) {
         buktiAduan: body.buktiAduan
       })
     });
-
     const text = await gasResponse.text();
 
     let result;
