@@ -1157,10 +1157,36 @@ const sppgJson = await sppgRes.json();
     }
 
     function setDefaultFilters() {
-    const latestDate = getLatestOperationalDateFromData() || getNearestPreviousOperationalDate(getTodayInputValue());
-    document.getElementById("reportDate").value = latestDate;
-    document.getElementById("reportMonth").value = latestDate.slice(0, 7);
-    }
+  const reportDate = document.getElementById("reportDate");
+  const reportMonth = document.getElementById("reportMonth");
+
+  if (!reportDate || !reportMonth) return;
+
+  let latestDate = "";
+
+  if (typeof getLatestOperationalDateFromData === "function") {
+    latestDate = getLatestOperationalDateFromData();
+  }
+
+  if (!latestDate && typeof getTodayInputValue === "function") {
+    latestDate = getTodayInputValue();
+  }
+
+  if (!latestDate) {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    latestDate = `${y}-${m}-${d}`;
+  }
+
+  if (typeof getNearestPreviousOperationalDate === "function") {
+    latestDate = getNearestPreviousOperationalDate(latestDate) || latestDate;
+  }
+
+  reportDate.value = latestDate;
+  reportMonth.value = latestDate.slice(0, 7);
+}
 
     function toggleFilterFields() {
       const fieldDate = document.getElementById("fieldDate");
@@ -1183,6 +1209,18 @@ const sppgJson = await sppgRes.json();
     }
 
     function renderDashboard() {
+        const reportDate = document.getElementById("reportDate");
+  const reportMonth = document.getElementById("reportMonth");
+
+  if (reportDate && !reportDate.value) {
+    reportDate.value = getTodayInputValue();
+  }
+
+  if (reportMonth && !reportMonth.value && reportDate && reportDate.value) {
+    reportMonth.value = reportDate.value.slice(0, 7);
+  }
+
+      updateHolidayNoticeForSelectedDate();
       renderReportHeader();
       renderExecutive();
       renderSummary();
@@ -1799,7 +1837,7 @@ function getNearestPreviousOperationalDate(startDate) {
   let date = normalizeDate(startDate) || getTodayInputValue();
 
   for (let i = 0; i < 370; i++) {
-    if (isOperationalDate(date)) {
+    if (typeof isOperationalDate !== "function" || isOperationalDate(date)) {
       return date;
     }
 
@@ -1814,7 +1852,7 @@ function getNearestPreviousOperationalDate(startDate) {
     date = `${y}-${m}-${day}`;
   }
 
-  return startDate;
+  return normalizeDate(startDate) || getTodayInputValue();
 }
 
 function getOperationalDatesInMonth(monthValue) {
