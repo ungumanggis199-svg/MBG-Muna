@@ -1677,23 +1677,26 @@
     }
 
     function driveImageUrl(url) {
-      const id = extractDriveFileId(url);
-      if (!id) return url;
-      return "https://drive.google.com/thumbnail?id=" + id + "&sz=w1000";
-    }
+  const id = extractDriveFileId(url);
 
-    function extractDriveFileId(url) {
-      const value = String(url || "");
+  if (!id) {
+    return url;
+  }
 
-      let match = value.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) return match[1];
+  return "/api/drive-image?id=" + encodeURIComponent(id);
+}
 
-      match = value.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) return match[1];
+function extractDriveFileId(url) {
+  const value = String(url || "");
 
-      return "";
-    }
+  let match = value.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (match && match[1]) return match[1];
 
+  match = value.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (match && match[1]) return match[1];
+
+  return "";
+}
     function waitForImages(container) {
       const images = Array.from(container.querySelectorAll("img"));
 
