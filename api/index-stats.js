@@ -1,5 +1,7 @@
 export default async function handler(req, res) {
-  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
 
   if (req.method !== "GET") {
     return res.status(405).json({
@@ -11,10 +13,13 @@ export default async function handler(req, res) {
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbztD_tVnz-62Q48yGLz5UimIC_JszFYAsoM5V5DoM283OUzJ5a8tpWC5qfC7a9RZI91/exec";
 
   try {
-    const gasResponse = await fetch(APPS_SCRIPT_URL, {
+    const gasResponse = await fetch(APPS_SCRIPT_URL + "?t=" + Date.now(), {
       method: "POST",
+      cache: "no-store",
       headers: {
-        "Content-Type": "text/plain;charset=utf-8"
+        "Content-Type": "text/plain;charset=utf-8",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache"
       },
       body: JSON.stringify({
         action: "getIndexStats"
