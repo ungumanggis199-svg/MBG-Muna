@@ -221,6 +221,13 @@
       font-weight: 800;
       text-align: center;
     }
+    .error-box.holiday-notice {
+    color: #854d0e;
+    background: #fef3c7;
+    border-color: #facc15;
+    text-align: left;
+    line-height: 1.45;
+    }
 
     .report-area {
       background: rgba(255,255,255,0.95);
@@ -1010,7 +1017,7 @@
         <div class="section-head">
           <div>
             <div class="section-title">Rekapitulasi Input SPPG</div>
-            <div class="section-sub">Centang hijau berarti sudah upload/simpan data pada tanggal tersebut. Silang merah berarti belum upload.</div>
+            <div class="section-sub">Centang hijau berarti sudah upload/simpan data pada tanggal operasional. Sabtu, Minggu, dan libur nasional tidak dihitung sebagai kewajiban update..</div>
           </div>
         </div>
 
@@ -1044,10 +1051,11 @@
   </main>
 
   <script>
-    let monitoringData = [];
-    let allSppgList = [];
-    let activeTab = "daily";
-    let activeGallery = "all";
+  let monitoringData = [];
+  let allSppgList = [];
+  let activeTab = "daily";
+  let activeGallery = "all";
+  let holidayMap = {};
 
     document.addEventListener("DOMContentLoaded", async function () {
       bindEvents();
@@ -1065,6 +1073,7 @@
           activeTab = btn.dataset.tab;
           toggleFilterFields();
           renderDashboard();
+          updateHolidayNoticeForSelectedDate();
         });
       });
 
@@ -1080,7 +1089,10 @@
         });
       });
 
-      document.getElementById("reportDate").addEventListener("change", renderDashboard);
+      document.getElementById("reportDate").addEventListener("change", function () {
+  enforceOperationalDateSelection();
+  renderDashboard();
+});
       document.getElementById("reportMonth").addEventListener("change", renderDashboard);
       document.getElementById("reportSppg").addEventListener("change", renderDashboard);
     }
@@ -1089,14 +1101,22 @@
       const errorBox = document.getElementById("errorBox");
 
       try {
-        const [monitoringRes, sppgRes] = await Promise.all([
-          fetch("/api/public-monitoring"),
-          fetch("/api/list-sppg")
-        ]);
+        const holidayPromise = fetch("/api/holidays", { cache: "no-store" })
+  .then(function(res) {
+    return res.ok ? res.json() : { success: false, data: [] };
+  })
+  .catch(function() {
+    return { success: false, data: [] };
+  });
 
-        const monitoringJson = await monitoringRes.json();
-        const sppgJson = await sppgRes.json();
+const [monitoringRes, sppgRes, holidaysJson] = await Promise.all([
+  fetch("/api/public-monitoring", { cache: "no-store" }),
+  fetch("/api/list-sppg", { cache: "no-store" }),
+  holidayPromise
+]);
 
+const monitoringJson = await monitoringRes.json();
+const sppgJson = await sppgRes.json();
         if (!monitoringJson.success) {
           throw new Error(monitoringJson.message || "Gagal mengambil data monitoring.");
         }
@@ -1105,11 +1125,13 @@
         allSppgList = sppgJson && sppgJson.success && Array.isArray(sppgJson.data)
           ? sppgJson.data.filter(Boolean)
           : [...new Set(monitoringData.map(item => item.namaSppg).filter(Boolean))];
+        holidayMap = normalizeHolidayMap(holidaysJson && holidaysJson.success ? holidaysJson.data : []);
 
         populateSppgSelect();
         setDefaultFilters();
         toggleFilterFields();
         renderDashboard();
+        updateHolidayNoticeForSelectedDate();
 
       } catch (error) {
         console.error(error);
@@ -1135,9 +1157,9 @@
     }
 
     function setDefaultFilters() {
-      const latestDate = getLatestDateFromData() || getTodayInputValue();
-      document.getElementById("reportDate").value = latestDate;
-      document.getElementById("reportMonth").value = latestDate.slice(0, 7);
+    const latestDate = getLatestOperationalDateFromData() || getNearestPreviousOperationalDate(getTodayInputValue());
+    document.getElementById("reportDate").value = latestDate;
+    document.getElementById("reportMonth").value = latestDate.slice(0, 7);
     }
 
     function toggleFilterFields() {
@@ -1176,9 +1198,14 @@
       const periodValue = document.getElementById("periodValue");
 
       if (activeTab === "daily") {
-        titleSub.textContent = "Laporan Harian";
-        periodLabel.textContent = "Tanggal";
-        periodValue.textContent = formatTanggalShortCard(document.getElementById("reportDate").value);
+      const selectedDate = document.getElementById("reportDate").value;
+
+      titleSub.textContent = "Laporan Harian";
+      periodLabel.textContent = "Tanggal";
+      periodValue.textContent = isOperationalDate(selectedDate)
+    ? formatTanggalShortCard(selectedDate)
+    : formatTanggalShortCard(selectedDate) + " · Hari Libur";
+}
       } else if (activeTab === "monthly") {
         titleSub.textContent = "Laporan Bulanan";
         periodLabel.textContent = "Bulan";
@@ -1199,15 +1226,19 @@
         const itemDate = normalizeDate(item.tanggal);
         const itemMonth = itemDate ? itemDate.slice(0, 7) : "";
 
-        if (activeTab === "daily") {
-          return itemDate === dateValue;
-        }
+if (!isOperationalDate(itemDate)) {
+  return false;
+}
 
-        if (activeTab === "monthly") {
-          return itemMonth === monthValue;
-        }
+if (activeTab === "daily") {
+  return itemDate === dateValue && isOperationalDate(dateValue);
+}
 
-        return itemMonth === monthValue && item.namaSppg === sppgValue;
+if (activeTab === "monthly") {
+  return itemMonth === monthValue;
+}
+
+return itemMonth === monthValue && item.namaSppg === sppgValue;
       });
     }
 
@@ -1222,13 +1253,14 @@
         : [...new Set(monitoringData.map(item => item.namaSppg).filter(Boolean))];
     }
 
-    function getScopeDates() {
-      if (activeTab === "daily") {
-        return [document.getElementById("reportDate").value];
-      }
+function getScopeDates() {
+  if (activeTab === "daily") {
+    const selectedDate = normalizeDate(document.getElementById("reportDate").value);
+    return isOperationalDate(selectedDate) ? [selectedDate] : [];
+  }
 
-      return getDatesInMonth(document.getElementById("reportMonth").value);
-    }
+  return getOperationalDatesInMonth(document.getElementById("reportMonth").value);
+}
 
     function buildPresenceMap(rows) {
       const map = {};
@@ -1486,11 +1518,23 @@
       const recapHead = document.getElementById("recapHead");
       const recapBody = document.getElementById("recapBody");
 
-      if (scopeSppg.length === 0 || scopeDates.length === 0) {
-        recapHead.innerHTML = "";
-        recapBody.innerHTML = '<tr><td class="empty-state">Tidak ada data rekapitulasi.</td></tr>';
-        return;
-      }
+if (scopeSppg.length === 0 || scopeDates.length === 0) {
+  recapHead.innerHTML = "";
+
+  const selectedDate = document.getElementById("reportDate").value;
+  const selectedMonth = document.getElementById("reportMonth").value;
+  let emptyMessage = "Tidak ada data rekapitulasi.";
+
+  if (activeTab === "daily" && selectedDate && !isOperationalDate(selectedDate)) {
+    const reason = getNonOperationalReason(selectedDate);
+    emptyMessage = "Tanggal " + formatTanggal(selectedDate) + " adalah " + reason + ". SPPG tidak wajib upload/simpan data pada hari tersebut.";
+  } else if (activeTab !== "daily" && selectedMonth) {
+    emptyMessage = "Tidak ada tanggal operasional pada periode ini.";
+  }
+
+  recapBody.innerHTML = '<tr><td class="empty-state">' + escapeHtml(emptyMessage) + '</td></tr>';
+  return;
+}
 
       recapHead.innerHTML = `
         <tr>
@@ -1610,16 +1654,18 @@
         "Dicetak " + new Date().toLocaleString("id-ID");
     }
 
-    function getLatestDateFromData() {
-      const dates = monitoringData
-        .map(item => normalizeDate(item.tanggal))
-        .filter(Boolean)
-        .sort(function (a, b) {
-          return new Date(b) - new Date(a);
-        });
+function getLatestOperationalDateFromData() {
+  const dates = monitoringData
+    .map(item => normalizeDate(item.tanggal))
+    .filter(function(date) {
+      return date && isOperationalDate(date);
+    })
+    .sort(function(a, b) {
+      return new Date(b) - new Date(a);
+    });
 
-      return dates[0] || "";
-    }
+  return dates[0] || "";
+}
 
     function getTodayInputValue() {
       const date = new Date();
@@ -1628,7 +1674,155 @@
       const d = String(date.getDate()).padStart(2, "0");
       return `${y}-${m}-${d}`;
     }
+function enforceOperationalDateSelection() {
+  const input = document.getElementById("reportDate");
+  if (!input || !input.value) return;
 
+  const selectedDate = normalizeDate(input.value);
+  input.value = selectedDate;
+
+  updateHolidayNoticeForSelectedDate();
+}
+
+function updateHolidayNoticeForSelectedDate() {
+  const input = document.getElementById("reportDate");
+  const selectedDate = input ? normalizeDate(input.value) : "";
+
+  if (activeTab !== "daily" || !selectedDate) {
+    hideHolidayNotice();
+    return;
+  }
+
+  if (isOperationalDate(selectedDate)) {
+    hideHolidayNotice();
+    return;
+  }
+
+  const reason = getNonOperationalReason(selectedDate);
+
+  const message = "Informasi hari libur: Tanggal "
+    + formatTanggal(selectedDate)
+    + " adalah "
+    + reason
+    + ". SPPG tidak wajib melakukan upload/simpan data pada hari tersebut, sehingga tanggal ini tidak dihitung dalam rekap kepatuhan monitoring MBG.";
+
+  showHolidayNotice(message);
+}
+
+function showHolidayNotice(message) {
+  const errorBox = document.getElementById("errorBox");
+  if (!errorBox) return;
+
+  errorBox.dataset.noticeType = "holiday";
+  errorBox.classList.add("holiday-notice");
+  errorBox.style.display = "block";
+  errorBox.textContent = message;
+}
+
+function hideHolidayNotice() {
+  const errorBox = document.getElementById("errorBox");
+  if (!errorBox) return;
+
+  if (errorBox.dataset.noticeType === "holiday") {
+    errorBox.style.display = "none";
+    errorBox.textContent = "";
+    delete errorBox.dataset.noticeType;
+    errorBox.classList.remove("holiday-notice");
+  }
+}
+
+function normalizeHolidayMap(list) {
+  const map = {};
+
+  if (!Array.isArray(list)) {
+    return map;
+  }
+
+  list.forEach(function(item) {
+    if (!item) return;
+
+    const date = normalizeDate(item.tanggal || item.date || item[0]);
+    const name = String(item.keterangan || item.name || item[1] || "Libur nasional").trim();
+
+    if (date) {
+      map[date] = name || "Libur nasional";
+    }
+  });
+
+  return map;
+}
+
+function isWeekend(dateValue) {
+  const date = normalizeDate(dateValue);
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+
+  const parts = date.split("-").map(Number);
+  const year = parts[0];
+  const month = parts[1];
+  const day = parts[2];
+
+  const localDate = new Date(year, month - 1, day);
+  const weekDay = localDate.getDay();
+
+  return weekDay === 0 || weekDay === 6;
+}
+
+function isHoliday(dateValue) {
+  const date = normalizeDate(dateValue);
+  return Boolean(date && holidayMap[date]);
+}
+
+function isOperationalDate(dateValue) {
+  const date = normalizeDate(dateValue);
+  if (!date) return false;
+
+  return !isWeekend(date) && !isHoliday(date);
+}
+
+function getNonOperationalReason(dateValue) {
+  const date = normalizeDate(dateValue);
+
+  if (isWeekend(date)) {
+    const parts = date.split("-").map(Number);
+    const day = new Date(parts[0], parts[1] - 1, parts[2]).getDay();
+    return day === 6 ? "hari Sabtu" : "hari Minggu";
+  }
+
+  if (isHoliday(date)) {
+    return "libur nasional" + (holidayMap[date] ? " (" + holidayMap[date] + ")" : "");
+  }
+
+  return "hari non-operasional";
+}
+
+function getNearestPreviousOperationalDate(startDate) {
+  let date = normalizeDate(startDate) || getTodayInputValue();
+
+  for (let i = 0; i < 370; i++) {
+    if (isOperationalDate(date)) {
+      return date;
+    }
+
+    const parts = date.split("-").map(Number);
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    d.setDate(d.getDate() - 1);
+
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+
+    date = `${y}-${m}-${day}`;
+  }
+
+  return startDate;
+}
+
+function getOperationalDatesInMonth(monthValue) {
+  return getDatesInMonth(monthValue).filter(function(date) {
+    return isOperationalDate(date);
+  });
+}
+    
     function getDatesInMonth(monthValue) {
       if (!monthValue) return [];
 
