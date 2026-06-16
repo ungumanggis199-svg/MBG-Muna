@@ -1517,7 +1517,9 @@ document.querySelectorAll(".modal-overlay").forEach(function(o) {
 });
  async function loadIndexStats() {
   try {
-    const res = await fetch("/api/index-stats");
+    const res = await fetch("/api/index-stats?t=" + Date.now(), {
+  cache: "no-store"
+});
     const result = await res.json();
 
     if (!result.success) {
