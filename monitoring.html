@@ -949,7 +949,7 @@
         </div>
 
         <div style="display:flex; align-items:end;">
-          <button type="button" class="btn-export" onclick="renderDashboard()" style="width:100%;">Tampilkan</button>
+          <button type="button" class="btn-export" onclick="handleApplyFilter()" style="width:100%;">Tampilkan</button>
         </div>
       </div>
     </section>
@@ -1098,47 +1098,70 @@
     }
 
     async function loadInitialData() {
-      const errorBox = document.getElementById("errorBox");
+  const errorBox = document.getElementById("errorBox");
 
-      try {
-        const holidayPromise = fetch("/api/holidays", { cache: "no-store" })
-  .then(function(res) {
-    return res.ok ? res.json() : { success: false, data: [] };
-  })
-  .catch(function() {
-    return { success: false, data: [] };
-  });
-
-const [monitoringRes, sppgRes, holidaysJson] = await Promise.all([
-  fetch("/api/public-monitoring", { cache: "no-store" }),
-  fetch("/api/list-sppg", { cache: "no-store" }),
-  holidayPromise
-]);
-
-const monitoringJson = await monitoringRes.json();
-const sppgJson = await sppgRes.json();
-        if (!monitoringJson.success) {
-          throw new Error(monitoringJson.message || "Gagal mengambil data monitoring.");
+  try {
+    const holidayPromise = fetch("/api/holidays?t=" + Date.now(), {
+      cache: "no-store"
+    })
+      .then(function(res) {
+        if (!res.ok) {
+          return { success: false, data: [] };
         }
+        return res.json();
+      })
+      .catch(function() {
+        return { success: false, data: [] };
+      });
 
-        monitoringData = Array.isArray(monitoringJson.data) ? monitoringJson.data : [];
-        allSppgList = sppgJson && sppgJson.success && Array.isArray(sppgJson.data)
-          ? sppgJson.data.filter(Boolean)
-          : [...new Set(monitoringData.map(item => item.namaSppg).filter(Boolean))];
-        holidayMap = normalizeHolidayMap(holidaysJson && holidaysJson.success ? holidaysJson.data : []);
+    const [monitoringRes, sppgRes, holidaysJson] = await Promise.all([
+      fetch("/api/public-monitoring?t=" + Date.now(), {
+        cache: "no-store"
+      }),
+      fetch("/api/list-sppg?t=" + Date.now(), {
+        cache: "no-store"
+      }),
+      holidayPromise
+    ]);
 
-        populateSppgSelect();
-        setDefaultFilters();
-        toggleFilterFields();
-        renderDashboard();
-        updateHolidayNoticeForSelectedDate();
+    const monitoringJson = await monitoringRes.json();
+    const sppgJson = await sppgRes.json();
 
-      } catch (error) {
-        console.error(error);
-        errorBox.style.display = "block";
-        errorBox.textContent = error.message || "Gagal memuat data monitoring.";
-      }
+    if (!monitoringJson.success) {
+      throw new Error(monitoringJson.message || "Gagal mengambil data monitoring.");
     }
+
+    monitoringData = Array.isArray(monitoringJson.data)
+      ? monitoringJson.data
+      : [];
+
+    allSppgList = sppgJson && sppgJson.success && Array.isArray(sppgJson.data)
+      ? sppgJson.data.filter(Boolean)
+      : [...new Set(monitoringData.map(function(item) {
+          return item.namaSppg;
+        }).filter(Boolean))];
+
+    holidayMap = normalizeHolidayMap(
+      holidaysJson && holidaysJson.success && Array.isArray(holidaysJson.data)
+        ? holidaysJson.data
+        : []
+    );
+
+    populateSppgSelect();
+    setDefaultFilters();
+    toggleFilterFields();
+    renderDashboard();
+    updateHolidayNoticeForSelectedDate();
+
+  } catch (error) {
+    console.error(error);
+
+    if (errorBox) {
+      errorBox.style.display = "block";
+      errorBox.textContent = error.message || "Gagal memuat data monitoring.";
+    }
+  }
+}
 
     function populateSppgSelect() {
       const select = document.getElementById("reportSppg");
@@ -1156,7 +1179,7 @@ const sppgJson = await sppgRes.json();
       }
     }
 
-    function setDefaultFilters() {
+   function setDefaultFilters() {
   const reportDate = document.getElementById("reportDate");
   const reportMonth = document.getElementById("reportMonth");
 
@@ -1207,9 +1230,12 @@ const sppgJson = await sppgRes.json();
         fieldSppg.style.display = "block";
       }
     }
-
+function handleApplyFilter() {
+  updateHolidayNoticeForSelectedDate();
+  renderDashboard();
+}
     function renderDashboard() {
-        const reportDate = document.getElementById("reportDate");
+  const reportDate = document.getElementById("reportDate");
   const reportMonth = document.getElementById("reportMonth");
 
   if (reportDate && !reportDate.value) {
@@ -1220,15 +1246,14 @@ const sppgJson = await sppgRes.json();
     reportMonth.value = reportDate.value.slice(0, 7);
   }
 
-      updateHolidayNoticeForSelectedDate();
-      renderReportHeader();
-      renderExecutive();
-      renderSummary();
-      renderStatusStrip();
-      renderGallery();
-      renderRecap();
-      renderFooter();
-    }
+  renderReportHeader();
+  renderExecutive();
+  renderSummary();
+  renderStatusStrip();
+  renderGallery();
+  renderRecap();
+  renderFooter();
+}
 
     function renderReportHeader() {
       const titleSub = document.getElementById("reportTitleSub");
