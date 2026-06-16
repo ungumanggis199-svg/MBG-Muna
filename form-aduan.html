@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Form Layanan Aduan MBG - Kejaksaan Negeri Muna</title>
+
+  <style>
+    :root {
+      --green-dark: #043927;
+      --green-main: #0f5132;
+      --green-soft: #15803d;
+      --gold: #d7b45a;
+      --white: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #d9e5dd;
+      --danger: #dc2626;
+      --success: #16a34a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        linear-gradient(rgba(255,255,255,0.86), rgba(255,255,255,0.94)),
+        url("https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Background%20Form.png");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 16px 34px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(4,57,39,0.13);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 18px 44px rgba(15,23,42,0.10);
+      backdrop-filter: blur(12px);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 2px solid #d8e8dc;
+      margin-bottom: 22px;
+    }
+
+    .header img {
+      width: 78px;
+      height: 78px;
+      object-fit: contain;
+    }
+
+    .org {
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--green-main);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .title {
+      margin-top: 4px;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--green-dark);
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .form-title {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .form-title h1 {
+      margin: 0;
+      color: var(--green-dark);
+      font-size: 30px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .form-title p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 18px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--green-dark);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 13px 15px;
+      font-size: 14px;
+      background: #ffffff;
+      outline: none;
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--green-soft);
+      box-shadow: 0 0 0 3px rgba(21,128,61,0.10);
+    }
+
+    .hint {
+      margin-top: 7px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .image-preview {
+      display: none;
+      margin-top: 10px;
+      border: 1px solid #d1e0d7;
+      border-radius: 14px;
+      padding: 10px;
+      background: rgba(255,255,255,0.85);
+    }
+
+    .image-preview img {
+      width: 100%;
+      max-height: 250px;
+      object-fit: contain;
+      border-radius: 12px;
+      display: block;
+      background: #f8fafc;
+    }
+
+    .image-preview-name {
+      display: block;
+      margin-top: 7px;
+      font-size: 12px;
+      color: #52657a;
+      word-break: break-all;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 26px;
+    }
+
+    .btn-submit {
+      min-width: 220px;
+      border: none;
+      border-radius: 999px;
+      padding: 15px 24px;
+      background: linear-gradient(135deg, #15803d, #16a34a);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(22,163,74,0.24);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .message {
+      display: none;
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .message.success {
+      display: block;
+      color: #166534;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+    }
+
+    .message.error {
+      display: block;
+      color: #991b1b;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+    }
+
+    .footer {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .back-link {
+      display: inline-flex;
+      margin-bottom: 14px;
+      color: var(--green-dark);
+      text-decoration: none;
+      font-weight: 900;
+      font-size: 13px;
+      background: rgba(255,255,255,0.86);
+      border: 1px solid rgba(4,57,39,0.14);
+      padding: 10px 15px;
+      border-radius: 999px;
+    }
+
+    @media (max-width: 720px) {
+      .header {
+        align-items: flex-start;
+      }
+
+      .header img {
+        width: 64px;
+        height: 64px;
+      }
+
+      .title {
+        font-size: 22px;
+      }
+
+      .form-title h1 {
+        font-size: 24px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <a href="/" class="back-link">← Kembali ke Beranda</a>
+
+    <section class="card">
+      <header class="header">
+        <img
+          src="https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Logo-Kejaksaan%20%281%29%281%29.png"
+          alt="Logo Kejaksaan"
+        />
+
+        <div>
+          <div class="org">Kejaksaan Republik Indonesia</div>
+          <div class="title">Kejaksaan Negeri Muna</div>
+          <div class="subtitle">Layanan Aduan Program Makanan Bergizi Gratis</div>
+        </div>
+      </header>
+
+      <div class="form-title">
+        <h1>Form Layanan Aduan MBG</h1>
+        <p>Sampaikan aduan, keluhan, atau informasi terkait pelaksanaan Program MBG.</p>
+      </div>
+
+      <form id="formAduan">
+        <div class="grid">
+          <div class="field">
+            <label for="nama">Nama Lengkap</label>
+            <input type="text" id="nama" name="nama" placeholder="Masukkan nama lengkap" required />
+          </div>
+
+          <div class="field">
+            <label for="nomorHp">Nomor HP</label>
+            <input type="tel" id="nomorHp" name="nomorHp" placeholder="Contoh: 081234567890" required />
+          </div>
+
+          <div class="field full">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Masukkan email aktif" required />
+          </div>
+
+          <div class="field full">
+            <label for="aduan">Aduan</label>
+            <textarea id="aduan" name="aduan" placeholder="Tuliskan isi aduan secara jelas..." required></textarea>
+          </div>
+
+          <div class="field full">
+            <label for="buktiAduan">Bukti Aduan</label>
+            <input
+              type="file"
+              id="buktiAduan"
+              name="buktiAduan"
+              accept="image/*"
+              onchange="previewSelectedImage(this)"
+              required
+            />
+            <div class="hint">Format disarankan JPG, JPEG, atau PNG. Ukuran maksimal 5 MB.</div>
+
+            <div class="image-preview" id="previewBox">
+              <img src="" alt="Preview Bukti Aduan" id="previewImage" />
+              <span class="image-preview-name" id="previewName"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn-submit" id="btnKirim">
+            Kirim Aduan
+          </button>
+        </div>
+
+        <div id="messageBox" class="message"></div>
+      </form>
+    </section>
+
+    <div class="footer">
+      Kejaksaan Negeri Muna · Layanan Aduan MBG
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("formAduan");
+    const messageBox = document.getElementById("messageBox");
+    const btnKirim = document.getElementById("btnKirim");
+
+    const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
+    const COMPRESS_MAX_WIDTH = 1600;
+    const COMPRESS_MAX_HEIGHT = 1600;
+    const JPEG_QUALITY = 0.72;
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const nama = document.getElementById("nama").value.trim();
+      const nomorHp = document.getElementById("nomorHp").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const aduan = document.getElementById("aduan").value.trim();
+      const buktiFile = document.getElementById("buktiAduan").files[0];
+
+      if (!nama || !nomorHp || !email || !aduan || !buktiFile) {
+        showMessage("Mohon lengkapi seluruh data aduan terlebih dahulu.", "error");
+        return;
+      }
+
+      if (!buktiFile.type.startsWith("image/")) {
+        showMessage("Bukti aduan harus berupa gambar.", "error");
+        return;
+      }
+
+      if (buktiFile.size > MAX_UPLOAD_SIZE) {
+        showMessage("Ukuran bukti aduan maksimal 5 MB.", "error");
+        return;
+      }
+
+      btnKirim.disabled = true;
+      btnKirim.textContent = "Mengompresi bukti...";
+
+      try {
+        const buktiAduan = await compressImageToBase64(buktiFile, "bukti-aduan-mbg.jpg");
+
+        btnKirim.textContent = "Mengirim Aduan...";
+
+        const payload = {
+          nama: nama,
+          nomorHp: nomorHp,
+          email: email,
+          aduan: aduan,
+          buktiAduan: buktiAduan
+        };
+
+        const res = await fetch("/api/save-aduan", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          showMessage("Aduan berhasil dikirim. Terima kasih atas laporan Anda.", "success");
+          form.reset();
+          resetPreview();
+        } else {
+          showMessage(result.message || "Aduan gagal dikirim.", "error");
+        }
+
+      } catch (error) {
+        console.error(error);
+        showMessage("Gagal mengirim aduan. Silakan coba lagi.", "error");
+
+      } finally {
+        btnKirim.disabled = false;
+        btnKirim.textContent = "Kirim Aduan";
+      }
+    });
+
+    function previewSelectedImage(input) {
+      const file = input.files[0];
+      const previewBox = document.getElementById("previewBox");
+      const previewImage = document.getElementById("previewImage");
+      const previewName = document.getElementById("previewName");
+
+      if (!file) {
+        resetPreview();
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        showMessage("File harus berupa gambar JPG, JPEG, atau PNG.", "error");
+        input.value = "";
+        resetPreview();
+        return;
+      }
+
+      if (file.size > MAX_UPLOAD_SIZE) {
+        showMessage("Ukuran bukti aduan maksimal 5 MB.", "error");
+        input.value = "";
+        resetPreview();
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        previewImage.src = e.target.result;
+        previewName.textContent = file.name;
+        previewBox.style.display = "block";
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function resetPreview() {
+      const previewBox = document.getElementById("previewBox");
+      const previewImage = document.getElementById("previewImage");
+      const previewName = document.getElementById("previewName");
+
+      previewImage.src = "";
+      previewName.textContent = "";
+      previewBox.style.display = "none";
+    }
+
+    function compressImageToBase64(file, newFileName) {
+      return new Promise(function(resolve, reject) {
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+          const img = new Image();
+
+          img.onload = function() {
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > COMPRESS_MAX_WIDTH) {
+                height = Math.round(height * COMPRESS_MAX_WIDTH / width);
+                width = COMPRESS_MAX_WIDTH;
+              }
+            } else {
+              if (height > COMPRESS_MAX_HEIGHT) {
+                width = Math.round(width * COMPRESS_MAX_HEIGHT / height);
+                height = COMPRESS_MAX_HEIGHT;
+              }
+            }
+
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const compressedDataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+            const base64 = compressedDataUrl.split(",")[1];
+
+            resolve({
+              fileName: newFileName,
+              mimeType: "image/jpeg",
+              data: base64,
+              originalName: file.name,
+              originalSize: file.size
+            });
+          };
+
+          img.onerror = function() {
+            reject(new Error("Gagal membaca gambar."));
+          };
+
+          img.src = event.target.result;
+        };
+
+        reader.onerror = function() {
+          reject(new Error("Gagal membaca file."));
+        };
+
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function showMessage(message, type) {
+      messageBox.textContent = message;
+      messageBox.className = "message " + type;
+    }
+  </script>
+</body>
+</html>
