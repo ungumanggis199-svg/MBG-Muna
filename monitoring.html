@@ -1234,7 +1234,7 @@ function handleApplyFilter() {
   updateHolidayNoticeForSelectedDate();
   renderDashboard();
 }
-    function renderDashboard() {
+function renderDashboard() {
   const reportDate = document.getElementById("reportDate");
   const reportMonth = document.getElementById("reportMonth");
 
@@ -1246,6 +1246,8 @@ function handleApplyFilter() {
     reportMonth.value = reportDate.value.slice(0, 7);
   }
 
+  updateHolidayNoticeForSelectedDate();
+
   renderReportHeader();
   renderExecutive();
   renderSummary();
@@ -1254,31 +1256,57 @@ function handleApplyFilter() {
   renderRecap();
   renderFooter();
 }
+    
+function renderReportHeader() {
+  const titleSub = document.getElementById("reportTitleSub");
+  const periodLabel = document.getElementById("periodLabel");
+  const periodValue = document.getElementById("periodValue");
 
-    function renderReportHeader() {
-      const titleSub = document.getElementById("reportTitleSub");
-      const periodLabel = document.getElementById("periodLabel");
-      const periodValue = document.getElementById("periodValue");
+  if (!titleSub || !periodLabel || !periodValue) return;
 
-      if (activeTab === "daily") {
-      const selectedDate = document.getElementById("reportDate").value;
+  if (activeTab === "daily") {
+    const selectedDate = normalizeDate(document.getElementById("reportDate").value);
 
-      titleSub.textContent = "Laporan Harian";
-      periodLabel.textContent = "Tanggal";
-      periodValue.textContent = isOperationalDate(selectedDate)
-    ? formatTanggalShortCard(selectedDate)
-    : formatTanggalShortCard(selectedDate) + " · Hari Libur";
-}
-      } else if (activeTab === "monthly") {
-        titleSub.textContent = "Laporan Bulanan";
-        periodLabel.textContent = "Bulan";
-        periodValue.textContent = formatMonthLabel(document.getElementById("reportMonth").value);
-      } else {
-        titleSub.textContent = "Laporan Bulanan per SPPG";
-        periodLabel.textContent = "SPPG";
-        periodValue.textContent = document.getElementById("reportSppg").value || "-";
-      }
+    titleSub.textContent = "Laporan Harian";
+    periodLabel.textContent = "Tanggal";
+
+    if (!selectedDate) {
+      periodValue.textContent = "-";
+    } else if (isOperationalDate(selectedDate)) {
+      periodValue.textContent = formatTanggalShortCard(selectedDate);
+    } else {
+      periodValue.textContent = formatTanggalShortCard(selectedDate) + " · Hari Libur";
     }
+
+    return;
+  }
+
+  if (activeTab === "monthly") {
+    const selectedMonth = document.getElementById("reportMonth").value;
+
+    titleSub.textContent = "Laporan Bulanan";
+    periodLabel.textContent = "Bulan";
+    periodValue.textContent = selectedMonth ? formatMonthLabel(selectedMonth) : "-";
+
+    return;
+  }
+
+  if (activeTab === "sppgMonthly") {
+    const selectedMonth = document.getElementById("reportMonth").value;
+    const selectedSppg = document.getElementById("reportSppg").value;
+
+    titleSub.textContent = "Laporan Bulanan per SPPG";
+    periodLabel.textContent = "SPPG";
+
+    if (selectedSppg && selectedMonth) {
+      periodValue.textContent = selectedSppg + " · " + formatMonthLabel(selectedMonth);
+    } else {
+      periodValue.textContent = selectedSppg || "-";
+    }
+
+    return;
+  }
+}
 
     function getFilteredRows() {
       const dateValue = document.getElementById("reportDate").value;
