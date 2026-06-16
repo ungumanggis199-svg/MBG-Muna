@@ -1055,6 +1055,130 @@
 .pdf-mode .recap-mobile {
   display: none !important;
 }
+/* FORCE DESKTOP LAYOUT SAAT EXPORT PDF */
+.pdf-mode .topbar,
+.pdf-mode .controls-card,
+.pdf-mode #errorBox {
+  display: none !important;
+}
+
+.pdf-mode .page {
+  width: 1320px !important;
+  max-width: 1320px !important;
+  min-width: 1320px !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+}
+
+.pdf-mode .report-area {
+  width: 1320px !important;
+  max-width: 1320px !important;
+  min-width: 1320px !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 18px !important;
+  background: #ffffff !important;
+}
+
+.pdf-mode .report-header {
+  display: grid !important;
+  grid-template-columns: 180px 1fr 180px !important;
+  align-items: center !important;
+  gap: 16px !important;
+  text-align: left !important;
+}
+
+.pdf-mode .report-logo-box {
+  text-align: center !important;
+}
+
+.pdf-mode .report-grid {
+  display: grid !important;
+  grid-template-columns: 300px 1fr !important;
+  gap: 16px !important;
+}
+
+.pdf-mode .summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 12px !important;
+}
+
+.pdf-mode .status-strip {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 12px !important;
+}
+
+.pdf-mode .gallery-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 12px !important;
+}
+
+.pdf-mode .doc-images {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+}
+
+.pdf-mode .recap-desktop {
+  display: block !important;
+}
+
+.pdf-mode .recap-mobile {
+  display: none !important;
+}
+
+.pdf-mode .recap-wrap {
+  overflow: visible !important;
+}
+
+.pdf-mode .recap-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.pdf-mode .recap-table th,
+.pdf-mode .recap-table td {
+  font-size: 10px !important;
+  padding: 6px 4px !important;
+}
+
+.pdf-mode .recap-table th.sticky-left,
+.pdf-mode .recap-table td.sticky-left {
+  position: static !important;
+  left: auto !important;
+  min-width: 170px !important;
+  max-width: 170px !important;
+  width: 170px !important;
+}
+
+.pdf-mode .date-col {
+  min-width: 28px !important;
+  width: 28px !important;
+}
+
+.pdf-mode .status-icon {
+  width: 18px !important;
+  height: 18px !important;
+  font-size: 10px !important;
+}
+
+.pdf-mode .legend {
+  page-break-inside: avoid !important;
+}
+
+.pdf-mode .section,
+.pdf-mode .panel,
+.pdf-mode .summary-card,
+.pdf-mode .status-box,
+.pdf-mode .doc-card {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
     
   </style>
 </head>
@@ -1219,10 +1343,11 @@
 
   <script>
   let monitoringData = [];
-  let allSppgList = [];
-  let activeTab = "daily";
-  let activeGallery = "all";
-  let holidayMap = {};
+let allSppgList = [];
+let activeTab = "daily";
+let activeGallery = "all";
+let holidayMap = {};
+let isExportingPDF = false;
 
     document.addEventListener("DOMContentLoaded", async function () {
       bindEvents();
@@ -1777,7 +1902,7 @@ function getScopeDates() {
     </div>
   `;
 }
-    function renderRecap() {
+   function renderRecap() {
   const rows = getFilteredRows();
   const scopeSppg = getScopeSppgList();
   const scopeDates = getScopeDates();
@@ -1787,9 +1912,10 @@ function getScopeDates() {
   const recapBody = document.getElementById("recapBody");
   const recapMobile = document.getElementById("recapMobile");
 
-  const isMobile = window.matchMedia("(max-width: 720px)").matches;
+  const isMobileScreen = window.matchMedia("(max-width: 720px)").matches;
+  const useMobileRecap = isMobileScreen && !isExportingPDF;
 
-  if (isMobile) {
+  if (useMobileRecap) {
     if (recapHead) recapHead.innerHTML = "";
     if (recapBody) recapBody.innerHTML = "";
     renderRecapMobile(scopeSppg, scopeDates, presenceMap);
@@ -1806,7 +1932,7 @@ function getScopeDates() {
     const emptyMessage = getRecapEmptyMessage();
 
     recapBody.innerHTML =
-      '<tr><td class="empty-state">' + escapeHtml(emptyMessage) + '</td></tr>';
+      '<tr><td class="empty-state" colspan="4">' + escapeHtml(emptyMessage) + '</td></tr>';
 
     return;
   }
@@ -1963,47 +2089,85 @@ function getRecapEmptyMessage() {
   return "Tidak ada data rekapitulasi.";
 }
     async function exportReportPDF() {
-      const element = document.getElementById("pdfReportArea");
-      const title = buildExportTitle();
-      const filename = title + ".pdf";
+  const element = document.getElementById("pdfReportArea");
+  const title = buildExportTitle();
+  const filename = title + ".pdf";
 
-      document.body.classList.add("pdf-mode");
-      await waitForImages(element);
+  if (!element) {
+    alert("Area laporan tidak ditemukan.");
+    return;
+  }
 
-      const opt = {
-        margin: 6,
-        filename: filename,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          allowTaint: false,
-          imageTimeout: 15000,
-          scrollY: 0
-        },
-        jsPDF: {
-          unit: "mm",
-          format: "a4",
-          orientation: "landscape"
-        },
-        pagebreak: {
-          mode: ["avoid-all", "css", "legacy"]
-        }
-      };
+  const oldBodyWidth = document.body.style.width;
+  const oldPageOverflow = document.documentElement.style.overflowX;
+  const oldElementWidth = element.style.width;
+  const oldElementMaxWidth = element.style.maxWidth;
 
-      html2pdf()
-        .set(opt)
-        .from(element)
-        .save()
-        .then(function () {
-          document.body.classList.remove("pdf-mode");
-        })
-        .catch(function (error) {
-          console.error(error);
-          document.body.classList.remove("pdf-mode");
-          alert("Gagal membuat PDF. Silakan coba lagi.");
-        });
-    }
+  try {
+    isExportingPDF = true;
+
+    document.body.classList.add("pdf-mode");
+    document.body.style.width = "1320px";
+    document.documentElement.style.overflowX = "visible";
+
+    element.style.width = "1320px";
+    element.style.maxWidth = "1320px";
+
+    renderDashboard();
+
+    await new Promise(function(resolve) {
+      setTimeout(resolve, 500);
+    });
+
+    await waitForImages(element);
+
+    const opt = {
+      margin: [6, 6, 6, 6],
+      filename: filename,
+      image: {
+        type: "jpeg",
+        quality: 0.98
+      },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        imageTimeout: 20000,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 1320,
+        width: 1320
+      },
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "landscape"
+      },
+      pagebreak: {
+        mode: ["css", "legacy"]
+      }
+    };
+
+    await html2pdf()
+      .set(opt)
+      .from(element)
+      .save();
+
+  } catch (error) {
+    console.error(error);
+    alert("Gagal membuat PDF. Silakan coba lagi.");
+  } finally {
+    document.body.classList.remove("pdf-mode");
+
+    document.body.style.width = oldBodyWidth;
+    document.documentElement.style.overflowX = oldPageOverflow;
+    element.style.width = oldElementWidth;
+    element.style.maxWidth = oldElementMaxWidth;
+
+    isExportingPDF = false;
+    renderDashboard();
+  }
+}
 
     function buildExportTitle() {
       const today = new Date().toISOString().slice(0, 10);
