@@ -8,7 +8,9 @@
 <link rel="apple-touch-icon" href="/Logo-Kejaksaan%20(1)(1).png?v=2" />
   <title>Monitoring Distribusi MBG - Kejaksaan Negeri Muna</title>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     :root {
@@ -2351,6 +2353,59 @@ function getRecapEmptyMessage() {
 
   return "Tidak ada data rekapitulasi.";
 }
+  function loadScriptOnce(src) {
+  return new Promise(function(resolve, reject) {
+    const existing = Array.from(document.scripts).find(function(script) {
+      return script.src === src;
+    });
+
+    if (existing) {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = false;
+
+    script.onload = function() {
+      resolve();
+    };
+
+    script.onerror = function() {
+      reject(new Error("Gagal memuat script: " + src));
+    };
+
+    document.head.appendChild(script);
+  });
+}
+
+async function ensurePdfLibraries() {
+  if (typeof window.html2canvas === "undefined") {
+    await loadScriptOnce("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js");
+  }
+
+  if (
+    typeof window.jspdf === "undefined" ||
+    !window.jspdf ||
+    !window.jspdf.jsPDF
+  ) {
+    await loadScriptOnce("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js");
+  }
+
+  if (typeof window.html2canvas === "undefined") {
+    throw new Error("Library html2canvas belum terbaca. Cek koneksi internet atau CDN diblokir.");
+  }
+
+  if (
+    typeof window.jspdf === "undefined" ||
+    !window.jspdf ||
+    !window.jspdf.jsPDF
+  ) {
+    throw new Error("Library jsPDF belum terbaca. Cek koneksi internet atau CDN diblokir.");
+  }
+}
+    
    async function exportReportPDF() {
   const sourceElement = document.getElementById("pdfReportArea");
   const title = buildExportTitle();
@@ -2361,20 +2416,16 @@ function getRecapEmptyMessage() {
     return;
   }
 
-  if (typeof html2canvas === "undefined") {
-    alert("Library html2canvas belum terbaca.");
-    return;
-  }
+try {
+  await ensurePdfLibraries();
+} catch (libraryError) {
+  console.error(libraryError);
+  alert(libraryError.message || "Library PDF belum terbaca.");
+  return;
+}
 
-  const jsPDFCtor =
-    window.jspdf && window.jspdf.jsPDF
-      ? window.jspdf.jsPDF
-      : window.jsPDF;
-
-  if (!jsPDFCtor) {
-    alert("Library jsPDF belum terbaca.");
-    return;
-  }
+const html2canvasLib = window.html2canvas;
+const jsPDFCtor = window.jspdf.jsPDF;
 
   let exportHost = null;
 
@@ -2410,7 +2461,7 @@ function getRecapEmptyMessage() {
 
     const exportWidth = 1200;
 
-    const canvas = await html2canvas(clonedReport, {
+    const canvas = await html2canvasLib(clonedReport, {
       scale: 2,
       useCORS: true,
       allowTaint: false,
