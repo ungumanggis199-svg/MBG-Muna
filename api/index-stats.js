@@ -1,4 +1,6 @@
 export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+
   if (req.method !== "GET") {
     return res.status(405).json({
       success: false,
@@ -33,8 +35,7 @@ export default async function handler(req, res) {
       });
     }
 
-    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-return res.status(200).json(result);
+    return res.status(200).json(result);
 
   } catch (error) {
     return res.status(500).json({
