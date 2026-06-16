@@ -1179,6 +1179,127 @@
   page-break-inside: avoid !important;
   break-inside: avoid !important;
 }
+/* KHUSUS CLONE EXPORT PDF - AGAR HP DAN PC HASILNYA SAMA */
+.export-pdf-host {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 1320px !important;
+  min-width: 1320px !important;
+  max-width: 1320px !important;
+  background: #ffffff !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+  overflow: visible !important;
+}
+
+.export-pdf-host .report-area {
+  width: 1320px !important;
+  min-width: 1320px !important;
+  max-width: 1320px !important;
+  padding: 18px !important;
+  margin: 0 !important;
+  background: #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.export-pdf-host .report-header {
+  display: grid !important;
+  grid-template-columns: 180px 1fr 180px !important;
+  align-items: center !important;
+  gap: 16px !important;
+  text-align: left !important;
+}
+
+.export-pdf-host .report-logo-box {
+  text-align: center !important;
+}
+
+.export-pdf-host .report-grid {
+  display: grid !important;
+  grid-template-columns: 300px 1fr !important;
+  gap: 16px !important;
+}
+
+.export-pdf-host .summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 12px !important;
+}
+
+.export-pdf-host .status-strip {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 12px !important;
+}
+
+.export-pdf-host .gallery-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 12px !important;
+}
+
+.export-pdf-host .doc-images {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+}
+
+.export-pdf-host .recap-desktop {
+  display: block !important;
+}
+
+.export-pdf-host .recap-mobile {
+  display: none !important;
+}
+
+.export-pdf-host .recap-wrap {
+  overflow: visible !important;
+}
+
+.export-pdf-host .recap-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.export-pdf-host .recap-table th,
+.export-pdf-host .recap-table td {
+  font-size: 10px !important;
+  padding: 6px 4px !important;
+}
+
+.export-pdf-host .recap-table th.sticky-left,
+.export-pdf-host .recap-table td.sticky-left {
+  position: static !important;
+  left: auto !important;
+  min-width: 170px !important;
+  max-width: 170px !important;
+  width: 170px !important;
+}
+
+.export-pdf-host .date-col {
+  min-width: 28px !important;
+  width: 28px !important;
+}
+
+.export-pdf-host .status-icon {
+  width: 18px !important;
+  height: 18px !important;
+  font-size: 10px !important;
+}
+
+.export-pdf-host .section,
+.export-pdf-host .panel,
+.export-pdf-host .summary-card,
+.export-pdf-host .status-box,
+.export-pdf-host .doc-card {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
     
   </style>
 </head>
@@ -2089,37 +2210,39 @@ function getRecapEmptyMessage() {
   return "Tidak ada data rekapitulasi.";
 }
     async function exportReportPDF() {
-  const element = document.getElementById("pdfReportArea");
+  const sourceElement = document.getElementById("pdfReportArea");
   const title = buildExportTitle();
   const filename = title + ".pdf";
 
-  if (!element) {
+  if (!sourceElement) {
     alert("Area laporan tidak ditemukan.");
     return;
   }
 
-  const oldBodyWidth = document.body.style.width;
-  const oldPageOverflow = document.documentElement.style.overflowX;
-  const oldElementWidth = element.style.width;
-  const oldElementMaxWidth = element.style.maxWidth;
+  let exportHost = null;
 
   try {
     isExportingPDF = true;
 
-    document.body.classList.add("pdf-mode");
-    document.body.style.width = "1320px";
-    document.documentElement.style.overflowX = "visible";
-
-    element.style.width = "1320px";
-    element.style.maxWidth = "1320px";
-
+    // Render ulang supaya rekap yang dipakai adalah versi desktop,
+    // bukan versi mobile card.
     renderDashboard();
 
     await new Promise(function(resolve) {
       setTimeout(resolve, 500);
     });
 
-    await waitForImages(element);
+    exportHost = document.createElement("div");
+    exportHost.className = "export-pdf-host";
+
+    const clonedReport = sourceElement.cloneNode(true);
+    clonedReport.id = "pdfReportAreaExport";
+    clonedReport.classList.add("pdf-export-area");
+
+    exportHost.appendChild(clonedReport);
+    document.body.appendChild(exportHost);
+
+    await waitForImages(clonedReport);
 
     const opt = {
       margin: [6, 6, 6, 6],
@@ -2132,6 +2255,7 @@ function getRecapEmptyMessage() {
         scale: 2,
         useCORS: true,
         allowTaint: false,
+        backgroundColor: "#ffffff",
         imageTimeout: 20000,
         scrollX: 0,
         scrollY: 0,
@@ -2144,25 +2268,29 @@ function getRecapEmptyMessage() {
         orientation: "landscape"
       },
       pagebreak: {
-        mode: ["css", "legacy"]
+        mode: ["css", "legacy"],
+        avoid: [
+          ".summary-card",
+          ".status-box",
+          ".panel",
+          ".doc-card",
+          ".legend"
+        ]
       }
     };
 
     await html2pdf()
       .set(opt)
-      .from(element)
+      .from(clonedReport)
       .save();
 
   } catch (error) {
     console.error(error);
     alert("Gagal membuat PDF. Silakan coba lagi.");
   } finally {
-    document.body.classList.remove("pdf-mode");
-
-    document.body.style.width = oldBodyWidth;
-    document.documentElement.style.overflowX = oldPageOverflow;
-    element.style.width = oldElementWidth;
-    element.style.maxWidth = oldElementMaxWidth;
+    if (exportHost && exportHost.parentNode) {
+      exportHost.parentNode.removeChild(exportHost);
+    }
 
     isExportingPDF = false;
     renderDashboard();
