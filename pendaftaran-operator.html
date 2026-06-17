@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="icon" type="image/png" href="/favicon.png?v=2" />
+  <link rel="shortcut icon" type="image/png" href="/favicon.png?v=2" />
+  <link rel="apple-touch-icon" href="/favicon.png?v=2" />
+
+  <title>Pendaftaran Operator SPPG - Kejaksaan Negeri Muna</title>
+
+  <style>
+    :root {
+      --green-900: #0a4f2d;
+      --green-800: #0f6a3a;
+      --green-700: #15803d;
+      --green-600: #16a34a;
+      --green-100: #eaf7ee;
+      --text: #102015;
+      --muted: #64748b;
+      --border: #dbe8de;
+      --danger: #dc2626;
+      --danger-soft: #fee2e2;
+      --success-soft: #dcfce7;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)),
+        url("https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Background%20Form.png");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 14px;
+    }
+
+    .form-page {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.96);
+      border: 1px solid rgba(10,79,45,0.14);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 26px 24px 20px;
+      text-align: center;
+      border-bottom: 1px solid #e5eee9;
+      background: linear-gradient(180deg, #ffffff, #f7fbf8);
+    }
+
+    .logo {
+      width: 82px;
+      height: 82px;
+      object-fit: contain;
+      margin-bottom: 12px;
+    }
+
+    .title-small {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      color: var(--green-800);
+      text-transform: uppercase;
+    }
+
+    .title-main {
+      margin-top: 5px;
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--green-900);
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    .title-sub {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .card-body {
+      padding: 22px 24px 24px;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--green-900);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
+      background: #ffffff;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--green-700);
+      box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.12);
+    }
+
+    .hint {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .btn-submit {
+      width: 100%;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 18px;
+      margin-top: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 900;
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--green-900), var(--green-600));
+      box-shadow: 0 10px 24px rgba(21, 128, 61, 0.22);
+    }
+
+    .btn-submit:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+      box-shadow: none;
+    }
+
+    .alert {
+      display: none;
+      margin-bottom: 16px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .alert.error {
+      display: block;
+      color: #991b1b;
+      background: var(--danger-soft);
+      border: 1px solid #fca5a5;
+    }
+
+    .alert.success {
+      display: block;
+      color: #166534;
+      background: var(--success-soft);
+      border: 1px solid #86efac;
+    }
+
+    .success-screen {
+      display: none;
+      padding: 42px 26px;
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 18px;
+      border-radius: 999px;
+      background: var(--success-soft);
+      color: #15803d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: 900;
+    }
+
+    .success-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--green-900);
+      line-height: 1.25;
+    }
+
+    .success-sub {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .back-link {
+      display: inline-flex;
+      margin-top: 18px;
+      color: var(--green-900);
+      font-weight: 900;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    @media (max-width: 520px) {
+      .card-header {
+        padding: 22px 18px 18px;
+      }
+
+      .card-body {
+        padding: 20px 18px 22px;
+      }
+
+      .title-main {
+        font-size: 20px;
+      }
+
+      .logo {
+        width: 72px;
+        height: 72px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="form-page">
+    <section class="card" id="formCard">
+      <div class="card-header">
+        <img
+          class="logo"
+          src="https://raw.githubusercontent.com/ungumanggis199-svg/MBG-Muna/main/Logo-Kejaksaan%20%281%29%281%29.png"
+          alt="Logo Kejaksaan"
+        />
+
+        <div class="title-small">Kejaksaan Negeri Muna</div>
+        <div class="title-main">Pendaftaran Operator SPPG</div>
+        <div class="title-sub">
+          Form ini digunakan untuk mendaftarkan email operator SPPG sebagai username login aplikasi monitoring MBG.
+        </div>
+      </div>
+
+      <div class="card-body" id="formBody">
+        <div id="alertBox" class="alert"></div>
+
+        <form id="operatorForm">
+          <div class="field">
+            <label for="namaSppg">Nama SPPG</label>
+            <select id="namaSppg" name="namaSppg" required>
+              <option value="">Memuat daftar SPPG...</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="namaOperator">Nama Operator</label>
+            <input
+              type="text"
+              id="namaOperator"
+              name="namaOperator"
+              placeholder="Masukkan nama lengkap operator"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="contoh: operator@email.com"
+              required
+            />
+            <div class="hint">Email wajib mengandung tanda @ dan akan digunakan sebagai username login.</div>
+          </div>
+
+          <div class="field">
+            <label for="nomorWhatsapp">Nomor Whatsapp</label>
+            <input
+              type="tel"
+              id="nomorWhatsapp"
+              name="nomorWhatsapp"
+              placeholder="contoh: 081234567890"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            Daftar
+          </button>
+        </form>
+      </div>
+
+      <div class="success-screen" id="successScreen">
+        <div class="success-icon">✓</div>
+        <div class="success-title">Pendaftaran email SPPG Berhasil</div>
+        <div class="success-sub">
+          Data operator sudah tersimpan. Email yang didaftarkan akan digunakan sebagai username login aplikasi.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      loadSppgList();
+      bindForm();
+    });
+
+    async function loadSppgList() {
+      const select = document.getElementById("namaSppg");
+
+      try {
+        const response = await fetch("/api/list-sppg?t=" + Date.now(), {
+          cache: "no-store"
+        });
+
+        const json = await response.json();
+
+        if (!json.success || !Array.isArray(json.data)) {
+          throw new Error(json.message || "Gagal memuat daftar SPPG.");
+        }
+
+        const list = json.data.filter(Boolean);
+
+        if (list.length === 0) {
+          select.innerHTML = '<option value="">Tidak ada SPPG aktif</option>';
+          return;
+        }
+
+        select.innerHTML = '<option value="">Pilih Nama SPPG</option>';
+
+        list.forEach(function(item) {
+          const option = document.createElement("option");
+          option.value = item;
+          option.textContent = item;
+          select.appendChild(option);
+        });
+
+      } catch (error) {
+        console.error(error);
+        select.innerHTML = '<option value="">Gagal memuat daftar SPPG</option>';
+        showAlert("Gagal memuat daftar SPPG. Silakan refresh halaman.", "error");
+      }
+    }
+
+    function bindForm() {
+      const form = document.getElementById("operatorForm");
+
+      form.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const namaSppg = document.getElementById("namaSppg").value.trim();
+        const namaOperator = document.getElementById("namaOperator").value.trim();
+        const email = document.getElementById("email").value.trim().toLowerCase();
+        const nomorWhatsapp = document.getElementById("nomorWhatsapp").value.trim();
+
+        if (!namaSppg || !namaOperator || !email || !nomorWhatsapp) {
+          showAlert("Semua field wajib diisi.", "error");
+          return;
+        }
+
+        if (!email.includes("@") || email.indexOf("@") === 0 || email.endsWith("@")) {
+          showAlert("Format email tidak valid. Email wajib mengandung tanda @.", "error");
+          return;
+        }
+
+        await submitOperatorRegistration({
+          namaSppg: namaSppg,
+          namaOperator: namaOperator,
+          email: email,
+          nomorWhatsapp: nomorWhatsapp
+        });
+      });
+    }
+
+    async function submitOperatorRegistration(payload) {
+      const submitBtn = document.getElementById("submitBtn");
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Mendaftarkan...";
+
+        const response = await fetch("/api/register-operator", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          cache: "no-store",
+          body: JSON.stringify(payload)
+        });
+
+        const json = await response.json();
+
+        if (!json.success) {
+          throw new Error(json.message || "Pendaftaran gagal.");
+        }
+
+        showSuccessScreen();
+
+      } catch (error) {
+        console.error(error);
+        showAlert(error.message || "Pendaftaran gagal. Silakan coba lagi.", "error");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Daftar";
+      }
+    }
+
+    function showAlert(message, type) {
+      const alertBox = document.getElementById("alertBox");
+      alertBox.className = "alert " + (type || "error");
+      alertBox.textContent = message;
+      alertBox.style.display = "block";
+    }
+
+    function showSuccessScreen() {
+      document.getElementById("formBody").style.display = "none";
+      document.getElementById("successScreen").style.display = "block";
+    }
+  </script>
+</body>
+</html>
