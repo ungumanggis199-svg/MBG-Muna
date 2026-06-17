@@ -1738,7 +1738,13 @@
   break-inside: avoid !important;
   page-break-inside: avoid !important;
 }
-    
+  .exec-label-top {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--green-900);
+  line-height: 1.35;
+  margin-bottom: 2px;
+}  
   </style>
 </head>
 <body>
@@ -1931,12 +1937,18 @@
   </main>
 
   <script>
-  let monitoringData = [];
+let monitoringData = [];
 let allSppgList = [];
 let activeTab = "daily";
 let activeGallery = "all";
 let holidayMap = {};
 let isExportingPDF = false;
+
+let sppgSummary = {
+  totalSppg: 0,
+  totalAktif: 0,
+  totalNonaktif: 0
+};
 
     document.addEventListener("DOMContentLoaded", async function () {
       bindEvents();
@@ -2031,7 +2043,20 @@ window.addEventListener("resize", function() {
       : [...new Set(monitoringData.map(function(item) {
           return item.namaSppg;
         }).filter(Boolean))];
-
+if (sppgJson && sppgJson.success && sppgJson.summary) {
+  sppgSummary = {
+    totalSppg: Number(sppgJson.summary.totalSppg || 0),
+    totalAktif: Number(sppgJson.summary.totalAktif || 0),
+    totalNonaktif: Number(sppgJson.summary.totalNonaktif || 0)
+  };
+} else {
+  sppgSummary = {
+    totalSppg: allSppgList.length,
+    totalAktif: allSppgList.length,
+    totalNonaktif: 0
+  };
+}
+    
     holidayMap = normalizeHolidayMap(
       holidaysJson && holidaysJson.success && Array.isArray(holidaysJson.data)
         ? holidaysJson.data
@@ -2271,51 +2296,94 @@ function getScopeDates() {
     }
 
     function renderExecutive() {
-      const rows = getFilteredRows();
-      const scopeSppg = getScopeSppgList();
-      const scopeDates = getScopeDates();
-      const presenceMap = buildPresenceMap(rows);
+  const rows = getFilteredRows();
+  const scopeSppg = getScopeSppgList();
+  const scopeDates = getScopeDates();
+  const presenceMap = buildPresenceMap(rows);
 
-      let checkedCells = 0;
-      scopeSppg.forEach(function (sppg) {
-        scopeDates.forEach(function (date) {
-          const key = sppg + "||" + date;
-          if (presenceMap[key]) checkedCells += 1;
-        });
-      });
+  let checkedCells = 0;
 
-      const totalSlots = scopeSppg.length * scopeDates.length;
-      const compliance = totalSlots > 0 ? Math.round((checkedCells / totalSlots) * 100) : 0;
+  scopeSppg.forEach(function(sppg) {
+    scopeDates.forEach(function(date) {
+      const key = sppg + "||" + date;
+      if (presenceMap[key]) checkedCells += 1;
+    });
+  });
 
-      const updatedSppgSet = new Set(rows.map(item => item.namaSppg).filter(Boolean));
-      const notUpdated = Math.max(scopeSppg.length - updatedSppgSet.size, 0);
+  const totalSlots = scopeSppg.length * scopeDates.length;
+  const compliance = totalSlots > 0 ? Math.round((checkedCells / totalSlots) * 100) : 0;
 
-      const totalFotoMenu = rows.filter(item => item.linkFotoMenu).length;
-      const totalFotoDistribusi = rows.filter(item => item.linkFotoDistribusi).length;
+  const updatedSppgSet = new Set(rows.map(function(item) {
+    return item.namaSppg;
+  }).filter(Boolean));
 
-      const items = [
-        { icon: "🏫", value: scopeSppg.length, label: "SPPG Aktif" },
-        { icon: "📝", value: rows.length, label: "Total Monitoring" },
-        { icon: "📅", value: scopeDates.length, label: activeTab === "daily" ? "Tanggal Monitoring" : "Hari Monitoring" },
-        { icon: "✅", value: compliance + "%", label: "Kepatuhan Input" },
-        { icon: "🍱", value: totalFotoMenu, label: "Total Foto Menu" },
-        { icon: "🚚", value: totalFotoDistribusi, label: "Total Foto Distribusi" },
-        { icon: "❌", value: notUpdated, label: "SPPG Belum Upload" }
-      ];
+  const notUpdated = Math.max(scopeSppg.length - updatedSppgSet.size, 0);
 
-      const executiveList = document.getElementById("executiveList");
-      executiveList.innerHTML = items.map(function (item) {
-        return `
-          <div class="exec-item">
-            <div class="exec-icon">${item.icon}</div>
-            <div>
-              <div class="exec-value">${escapeHtml(item.value)}</div>
-              <div class="exec-label">${escapeHtml(item.label)}</div>
-            </div>
-          </div>
-        `;
-      }).join("");
+  const totalFotoMenu = rows.filter(function(item) {
+    return item.linkFotoMenu;
+  }).length;
+
+  const totalFotoDistribusi = rows.filter(function(item) {
+    return item.linkFotoDistribusi;
+  }).length;
+
+  const totalSppg = sppgSummary.totalSppg || scopeSppg.length;
+  const totalSppgAktif = sppgSummary.totalAktif || scopeSppg.length;
+
+  const items = [
+    {
+      icon: "🏫",
+      value: totalSppg,
+      labelTop: "Total SPPG",
+      label: totalSppgAktif + " SPPG Aktif"
+    },
+    {
+      icon: "📝",
+      value: rows.length,
+      label: "Total Monitoring"
+    },
+    {
+      icon: "📅",
+      value: scopeDates.length,
+      label: activeTab === "daily" ? "Tanggal Monitoring" : "Hari Monitoring"
+    },
+    {
+      icon: "✅",
+      value: compliance + "%",
+      label: "Kepatuhan Input"
+    },
+    {
+      icon: "🍱",
+      value: totalFotoMenu,
+      label: "Total Foto Menu"
+    },
+    {
+      icon: "🚚",
+      value: totalFotoDistribusi,
+      label: "Total Foto Distribusi"
+    },
+    {
+      icon: "❌",
+      value: notUpdated,
+      label: "SPPG Belum Upload"
     }
+  ];
+
+  const executiveList = document.getElementById("executiveList");
+
+  executiveList.innerHTML = items.map(function(item) {
+    return `
+      <div class="exec-item">
+        <div class="exec-icon">${item.icon}</div>
+        <div>
+          <div class="exec-value">${escapeHtml(item.value)}</div>
+          ${item.labelTop ? `<div class="exec-label-top">${escapeHtml(item.labelTop)}</div>` : ""}
+          <div class="exec-label">${escapeHtml(item.label)}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
 
     function renderSummary() {
       const rows = getFilteredRows();
