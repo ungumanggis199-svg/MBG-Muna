@@ -1445,6 +1445,163 @@
   break-inside: avoid !important;
   page-break-inside: avoid !important;
 }
+/* MONITORING MENU MAKANAN DAN NILAI GIZI */
+.menu-nutrition-desktop {
+  display: block;
+}
+
+.menu-nutrition-mobile {
+  display: none;
+}
+
+.menu-nutrition-wrap {
+  overflow-x: auto;
+}
+
+.menu-nutrition-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.menu-nutrition-table th,
+.menu-nutrition-table td {
+  border-bottom: 1px solid #edf3ee;
+  padding: 10px 12px;
+  vertical-align: top;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.menu-nutrition-table th {
+  background: #f3f8f5;
+  color: var(--green-900);
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.menu-nutrition-table td {
+  color: #1f2937;
+}
+
+.menu-nutrition-table .menu-date {
+  width: 130px;
+  white-space: nowrap;
+  font-weight: 800;
+  color: var(--green-900);
+}
+
+.menu-nutrition-table .menu-sppg {
+  width: 250px;
+  font-weight: 900;
+  color: var(--green-900);
+}
+
+.menu-text-box,
+.nutrition-text-box {
+  white-space: pre-line;
+}
+
+.nutrition-text-box {
+  font-weight: 700;
+  color: #374151;
+}
+
+.menu-mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-mobile-card {
+  border: 1px solid #dcebe1;
+  border-radius: 16px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.menu-mobile-head {
+  padding: 12px;
+  background: #f7fbf8;
+  border-bottom: 1px solid #e5eee9;
+}
+
+.menu-mobile-sppg {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--green-900);
+  line-height: 1.35;
+}
+
+.menu-mobile-date {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.menu-mobile-body {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.menu-mobile-label {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--green-900);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.menu-mobile-value {
+  font-size: 13px;
+  color: #1f2937;
+  line-height: 1.45;
+  white-space: pre-line;
+}
+
+@media (max-width: 720px) {
+  .menu-nutrition-desktop {
+    display: none;
+  }
+
+  .menu-nutrition-mobile {
+    display: block;
+  }
+}
+
+/* Saat export PDF, paksa pakai tampilan tabel desktop */
+.mbg-pdf-export-host .menu-nutrition-desktop {
+  display: block !important;
+}
+
+.mbg-pdf-export-host .menu-nutrition-mobile {
+  display: none !important;
+}
+
+.mbg-pdf-export-host .menu-nutrition-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+}
+
+.mbg-pdf-export-host .menu-nutrition-table th,
+.mbg-pdf-export-host .menu-nutrition-table td {
+  font-size: 10px !important;
+  padding: 7px 8px !important;
+}
+
+.mbg-pdf-export-host .menu-nutrition-table .menu-date {
+  width: 115px !important;
+}
+
+.mbg-pdf-export-host .menu-nutrition-table .menu-sppg {
+  width: 220px !important;
+}
+    
   </style>
 </head>
 <body>
@@ -1545,6 +1702,36 @@
           <div class="status-strip" id="statusStrip"></div>
         </div>
       </div>
+
+      <!-- BAGIAN MENU DAN NILAI GIZI -->
+<section class="section" id="menuNutritionSection">
+  <div class="section-head">
+    <div>
+      <div class="section-title">Monitoring Menu Makanan dan Nilai Gizi</div>
+      <div class="section-sub">Menampilkan menu makanan dan nilai gizi berdasarkan laporan SPPG pada periode yang dipilih.</div>
+    </div>
+  </div>
+
+  <div class="section-body">
+    <div class="menu-nutrition-desktop">
+      <div class="menu-nutrition-wrap">
+        <table class="menu-nutrition-table">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Nama SPPG</th>
+              <th>Menu Makanan</th>
+              <th>Nilai / Jumlah Gizi</th>
+            </tr>
+          </thead>
+          <tbody id="menuNutritionBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="menuNutritionMobile" class="menu-nutrition-mobile"></div>
+  </div>
+</section>
 
       <!-- BAGIAN 2 -->
       <section class="section">
@@ -1816,12 +2003,13 @@ function renderDashboard() {
   updateHolidayNoticeForSelectedDate();
 
   renderReportHeader();
-  renderExecutive();
-  renderSummary();
-  renderStatusStrip();
-  renderGallery();
-  renderRecap();
-  renderFooter();
+renderExecutive();
+renderSummary();
+renderStatusStrip();
+renderMenuNutrition();
+renderGallery();
+renderRecap();
+renderFooter();
 }
     
 function renderReportHeader() {
@@ -2098,6 +2286,99 @@ function getScopeDates() {
       }).join("");
     }
 
+function renderMenuNutrition() {
+  const rows = getFilteredRows();
+  const tableBody = document.getElementById("menuNutritionBody");
+  const mobileBox = document.getElementById("menuNutritionMobile");
+
+  if (!tableBody || !mobileBox) return;
+
+  const sortedRows = rows.slice().sort(function(a, b) {
+    const dateA = normalizeDate(a.tanggal);
+    const dateB = normalizeDate(b.tanggal);
+
+    if (dateA !== dateB) {
+      return dateB.localeCompare(dateA);
+    }
+
+    return String(a.namaSppg || "").localeCompare(String(b.namaSppg || ""));
+  });
+
+  if (sortedRows.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="4" class="empty-state">
+          Belum ada data menu makanan dan nilai gizi pada periode ini.
+        </td>
+      </tr>
+    `;
+
+    mobileBox.innerHTML = `
+      <div class="empty-state">
+        Belum ada data menu makanan dan nilai gizi pada periode ini.
+      </div>
+    `;
+
+    return;
+  }
+
+  tableBody.innerHTML = sortedRows.map(function(item) {
+    const tanggal = normalizeDate(item.tanggal);
+    const sppg = item.namaSppg || "-";
+    const menu = item.menuMbg || "-";
+    const nilaiGizi = item.nilaiGizi || "-";
+
+    return `
+      <tr>
+        <td class="menu-date">${escapeHtml(formatTanggal(tanggal))}</td>
+        <td class="menu-sppg">${escapeHtml(sppg)}</td>
+        <td>
+          <div class="menu-text-box">${renderSafeMultiline(menu)}</div>
+        </td>
+        <td>
+          <div class="nutrition-text-box">${renderSafeMultiline(nilaiGizi)}</div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  mobileBox.innerHTML = `
+    <div class="menu-mobile-list">
+      ${sortedRows.map(function(item) {
+        const tanggal = normalizeDate(item.tanggal);
+        const sppg = item.namaSppg || "-";
+        const menu = item.menuMbg || "-";
+        const nilaiGizi = item.nilaiGizi || "-";
+
+        return `
+          <div class="menu-mobile-card">
+            <div class="menu-mobile-head">
+              <div class="menu-mobile-sppg">${escapeHtml(sppg)}</div>
+              <div class="menu-mobile-date">${escapeHtml(formatTanggal(tanggal))}</div>
+            </div>
+
+            <div class="menu-mobile-body">
+              <div>
+                <div class="menu-mobile-label">Menu Makanan</div>
+                <div class="menu-mobile-value">${renderSafeMultiline(menu)}</div>
+              </div>
+
+              <div>
+                <div class="menu-mobile-label">Nilai / Jumlah Gizi</div>
+                <div class="menu-mobile-value">${renderSafeMultiline(nilaiGizi)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderSafeMultiline(value) {
+  return escapeHtml(value || "-").replace(/\n/g, "<br>");
+}
+    
     function renderGallery() {
       const rows = getFilteredRows();
       const gallery = document.getElementById("galleryGrid");
